@@ -1,4 +1,5 @@
 <?php
+
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -16,10 +17,10 @@
 
 /**
  * Schema sync endpoint for MoodleConnect.
- * 
+ *
  * Handles AJAX requests for syncing event schemas and checking connection status.
  * Also provides a standalone sync UI for advanced users.
- * 
+ *
  * @package    local_mc_plugin
  * @copyright  2025 Kerem Can Akdag
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -39,17 +40,17 @@ $action = optional_param('action', '', PARAM_ALPHA);
 // ========================================
 if ($action === 'status') {
     header('Content-Type: application/json');
-    
+
     $base_url = local_mc_plugin_get_api_url();
     $test_url = preg_replace('/\/api$/', '', $base_url);
-    
+
     $site_key = get_config('local_mc_plugin', 'site_key');
-    
+
     if (empty($site_key)) {
         echo json_encode(['configured' => false, 'connected' => false]);
         exit;
     }
-    
+
     // Check connection by calling the site status endpoint (with activate=true to auto-activate)
     $status_url = $base_url . '/sites/status?site_key=' . urlencode($site_key) . '&activate=true';
     $ch = curl_init($status_url);
@@ -59,7 +60,7 @@ if ($action === 'status') {
     $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     $curl_error = curl_error($ch);
     curl_close($ch);
-    
+
     if ($httpcode === 200 && $result) {
         $data = json_decode($result, true);
         echo json_encode([
@@ -72,8 +73,8 @@ if ($action === 'status') {
     } else {
         // Include debug info
         echo json_encode([
-            'configured' => true, 
-            'connected' => false, 
+            'configured' => true,
+            'connected' => false,
             'error' => 'Cannot reach MoodleConnect',
             'debug' => [
                 'url' => $status_url,
@@ -90,27 +91,27 @@ if ($action === 'status') {
 // ========================================
 if ($action === 'sync') {
     header('Content-Type: application/json');
-    
+
     $site_key = get_config('local_mc_plugin', 'site_key');
     $base_url = local_mc_plugin_get_api_url();
-    
+
     if (empty($site_key)) {
         echo json_encode(['success' => false, 'message' => get_string('error_no_site_key', 'local_mc_plugin')]);
         exit;
     }
-    
+
     $monitored_events = get_config('local_mc_plugin', 'monitored_events');
     $eventclasses = array_filter(array_map('trim', explode(',', $monitored_events)));
-    
+
     // Allow empty events - user may want to clear all monitored events
     $schemas = [];
     if (!empty($eventclasses)) {
         $inspector = new \local_mc_plugin\local\dynamic_inspector();
         $schemas = $inspector->get_event_schemas($eventclasses);
     }
-    
+
     $result = \local_mc_plugin\local\moodleconnect_client::sync_schema($schemas);
-    
+
     echo json_encode([
         'success' => $result['success'],
         'message' => $result['message'],
@@ -143,10 +144,10 @@ if (empty($site_key)) {
     );
 } else {
     $eventclasses = array_filter(array_map('trim', explode(',', $monitored_events)));
-    
+
     echo html_writer::tag('p', get_string('sync_site_key_label', 'local_mc_plugin', html_writer::tag('code', $site_key)));
     echo html_writer::tag('p', get_string('sync_monitored_events_label', 'local_mc_plugin', count($eventclasses)));
-    
+
     if (!empty($eventclasses)) {
         echo html_writer::start_tag('ul');
         foreach ($eventclasses as $event) {
@@ -154,7 +155,7 @@ if (empty($site_key)) {
         }
         echo html_writer::end_tag('ul');
     }
-    
+
     echo html_writer::start_div('mt-3');
     echo html_writer::link(
         new moodle_url('/admin/settings.php', ['section' => 'local_mc_plugin']),

@@ -1,4 +1,5 @@
 <?php
+
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -32,7 +33,8 @@ defined('MOODLE_INTERNAL') || die();
  * @param int $oldversion The version we are upgrading from
  * @return bool Always returns true
  */
-function xmldb_local_mc_plugin_upgrade($oldversion) {
+function xmldb_local_mc_plugin_upgrade($oldversion)
+{
     global $DB;
     $dbman = $DB->get_manager();
 

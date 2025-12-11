@@ -1,4 +1,5 @@
 <?php
+
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -58,8 +59,10 @@ $observers = \core\event\manager::get_all_observers();
 $our_observers = [];
 foreach ($observers as $eventname => $obs_list) {
     foreach ($obs_list as $obs) {
-        if (isset($obs['callable']) && is_array($obs['callable']) && 
-            strpos($obs['callable'][0] ?? '', 'local_mc_plugin') !== false) {
+        if (
+            isset($obs['callable']) && is_array($obs['callable']) &&
+            strpos($obs['callable'][0] ?? '', 'local_mc_plugin') !== false
+        ) {
             $our_observers[$eventname] = $obs;
         }
     }

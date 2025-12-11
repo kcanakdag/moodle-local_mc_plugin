@@ -1,0 +1,13 @@
+# PHP Code Sniffer tools
+phpcs.phar
+phpcbf.phar
+moodle-cs/
+CodeSniffer.conf
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store

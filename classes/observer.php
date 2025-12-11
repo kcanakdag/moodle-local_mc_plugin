@@ -1,4 +1,5 @@
 <?php
+
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -36,8 +37,8 @@ use local_mc_plugin\local\dynamic_inspector;
  * @copyright  2025 Kerem Can Akdag
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class observer {
-    
+class observer
+{
     /**
      * Generic handler for ALL events.
      *
@@ -48,25 +49,28 @@ class observer {
      * @param \core\event\base $event The Moodle event object
      * @return void
      */
-    public static function handle_event(\core\event\base $event) {
+    public static function handle_event(\core\event\base $event)
+    {
         global $CFG;
-        
+
         // Debug: log ALL events to file if debug mode is on
         if (get_config('local_mc_plugin', 'debug_mode')) {
             $logfile = $CFG->dataroot . '/moodleconnect_debug.log';
             $msg = date('Y-m-d H:i:s') . " | Event received: {$event->eventname}\n";
             @file_put_contents($logfile, $msg, FILE_APPEND);
         }
-        
+
         // Get monitored events (comma separated string from multiselect)
         $monitored_events_str = get_config('local_mc_plugin', 'monitored_events');
         $monitored_events = array_map('trim', explode(',', $monitored_events_str));
-        
+
         // Normalize event name - remove leading backslash for comparison
         // Event names from Moodle have leading \, but stored config may not
         $eventname_normalized = ltrim($event->eventname, '\\');
-        $monitored_normalized = array_map(function($e) { return ltrim($e, '\\'); }, $monitored_events);
-        
+        $monitored_normalized = array_map(function ($e) {
+            return ltrim($e, '\\');
+        }, $monitored_events);
+
         // Allow wildcard (for debugging) or check exact match
         if ($monitored_events_str !== '*' && !in_array($eventname_normalized, $monitored_normalized)) {
             return;
@@ -75,14 +79,14 @@ class observer {
         // Extract Data using the rich inspector
         $inspector = new dynamic_inspector();
         $payload = $inspector->extract_data($event);
-        
+
         // Send to MoodleConnect
         $result = moodleconnect_client::send_event($event->eventname, $payload);
 
         // Debug mode: show notification and console log
         if (get_config('local_mc_plugin', 'debug_mode')) {
             global $PAGE;
-            
+
             // Add console.log via inline JS
             $log_data = json_encode([
                 'event' => $event->eventname,
@@ -90,7 +94,7 @@ class observer {
                 'message' => $result['message'],
                 'timestamp' => date('c')
             ]);
-            
+
             try {
                 $PAGE->requires->js_amd_inline("
                     console.log('%c[MoodleConnect]', 'color: #4CAF50; font-weight: bold', {$log_data});
@@ -98,7 +102,7 @@ class observer {
             } catch (\Exception $e) {
                 // May fail if PAGE not ready
             }
-            
+
             // Also show notification
             try {
                 if ($result['success']) {
