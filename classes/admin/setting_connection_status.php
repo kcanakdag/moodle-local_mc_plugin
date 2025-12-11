@@ -33,16 +33,16 @@ require_once($CFG->libdir . '/adminlib.php');
  */
 class setting_connection_status extends \admin_setting {
     /** @var bool Whether the site is currently connected */
-    private $is_connected;
+    private $isconnected;
 
     /**
      * Constructor.
      *
      * @param string $name Unique setting name
-     * @param bool $is_connected Whether the site is currently connected
+     * @param bool $isconnected Whether the site is currently connected
      */
-    public function __construct($name, $is_connected) {
-        $this->is_connected = $is_connected;
+    public function __construct($name, $isconnected) {
+        $this->isconnected = $isconnected;
         parent::__construct($name, get_string('connection_status', 'local_mc_plugin'), '', '');
     }
 
@@ -73,9 +73,9 @@ class setting_connection_status extends \admin_setting {
      * @return string HTML output
      */
     public function output_html($data, $query = '') {
-        $sync_url = (new \moodle_url('/local/mc_plugin/sync_schema.php'))->out(false);
+        $syncurl = (new \moodle_url('/local/mc_plugin/sync_schema.php'))->out(false);
 
-        // Always show the dynamic status UI
+        // Always show the dynamic status UI.
         $html = '<div id="mc-connection-status">';
         $html .= '<div id="mc-status-display">';
         $html .= '<span id="mc-status-dot" style="color: #6c757d; margin-right: 6px;">●</span>';
@@ -86,7 +86,7 @@ class setting_connection_status extends \admin_setting {
         $html .= '<span id="mc-test-result" style="margin-left: 10px; font-size: 0.85em;"></span>';
         $html .= '</div>';
 
-        // Always include the JavaScript
+        // Always include the JavaScript.
         $html .= '
             <script>
             (function() {
@@ -95,23 +95,25 @@ class setting_connection_status extends \admin_setting {
                 var siteName = document.getElementById("mc-site-name");
                 var statusDot = document.getElementById("mc-status-dot");
                 var syncStatus = document.getElementById("mc-sync-status");
-                var syncUrl = "' . $sync_url . '";
-                
+                var syncUrl = "' . $syncurl . '";
+
                 function getSelectedEventCount() {
                     var eventsInput = document.querySelector("input[name=\"s_local_mc_plugin_monitored_events\"]");
                     if (!eventsInput || !eventsInput.value) return 0;
                     return eventsInput.value.split(",").filter(function(e) { return e.trim() !== ""; }).length;
                 }
-                
+
                 function getSelectedEvents() {
                     var eventsInput = document.querySelector("input[name=\"s_local_mc_plugin_monitored_events\"]");
                     if (!eventsInput || !eventsInput.value) return [];
-                    return eventsInput.value.split(",").map(function(e) { return e.trim(); }).filter(function(e) { return e !== ""; });
+                    return eventsInput.value.split(",").map(function(e) { return e.trim(); }).filter(function(e) {
+                        return e !== "";
+                    });
                 }
-                
+
                 function updateStatus(connected, siteName_val, syncedCount, syncedEvents, message) {
                     window.mcSyncedEvents = syncedEvents || [];
-                    
+
                     if (connected) {
                         statusDot.style.color = "#28a745";
                         statusText.style.color = "#155724";
@@ -120,28 +122,32 @@ class setting_connection_status extends \admin_setting {
                             siteName.textContent = "(" + siteName_val + ")";
                         }
                         testResult.innerHTML = "";
-                        
+
                         var selectedCount = getSelectedEventCount();
                         var selectedEvents = getSelectedEvents();
-                        
+
                         if (syncedCount === 0) {
                             syncStatus.innerHTML = "<span style=\"color: #856404;\">• Events not synced yet</span>";
                         } else if (syncedCount === selectedCount && syncedEvents) {
                             var allMatch = selectedEvents.every(function(e) { return syncedEvents.indexOf(e) >= 0; });
                             if (allMatch) {
-                                syncStatus.innerHTML = "<span style=\"color: #155724;\">• " + syncedCount + " events synced</span>";
+                                syncStatus.innerHTML = "<span style=\"color: #155724;\">• " + syncedCount +
+                                    " events synced</span>";
                             } else {
-                                syncStatus.innerHTML = "<span style=\"color: #856404;\">• Events changed, click Save & Sync</span>";
+                                syncStatus.innerHTML = "<span style=\"color: #856404;\">• Events changed, " +
+                                    "click Save & Sync</span>";
                             }
                         } else {
                             var diff = selectedCount - syncedCount;
                             if (diff > 0) {
-                                syncStatus.innerHTML = "<span style=\"color: #856404;\">• " + diff + " new event(s) to sync</span>";
+                                syncStatus.innerHTML = "<span style=\"color: #856404;\">• " + diff +
+                                    " new event(s) to sync</span>";
                             } else {
-                                syncStatus.innerHTML = "<span style=\"color: #856404;\">• Events changed, click Save & Sync</span>";
+                                syncStatus.innerHTML = "<span style=\"color: #856404;\">• Events changed, " +
+                                    "click Save & Sync</span>";
                             }
                         }
-                        
+
                         if (typeof window.mcUpdateEventCounter === "function") {
                             window.mcUpdateEventCounter();
                         }
@@ -151,19 +157,20 @@ class setting_connection_status extends \admin_setting {
                         statusText.textContent = "Not connected";
                         siteName.textContent = "";
                         syncStatus.textContent = "";
-                        testResult.innerHTML = "<span style=\"color: #dc3545;\">" + (message || "Connection failed") + "</span>";
+                        testResult.innerHTML = "<span style=\"color: #dc3545;\">" +
+                            (message || "Connection failed") + "</span>";
                     }
                 }
-                
 
-                
+
+
                 function testConnection() {
                     statusDot.style.color = "#6c757d";
                     statusText.style.color = "#6c757d";
                     statusText.textContent = "Checking...";
                     syncStatus.textContent = "";
                     testResult.innerHTML = "";
-                    
+
                     fetch(syncUrl + "?action=status", { method: "GET" })
                     .then(function(r) { return r.json(); })
                     .then(function(data) {
@@ -181,19 +188,19 @@ class setting_connection_status extends \admin_setting {
                         updateStatus(false, null, 0, [], err.message);
                     });
                 }
-                
-                // Expose testConnection globally so action buttons can call it
+
+                // Expose testConnection globally so action buttons can call it.
                 window.mcTestConnection = testConnection;
-                
-                // Expose function to update status with error message (for sync failures)
+
+                // Expose function to update status with error message (for sync failures).
                 window.mcUpdateStatusWithError = function(errorMessage) {
                     statusDot.style.color = "#dc3545";
                     statusText.style.color = "#721c24";
                     statusText.textContent = "Sync failed";
                     syncStatus.innerHTML = "<span style=\"color: #dc3545;\">• " + errorMessage + "</span>";
                 };
-                
-                // Initial check on page load
+
+                // Initial check on page load.
                 testConnection();
             })();
             </script>';

@@ -34,30 +34,28 @@ require_capability('moodle/site:config', context_system::instance());
 
 $action = optional_param('action', '', PARAM_ALPHA);
 
-// ========================================
-// AJAX: Check connection status
-// ========================================
+// AJAX: Check connection status.
 if ($action === 'status') {
     header('Content-Type: application/json');
 
-    $base_url = local_mc_plugin_get_api_url();
-    $test_url = preg_replace('/\/api$/', '', $base_url);
+    $baseurl = local_mc_plugin_get_api_url();
+    $testurl = preg_replace('/\/api$/', '', $baseurl);
 
-    $site_key = get_config('local_mc_plugin', 'site_key');
+    $sitekey = get_config('local_mc_plugin', 'site_key');
 
-    if (empty($site_key)) {
+    if (empty($sitekey)) {
         echo json_encode(['configured' => false, 'connected' => false]);
         exit;
     }
 
-    // Check connection by calling the site status endpoint (with activate=true to auto-activate)
-    $status_url = $base_url . '/sites/status?site_key=' . urlencode($site_key) . '&activate=true';
-    $ch = curl_init($status_url);
+    // Check connection by calling the site status endpoint (with activate=true to auto-activate).
+    $statusurl = $baseurl . '/sites/status?site_key=' . urlencode($sitekey) . '&activate=true';
+    $ch = curl_init($statusurl);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_TIMEOUT, 5);
     $result = curl_exec($ch);
     $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    $curl_error = curl_error($ch);
+    $curlerror = curl_error($ch);
     curl_close($ch);
 
     if ($httpcode === 200 && $result) {
@@ -70,39 +68,37 @@ if ($action === 'status') {
             'synced_events' => $data['synced_events'] ?? [],
         ]);
     } else {
-        // Include debug info
+        // Include debug info.
         echo json_encode([
             'configured' => true,
             'connected' => false,
             'error' => 'Cannot reach MoodleConnect',
             'debug' => [
-                'url' => $status_url,
+                'url' => $statusurl,
                 'http_code' => $httpcode,
-                'curl_error' => $curl_error,
+                'curl_error' => $curlerror,
             ],
         ]);
     }
     exit;
 }
 
-// ========================================
-// AJAX: Sync event schemas
-// ========================================
+// AJAX: Sync event schemas.
 if ($action === 'sync') {
     header('Content-Type: application/json');
 
-    $site_key = get_config('local_mc_plugin', 'site_key');
-    $base_url = local_mc_plugin_get_api_url();
+    $sitekey = get_config('local_mc_plugin', 'site_key');
+    $baseurl = local_mc_plugin_get_api_url();
 
-    if (empty($site_key)) {
+    if (empty($sitekey)) {
         echo json_encode(['success' => false, 'message' => get_string('error_no_site_key', 'local_mc_plugin')]);
         exit;
     }
 
-    $monitored_events = get_config('local_mc_plugin', 'monitored_events');
-    $eventclasses = array_filter(array_map('trim', explode(',', $monitored_events)));
+    $monitoredevents = get_config('local_mc_plugin', 'monitored_events');
+    $eventclasses = array_filter(array_map('trim', explode(',', $monitoredevents)));
 
-    // Allow empty events - user may want to clear all monitored events
+    // Allow empty events - user may want to clear all monitored events.
     $schemas = [];
     if (!empty($eventclasses)) {
         $inspector = new \local_mc_plugin\local\dynamic_inspector();
@@ -119,9 +115,7 @@ if ($action === 'sync') {
     exit;
 }
 
-// ========================================
-// Standalone Page UI (for direct access)
-// ========================================
+// Standalone Page UI (for direct access).
 $PAGE->set_url(new moodle_url('/local/mc_plugin/sync_schema.php'));
 $PAGE->set_context(context_system::instance());
 $PAGE->set_title(get_string('pluginname', 'local_mc_plugin') . ' - Sync');
@@ -131,10 +125,10 @@ $PAGE->set_pagelayout('admin');
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('sync_schema_heading', 'local_mc_plugin'));
 
-$site_key = get_config('local_mc_plugin', 'site_key');
-$monitored_events = get_config('local_mc_plugin', 'monitored_events');
+$sitekey = get_config('local_mc_plugin', 'site_key');
+$monitoredevents = get_config('local_mc_plugin', 'monitored_events');
 
-if (empty($site_key)) {
+if (empty($sitekey)) {
     echo $OUTPUT->notification(get_string('sync_configure_first', 'local_mc_plugin'), 'warning');
     echo html_writer::link(
         new moodle_url('/admin/settings.php', ['section' => 'local_mc_plugin']),
@@ -142,9 +136,9 @@ if (empty($site_key)) {
         ['class' => 'btn btn-primary']
     );
 } else {
-    $eventclasses = array_filter(array_map('trim', explode(',', $monitored_events)));
+    $eventclasses = array_filter(array_map('trim', explode(',', $monitoredevents)));
 
-    echo html_writer::tag('p', get_string('sync_site_key_label', 'local_mc_plugin', html_writer::tag('code', $site_key)));
+    echo html_writer::tag('p', get_string('sync_site_key_label', 'local_mc_plugin', html_writer::tag('code', $sitekey)));
     echo html_writer::tag('p', get_string('sync_monitored_events_label', 'local_mc_plugin', count($eventclasses)));
 
     if (!empty($eventclasses)) {

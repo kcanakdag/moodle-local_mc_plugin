@@ -24,8 +24,6 @@
 
 namespace local_mc_plugin\local;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Service class for dynamically inspecting events and extracting available data fields.
  */
@@ -102,8 +100,8 @@ class dynamic_inspector {
 
         try {
             $logevent = $DB->get_record_sql(
-                "SELECT * FROM {logstore_standard_log} 
-                 WHERE eventname = :eventname 
+                "SELECT * FROM {logstore_standard_log}
+                 WHERE eventname = :eventname
                  ORDER BY timecreated DESC",
                 ['eventname' => $eventclass],
                 IGNORE_MULTIPLE
@@ -113,7 +111,8 @@ class dynamic_inspector {
                 return $this->extract_fields_from_log($logevent, $eventclass);
             }
         } catch (\Exception $e) {
-            // Log table might not exist or query failed
+            // Log table might not exist or query failed - ignore.
+            unset($e);
         }
 
         return $this->get_mock_fields($eventclass);
@@ -151,7 +150,8 @@ class dynamic_inspector {
                     ];
                 }
             } catch (\Exception $e) {
-                // User not found
+                // User not found - ignore.
+                unset($e);
             }
         }
 
@@ -168,7 +168,8 @@ class dynamic_inspector {
                     ];
                 }
             } catch (\Exception $e) {
-                // Course not found
+                // Course not found - ignore.
+                unset($e);
             }
         }
 
@@ -190,7 +191,8 @@ class dynamic_inspector {
                     }
                 }
             } catch (\Exception $e) {
-                // Object not found
+                // Object not found - ignore.
+                unset($e);
             }
         }
 
@@ -234,6 +236,8 @@ class dynamic_inspector {
                     ];
                 }
             } catch (\Exception $e) {
+                // User not found - ignore.
+                unset($e);
             }
         }
 
@@ -250,6 +254,8 @@ class dynamic_inspector {
                     ];
                 }
             } catch (\Exception $e) {
+                // Course not found - ignore.
+                unset($e);
             }
         }
 
@@ -378,7 +384,11 @@ class dynamic_inspector {
                         return $event->objecttable;
                     }
                 } catch (\Exception $e) {
+                    // Event creation may fail for some event types - ignore.
+                    unset($e);
                 } catch (\Error $e) {
+                    // Event creation may fail for some event types - ignore.
+                    unset($e);
                 }
             }
 
@@ -391,10 +401,14 @@ class dynamic_inspector {
                             return $mapping['db'];
                         }
                     } catch (\Error $e) {
+                        // Method invocation may fail - ignore.
+                        unset($e);
                     }
                 }
             }
         } catch (\Exception $e) {
+            // Reflection may fail for some event types - ignore.
+            unset($e);
         }
 
         return null;
@@ -422,6 +436,8 @@ class dynamic_inspector {
                 ];
             }
         } catch (\Exception $e) {
+            // Table may not exist - ignore.
+            unset($e);
         }
 
         return $fields;
