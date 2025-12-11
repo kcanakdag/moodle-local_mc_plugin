@@ -95,7 +95,7 @@ if ($action === 'sync') {
     $base_url = local_mc_plugin_get_api_url();
     
     if (empty($site_key)) {
-        echo json_encode(['success' => false, 'message' => 'No site key configured']);
+        echo json_encode(['success' => false, 'message' => get_string('error_no_site_key', 'local_mc_plugin')]);
         exit;
     }
     
@@ -129,23 +129,23 @@ $PAGE->set_heading(get_string('pluginname', 'local_mc_plugin'));
 $PAGE->set_pagelayout('admin');
 
 echo $OUTPUT->header();
-echo $OUTPUT->heading('Event Schema Sync');
+echo $OUTPUT->heading(get_string('sync_schema_heading', 'local_mc_plugin'));
 
 $site_key = get_config('local_mc_plugin', 'site_key');
 $monitored_events = get_config('local_mc_plugin', 'monitored_events');
 
 if (empty($site_key)) {
-    echo $OUTPUT->notification('Please configure your Site Key in the plugin settings first.', 'warning');
+    echo $OUTPUT->notification(get_string('sync_configure_first', 'local_mc_plugin'), 'warning');
     echo html_writer::link(
         new moodle_url('/admin/settings.php', ['section' => 'local_mc_plugin']),
-        'Go to Settings',
+        get_string('sync_go_to_settings', 'local_mc_plugin'),
         ['class' => 'btn btn-primary']
     );
 } else {
     $eventclasses = array_filter(array_map('trim', explode(',', $monitored_events)));
     
-    echo html_writer::tag('p', 'Site Key: ' . html_writer::tag('code', $site_key));
-    echo html_writer::tag('p', 'Monitored Events: ' . count($eventclasses));
+    echo html_writer::tag('p', get_string('sync_site_key_label', 'local_mc_plugin', html_writer::tag('code', $site_key)));
+    echo html_writer::tag('p', get_string('sync_monitored_events_label', 'local_mc_plugin', count($eventclasses)));
     
     if (!empty($eventclasses)) {
         echo html_writer::start_tag('ul');
@@ -158,7 +158,7 @@ if (empty($site_key)) {
     echo html_writer::start_div('mt-3');
     echo html_writer::link(
         new moodle_url('/admin/settings.php', ['section' => 'local_mc_plugin']),
-        'Back to Settings',
+        get_string('sync_back_to_settings', 'local_mc_plugin'),
         ['class' => 'btn btn-secondary mr-2']
     );
     echo html_writer::end_div();

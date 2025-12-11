@@ -76,7 +76,7 @@ if ($action === 'init') {
     if ($result === false) {
         echo json_encode([
             'success' => false,
-            'message' => 'Connection failed: ' . $curl_error
+            'message' => get_string('error_connection_failed', 'local_mc_plugin', $curl_error)
         ]);
         exit;
     }
@@ -102,5 +102,5 @@ if ($action === 'init') {
 // Unknown action
 echo json_encode([
     'success' => false,
-    'message' => 'Unknown action: ' . $action
+    'message' => get_string('error_unknown_action', 'local_mc_plugin', $action)
 ]);

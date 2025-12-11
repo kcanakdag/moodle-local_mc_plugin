@@ -104,3 +104,60 @@ $string['privacy:metadata:moodleconnect_api:eventtype'] = 'The type of Moodle ev
 $string['privacy:metadata:moodleconnect_api:eventdata'] = 'Additional event-specific data that may include personal information depending on the event type and configuration.';
 $string['privacy:metadata:moodleconnect_api:timecreated'] = 'The timestamp when the event occurred in Moodle.';
 $string['privacy:export:note'] = 'This plugin does not store personal data locally in Moodle. Event data is transmitted to the MoodleConnect service (https://moodleconnect.com) for integration with external tools. To request export or deletion of data transmitted to MoodleConnect, please contact the service administrator or visit the MoodleConnect dashboard.';
+
+// Error messages
+$string['error_connection_failed'] = 'Connection failed: {$a}';
+$string['error_unknown_action'] = 'Unknown action: {$a}';
+$string['error_no_site_key'] = 'No site key configured';
+$string['error_missing_site_key'] = 'Missing Site Key';
+$string['error_missing_site_secret'] = 'Missing Site Secret';
+$string['error_invalid_site_key_format'] = 'Invalid site_key format';
+$string['error_invalid_site_secret_format'] = 'Invalid site_secret format';
+$string['error_loading_events'] = 'Error loading events: {$a}';
+
+// Success messages
+$string['success_settings_saved'] = 'Settings saved';
+$string['success_event_sent'] = 'MoodleConnect: Event \'{$a}\' sent successfully';
+$string['success'] = 'Success';
+$string['sent'] = 'Sent';
+$string['sent_async'] = 'Sent (async)';
+
+// Failure messages
+$string['failed_event_sent'] = 'MoodleConnect: Event \'{$a->event}\' failed - {$a->message}';
+
+// Sync schema page
+$string['sync_schema_heading'] = 'Event Schema Sync';
+$string['sync_configure_first'] = 'Please configure your Site Key in the plugin settings first.';
+$string['sync_go_to_settings'] = 'Go to Settings';
+$string['sync_site_key_label'] = 'Site Key: {$a}';
+$string['sync_monitored_events_label'] = 'Monitored Events: {$a}';
+$string['sync_back_to_settings'] = 'Back to Settings';
+
+// Debug page
+$string['debug_heading'] = 'MoodleConnect Debug';
+$string['debug_configuration'] = 'Configuration';
+$string['debug_setting'] = 'Setting';
+$string['debug_value'] = 'Value';
+$string['debug_api_url'] = 'API URL';
+$string['debug_not_set'] = 'Not set';
+$string['debug_site_key'] = 'Site Key';
+$string['debug_debug_mode'] = 'Debug Mode';
+$string['debug_on'] = 'ON';
+$string['debug_off'] = 'OFF';
+$string['debug_monitored_events'] = 'Monitored Events';
+$string['debug_none'] = 'None';
+$string['debug_event_observers'] = 'Event Observers';
+$string['debug_warning_no_observers'] = 'WARNING: No local_mc_plugin observers found! Did you purge caches?';
+$string['debug_found_observers'] = 'Found {$a} observer(s):';
+$string['debug_log'] = 'Debug Log';
+$string['debug_no_log_found'] = 'No debug log found at: {$a}';
+$string['debug_enable_mode'] = 'Enable debug mode and trigger an event to create the log.';
+
+// Event selection UI
+$string['event_search_placeholder'] = 'Search events...';
+$string['event_selected_count'] = '{$a} selected';
+$string['event_select_visible'] = 'Select Visible';
+$string['event_deselect_visible'] = 'Deselect Visible';
+$string['event_all_synced'] = 'all synced';
+$string['event_new'] = 'new';
+$string['event_removed'] = 'removed';

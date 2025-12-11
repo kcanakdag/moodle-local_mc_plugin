@@ -91,11 +91,11 @@ class moodleconnect_client {
         $site_secret = get_config('local_mc_plugin', 'site_secret');
         
         if (empty($site_key)) {
-            return ['success' => false, 'message' => 'Missing Site Key'];
+            return ['success' => false, 'message' => get_string('error_missing_site_key', 'local_mc_plugin')];
         }
         
         if (empty($site_secret)) {
-            return ['success' => false, 'message' => 'Missing Site Secret'];
+            return ['success' => false, 'message' => get_string('error_missing_site_secret', 'local_mc_plugin')];
         }
 
         $url = $base_url . '/events';
@@ -131,11 +131,11 @@ class moodleconnect_client {
         $site_secret = get_config('local_mc_plugin', 'site_secret');
         
         if (empty($site_key)) {
-            return ['success' => false, 'message' => 'Missing Site Key'];
+            return ['success' => false, 'message' => get_string('error_missing_site_key', 'local_mc_plugin')];
         }
         
         if (empty($site_secret)) {
-            return ['success' => false, 'message' => 'Missing Site Secret'];
+            return ['success' => false, 'message' => get_string('error_missing_site_secret', 'local_mc_plugin')];
         }
 
         $url = $base_url . '/events/schema';
@@ -186,11 +186,11 @@ class moodleconnect_client {
         curl_close($ch);
         
         if ($result === false) {
-            return ['success' => false, 'message' => 'Connection failed: ' . $curl_error];
+            return ['success' => false, 'message' => get_string('error_connection_failed', 'local_mc_plugin', $curl_error)];
         }
 
         if ($httpcode >= 200 && $httpcode < 300) {
-            return ['success' => true, 'message' => 'Success'];
+            return ['success' => true, 'message' => get_string('success', 'local_mc_plugin')];
         } else {
             return ['success' => false, 'message' => "HTTP $httpcode: $result"];
         }
@@ -227,9 +227,9 @@ class moodleconnect_client {
         curl_close($ch);
         
         if ($httpcode >= 200 && $httpcode < 300) {
-            return ['success' => true, 'message' => 'Sent'];
+            return ['success' => true, 'message' => get_string('sent', 'local_mc_plugin')];
         } else if ($httpcode == 0) {
-            return ['success' => true, 'message' => 'Sent (async)'];
+            return ['success' => true, 'message' => get_string('sent_async', 'local_mc_plugin')];
         } else {
             return ['success' => false, 'message' => "HTTP $httpcode"];
         }

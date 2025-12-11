@@ -44,7 +44,7 @@ class setting_event_selection extends \admin_setting_configtext {
         try {
             $events = $discovery->get_all_events();
         } catch (\Exception $e) {
-            return $OUTPUT->notification('Error loading events: ' . $e->getMessage(), 'notifyproblem');
+            return $OUTPUT->notification(get_string('error_loading_events', 'local_mc_plugin', $e->getMessage()), 'notifyproblem');
         }
 
         $grouped = [];
@@ -137,10 +137,10 @@ class setting_event_selection extends \admin_setting_configtext {
         $html .= '<div class="mc-event-selector-wrapper">';
         
         $html .= '<div class="mc-controls">';
-        $html .= '<input type="text" id="' . $id . '_search" class="mc-event-search" placeholder="Search events...">';
-        $html .= '<span id="' . $id . '_counter" style="font-size:0.9em;color:#666;min-width:100px;">0 selected</span>';
-        $html .= '<button type="button" id="' . $id . '_select_visible" class="mc-btn-small">Select Visible</button>';
-        $html .= '<button type="button" id="' . $id . '_deselect_visible" class="mc-btn-small">Deselect Visible</button>';
+        $html .= '<input type="text" id="' . $id . '_search" class="mc-event-search" placeholder="' . get_string('event_search_placeholder', 'local_mc_plugin') . '">';
+        $html .= '<span id="' . $id . '_counter" style="font-size:0.9em;color:#666;min-width:100px;">' . get_string('event_selected_count', 'local_mc_plugin', 0) . '</span>';
+        $html .= '<button type="button" id="' . $id . '_select_visible" class="mc-btn-small">' . get_string('event_select_visible', 'local_mc_plugin') . '</button>';
+        $html .= '<button type="button" id="' . $id . '_deselect_visible" class="mc-btn-small">' . get_string('event_deselect_visible', 'local_mc_plugin') . '</button>';
         $html .= '</div>';
 
         $html .= '<div class="mc-event-selector">';
@@ -170,6 +170,12 @@ class setting_event_selection extends \admin_setting_configtext {
 
         $html .= '</div></div>';
 
+        // Get language strings for JavaScript
+        $str_selected = get_string('event_selected_count', 'local_mc_plugin', '{COUNT}');
+        $str_all_synced = get_string('event_all_synced', 'local_mc_plugin');
+        $str_new = get_string('event_new', 'local_mc_plugin');
+        $str_removed = get_string('event_removed', 'local_mc_plugin');
+
         $html .= "
         <script>
         (function() {
@@ -179,6 +185,11 @@ class setting_event_selection extends \admin_setting_configtext {
             var selectBtn = document.getElementById(inputId + '_select_visible');
             var deselectBtn = document.getElementById(inputId + '_deselect_visible');
             var counter = document.getElementById(inputId + '_counter');
+            
+            var strSelected = '" . addslashes_js($str_selected) . "';
+            var strAllSynced = '" . addslashes_js($str_all_synced) . "';
+            var strNew = '" . addslashes_js($str_new) . "';
+            var strRemoved = '" . addslashes_js($str_removed) . "';
             
             function updateValue() {
                 var selected = [];
@@ -205,15 +216,15 @@ class setting_event_selection extends \admin_setting_configtext {
                     });
                     
                     if (toAdd === 0 && toRemove === 0) {
-                        counter.innerHTML = selected.length + ' selected <span style=\"color:#155724;\">• all synced</span>';
+                        counter.innerHTML = strSelected.replace('{COUNT}', selected.length) + ' <span style=\"color:#155724;\">• ' + strAllSynced + '</span>';
                     } else {
                         var changes = [];
-                        if (toAdd > 0) changes.push(toAdd + ' new');
-                        if (toRemove > 0) changes.push(toRemove + ' removed');
-                        counter.innerHTML = selected.length + ' selected <span style=\"color:#856404;\">• ' + changes.join(', ') + '</span>';
+                        if (toAdd > 0) changes.push(toAdd + ' ' + strNew);
+                        if (toRemove > 0) changes.push(toRemove + ' ' + strRemoved);
+                        counter.innerHTML = strSelected.replace('{COUNT}', selected.length) + ' <span style=\"color:#856404;\">• ' + changes.join(', ') + '</span>';
                     }
                 } else {
-                    counter.textContent = selected.length + ' selected';
+                    counter.textContent = strSelected.replace('{COUNT}', selected.length);
                 }
             }
             

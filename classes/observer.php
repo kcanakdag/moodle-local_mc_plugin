@@ -89,11 +89,14 @@ class observer {
             try {
                 if ($result['success']) {
                     \core\notification::success(
-                        "MoodleConnect: Event '{$event->eventname}' sent successfully"
+                        get_string('success_event_sent', 'local_mc_plugin', $event->eventname)
                     );
                 } else {
                     \core\notification::error(
-                        "MoodleConnect: Event '{$event->eventname}' failed - {$result['message']}"
+                        get_string('failed_event_sent', 'local_mc_plugin', [
+                            'event' => $event->eventname,
+                            'message' => $result['message']
+                        ])
                     );
                 }
             } catch (\Exception $e) {

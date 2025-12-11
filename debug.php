@@ -30,8 +30,8 @@ use local_mc_plugin\local\moodleconnect_client;
 
 $PAGE->set_url(new moodle_url('/local/mc_plugin/debug.php'));
 $PAGE->set_context(context_system::instance());
-$PAGE->set_title('MoodleConnect Debug');
-$PAGE->set_heading('MoodleConnect Debug');
+$PAGE->set_title(get_string('debug_heading', 'local_mc_plugin'));
+$PAGE->set_heading(get_string('debug_heading', 'local_mc_plugin'));
 
 echo $OUTPUT->header();
 
@@ -41,17 +41,17 @@ $site_key = get_config('local_mc_plugin', 'site_key');
 $monitored_events = get_config('local_mc_plugin', 'monitored_events');
 $debug_mode = get_config('local_mc_plugin', 'debug_mode');
 
-echo '<h3>Configuration</h3>';
+echo '<h3>' . get_string('debug_configuration', 'local_mc_plugin') . '</h3>';
 echo '<table class="generaltable">';
-echo '<tr><th>Setting</th><th>Value</th></tr>';
-echo '<tr><td>API URL</td><td>' . (local_mc_plugin_get_api_url() ?: '<em>Not set</em>') . '</td></tr>';
-echo '<tr><td>Site Key</td><td>' . ($site_key ?: '<em>Not set</em>') . '</td></tr>';
-echo '<tr><td>Debug Mode</td><td>' . ($debug_mode ? 'ON' : 'OFF') . '</td></tr>';
-echo '<tr><td>Monitored Events</td><td>' . ($monitored_events ?: '<em>None</em>') . '</td></tr>';
+echo '<tr><th>' . get_string('debug_setting', 'local_mc_plugin') . '</th><th>' . get_string('debug_value', 'local_mc_plugin') . '</th></tr>';
+echo '<tr><td>' . get_string('debug_api_url', 'local_mc_plugin') . '</td><td>' . (local_mc_plugin_get_api_url() ?: '<em>' . get_string('debug_not_set', 'local_mc_plugin') . '</em>') . '</td></tr>';
+echo '<tr><td>' . get_string('debug_site_key', 'local_mc_plugin') . '</td><td>' . ($site_key ?: '<em>' . get_string('debug_not_set', 'local_mc_plugin') . '</em>') . '</td></tr>';
+echo '<tr><td>' . get_string('debug_debug_mode', 'local_mc_plugin') . '</td><td>' . ($debug_mode ? get_string('debug_on', 'local_mc_plugin') : get_string('debug_off', 'local_mc_plugin')) . '</td></tr>';
+echo '<tr><td>' . get_string('debug_monitored_events', 'local_mc_plugin') . '</td><td>' . ($monitored_events ?: '<em>' . get_string('debug_none', 'local_mc_plugin') . '</em>') . '</td></tr>';
 echo '</table>';
 
 // Check event observers
-echo '<h3>Event Observers</h3>';
+echo '<h3>' . get_string('debug_event_observers', 'local_mc_plugin') . '</h3>';
 $observers = \core\event\manager::get_all_observers();
 
 // Find our observers
@@ -66,9 +66,9 @@ foreach ($observers as $eventname => $obs_list) {
 }
 
 if (empty($our_observers)) {
-    echo '<p style="color:red;"><strong>WARNING:</strong> No local_mc_plugin observers found! Did you purge caches?</p>';
+    echo '<p style="color:red;"><strong>' . get_string('debug_warning_no_observers', 'local_mc_plugin') . '</strong></p>';
 } else {
-    echo '<p style="color:green;"><strong>Found ' . count($our_observers) . ' observer(s):</strong></p>';
+    echo '<p style="color:green;"><strong>' . get_string('debug_found_observers', 'local_mc_plugin', count($our_observers)) . '</strong></p>';
     echo '<ul>';
     foreach ($our_observers as $eventname => $obs) {
         echo '<li>' . $eventname . ' → ' . print_r($obs['callable'], true) . '</li>';
@@ -77,7 +77,7 @@ if (empty($our_observers)) {
 }
 
 // Debug log location
-echo '<h3>Debug Log</h3>';
+echo '<h3>' . get_string('debug_log', 'local_mc_plugin') . '</h3>';
 $logfile = $CFG->dataroot . '/moodleconnect_debug.log';
 if (file_exists($logfile)) {
     $log_content = file_get_contents($logfile);
@@ -87,8 +87,8 @@ if (file_exists($logfile)) {
     echo htmlspecialchars(implode("\n", $recent));
     echo '</pre>';
 } else {
-    echo '<p>No debug log found at: ' . $logfile . '</p>';
-    echo '<p>Enable debug mode and trigger an event to create the log.</p>';
+    echo '<p>' . get_string('debug_no_log_found', 'local_mc_plugin', $logfile) . '</p>';
+    echo '<p>' . get_string('debug_enable_mode', 'local_mc_plugin') . '</p>';
 }
 
 echo $OUTPUT->footer();

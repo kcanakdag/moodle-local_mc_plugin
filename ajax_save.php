@@ -36,11 +36,11 @@ $site_secret = optional_param('site_secret', null, PARAM_RAW);
 
 // Validate site_key and site_secret format (base64url: alphanumeric, -, _)
 if ($site_key !== null && !preg_match('/^[A-Za-z0-9_-]+$/', $site_key)) {
-    echo json_encode(['success' => false, 'message' => 'Invalid site_key format']);
+    echo json_encode(['success' => false, 'message' => get_string('error_invalid_site_key_format', 'local_mc_plugin')]);
     exit;
 }
 if ($site_secret !== null && !preg_match('/^[A-Za-z0-9_-]+$/', $site_secret)) {
-    echo json_encode(['success' => false, 'message' => 'Invalid site_secret format']);
+    echo json_encode(['success' => false, 'message' => get_string('error_invalid_site_secret_format', 'local_mc_plugin')]);
     exit;
 }
 $monitored_events = optional_param('monitored_events', null, PARAM_RAW);
@@ -71,12 +71,12 @@ if ($action === 'save') {
     
     echo json_encode([
         'success' => true,
-        'message' => 'Settings saved',
+        'message' => get_string('success_settings_saved', 'local_mc_plugin'),
         'saved' => $saved
     ]);
 } else {
     echo json_encode([
         'success' => false,
-        'message' => 'Unknown action'
+        'message' => get_string('error_unknown_action', 'local_mc_plugin', $action)
     ]);
 }
