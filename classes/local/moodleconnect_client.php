@@ -28,6 +28,13 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once(__DIR__ . '/../../lib.php');
 
+/**
+ * MoodleConnect API client for sending events and syncing schemas.
+ *
+ * @package    local_mc_plugin
+ * @copyright  2025 Kerem Can Akdag
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class moodleconnect_client
 {
     /**
@@ -41,10 +48,10 @@ class moodleconnect_client
             return $data;
         }
 
-        // Check if it's an associative array (object in JSON terms)
-        $is_assoc = array_keys($data) !== range(0, count($data) - 1);
+        // Check if it's an associative array (object in JSON terms).
+        $isassoc = array_keys($data) !== range(0, count($data) - 1);
 
-        if ($is_assoc) {
+        if ($isassoc) {
             ksort($data);
         }
 
@@ -63,58 +70,58 @@ class moodleconnect_client
      *
      * @param int $timestamp Unix timestamp
      * @param array $payload Request payload (will be JSON encoded)
-     * @param string $site_secret The site secret for signing
+     * @param string $sitesecret The site secret for signing
      * @return string Hex-encoded HMAC signature
      */
-    private static function compute_signature($timestamp, $payload, $site_secret) {
+    private static function compute_signature($timestamp, $payload, $sitesecret) {
         global $CFG;
 
-        // Sort keys recursively for consistent signature computation
-        $sorted_payload = self::sort_keys_recursive($payload);
-        // Use compact JSON format (no spaces) to match backend
-        $json_payload = json_encode($sorted_payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-        $message = $timestamp . '.' . $json_payload;
+        // Sort keys recursively for consistent signature computation.
+        $sortedpayload = self::sort_keys_recursive($payload);
+        // Use compact JSON format (no spaces) to match backend.
+        $jsonpayload = json_encode($sortedpayload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        $message = $timestamp . '.' . $jsonpayload;
 
-        return hash_hmac('sha256', $message, $site_secret);
+        return hash_hmac('sha256', $message, $sitesecret);
     }
 
     /**
-     * Send event to MoodleConnect (fire-and-forget, non-blocking)
+     * Send event to MoodleConnect (fire-and-forget, non-blocking).
      *
-     * @param string $event_type
-     * @param array $data
+     * @param string $eventtype Event type
+     * @param array $data Event data
      * @return array ['success' => bool, 'message' => string]
      */
-    public static function send_event($event_type, $data) {
-        $base_url = local_mc_plugin_get_api_url();
-        $site_key = get_config('local_mc_plugin', 'site_key');
-        $site_secret = get_config('local_mc_plugin', 'site_secret');
+    public static function send_event($eventtype, $data) {
+        $baseurl = local_mc_plugin_get_api_url();
+        $sitekey = get_config('local_mc_plugin', 'site_key');
+        $sitesecret = get_config('local_mc_plugin', 'site_secret');
 
-        if (empty($site_key)) {
+        if (empty($sitekey)) {
             return ['success' => false, 'message' => get_string('error_missing_site_key', 'local_mc_plugin')];
         }
 
-        if (empty($site_secret)) {
+        if (empty($sitesecret)) {
             return ['success' => false, 'message' => get_string('error_missing_site_secret', 'local_mc_plugin')];
         }
 
-        $url = $base_url . '/events';
+        $url = $baseurl . '/events';
         $timestamp = time();
 
         $payload = [
-            'site_key' => $site_key,
-            'event_type' => $event_type,
+            'site_key' => $sitekey,
+            'event_type' => $eventtype,
             'data' => $data,
         ];
 
-        // Compute HMAC signature
-        $signature = self::compute_signature($timestamp, $payload, $site_secret);
+        // Compute HMAC signature.
+        $signature = self::compute_signature($timestamp, $payload, $sitesecret);
 
-        // Add signature and timestamp to payload
+        // Add signature and timestamp to payload.
         $payload['signature'] = $signature;
         $payload['timestamp'] = $timestamp;
 
-        // Use fire-and-forget for events to not block page load
+        // Use fire-and-forget for events to not block page load.
         return self::post_json_async($url, $payload);
     }
 
@@ -126,30 +133,30 @@ class moodleconnect_client
      * @return array ['success' => bool, 'message' => string]
      */
     public static function sync_schema($events) {
-        $base_url = local_mc_plugin_get_api_url();
-        $site_key = get_config('local_mc_plugin', 'site_key');
-        $site_secret = get_config('local_mc_plugin', 'site_secret');
+        $baseurl = local_mc_plugin_get_api_url();
+        $sitekey = get_config('local_mc_plugin', 'site_key');
+        $sitesecret = get_config('local_mc_plugin', 'site_secret');
 
-        if (empty($site_key)) {
+        if (empty($sitekey)) {
             return ['success' => false, 'message' => get_string('error_missing_site_key', 'local_mc_plugin')];
         }
 
-        if (empty($site_secret)) {
+        if (empty($sitesecret)) {
             return ['success' => false, 'message' => get_string('error_missing_site_secret', 'local_mc_plugin')];
         }
 
-        $url = $base_url . '/events/schema';
+        $url = $baseurl . '/events/schema';
         $timestamp = time();
 
         $payload = [
-            'site_key' => $site_key,
+            'site_key' => $sitekey,
             'events' => $events,
         ];
 
-        // Compute HMAC signature
-        $signature = self::compute_signature($timestamp, $payload, $site_secret);
+        // Compute HMAC signature.
+        $signature = self::compute_signature($timestamp, $payload, $sitesecret);
 
-        // Add signature and timestamp to payload
+        // Add signature and timestamp to payload.
         $payload['signature'] = $signature;
         $payload['timestamp'] = $timestamp;
 
@@ -157,17 +164,17 @@ class moodleconnect_client
     }
 
     /**
-     * Helper to POST JSON data (blocking, waits for response)
+     * Helper to POST JSON data (blocking, waits for response).
      *
-     * @param string $url
-     * @param array $payload
+     * @param string $url URL to post to
+     * @param array $payload Payload data
      * @param int $timeout Timeout in seconds
      * @return array ['success' => bool, 'message' => string]
      */
     private static function post_json($url, $payload, $timeout = 10) {
-        // Sort keys and use same JSON flags as signature computation
-        $sorted_payload = self::sort_keys_recursive($payload);
-        $json = json_encode($sorted_payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        // Sort keys and use same JSON flags as signature computation.
+        $sortedpayload = self::sort_keys_recursive($payload);
+        $json = json_encode($sortedpayload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
@@ -182,11 +189,11 @@ class moodleconnect_client
 
         $result = curl_exec($ch);
         $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        $curl_error = curl_error($ch);
+        $curlerror = curl_error($ch);
         curl_close($ch);
 
         if ($result === false) {
-            return ['success' => false, 'message' => get_string('error_connection_failed', 'local_mc_plugin', $curl_error)];
+            return ['success' => false, 'message' => get_string('error_connection_failed', 'local_mc_plugin', $curlerror)];
         }
 
         if ($httpcode >= 200 && $httpcode < 300) {
@@ -197,17 +204,17 @@ class moodleconnect_client
     }
 
     /**
-     * Fire-and-forget POST - sends request without waiting for response
-     * Uses very short timeout to minimize blocking
+     * Fire-and-forget POST - sends request without waiting for response.
+     * Uses very short timeout to minimize blocking.
      *
-     * @param string $url
-     * @param array $payload
+     * @param string $url URL to post to
+     * @param array $payload Payload data
      * @return array ['success' => bool, 'message' => string]
      */
     private static function post_json_async($url, $payload) {
-        // Sort keys and use same JSON flags as signature computation
-        $sorted_payload = self::sort_keys_recursive($payload);
-        $json = json_encode($sorted_payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        // Sort keys and use same JSON flags as signature computation.
+        $sortedpayload = self::sort_keys_recursive($payload);
+        $json = json_encode($sortedpayload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");

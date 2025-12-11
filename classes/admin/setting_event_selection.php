@@ -61,8 +61,8 @@ class setting_event_selection extends \admin_setting_configtext {
     public function output_html($data, $query = '') {
         global $OUTPUT, $PAGE;
 
-        $selected_list = array_map('trim', explode(',', $data));
-        $selected_map = array_flip($selected_list);
+        $selectedlist = array_map('trim', explode(',', $data));
+        $selectedmap = array_flip($selectedlist);
 
         $discovery = new \local_mc_plugin\local\event_discovery();
         try {
@@ -161,28 +161,34 @@ class setting_event_selection extends \admin_setting_configtext {
         $html .= '<div class="mc-event-selector-wrapper">';
 
         $html .= '<div class="mc-controls">';
-        $html .= '<input type="text" id="' . $id . '_search" class="mc-event-search" placeholder="' . get_string('event_search_placeholder', 'local_mc_plugin') . '">';
-        $html .= '<span id="' . $id . '_counter" style="font-size:0.9em;color:#666;min-width:100px;">' . get_string('event_selected_count', 'local_mc_plugin', 0) . '</span>';
-        $html .= '<button type="button" id="' . $id . '_select_visible" class="mc-btn-small">' . get_string('event_select_visible', 'local_mc_plugin') . '</button>';
-        $html .= '<button type="button" id="' . $id . '_deselect_visible" class="mc-btn-small">' . get_string('event_deselect_visible', 'local_mc_plugin') . '</button>';
+        $html .= '<input type="text" id="' . $id . '_search" class="mc-event-search" ' .
+            'placeholder="' . get_string('event_search_placeholder', 'local_mc_plugin') . '">';
+        $html .= '<span id="' . $id . '_counter" style="font-size:0.9em;color:#666;min-width:100px;">' .
+            get_string('event_selected_count', 'local_mc_plugin', 0) . '</span>';
+        $html .= '<button type="button" id="' . $id . '_select_visible" class="mc-btn-small">' .
+            get_string('event_select_visible', 'local_mc_plugin') . '</button>';
+        $html .= '<button type="button" id="' . $id . '_deselect_visible" class="mc-btn-small">' .
+            get_string('event_deselect_visible', 'local_mc_plugin') . '</button>';
         $html .= '</div>';
 
         $html .= '<div class="mc-event-selector">';
 
-        foreach ($grouped as $category => $cat_events) {
-            $cat_label = ($category === 'core') ? 'Core' : str_replace('_', ' ', $category);
-            $cat_label = ucwords($cat_label);
+        foreach ($grouped as $category => $catevents) {
+            $catlabel = ($category === 'core') ? 'Core' : str_replace('_', ' ', $category);
+            $catlabel = ucwords($catlabel);
 
             $html .= '<div class="mc-category">';
-            $html .= '<div class="mc-category-title">' . $cat_label . ' <small>(' . count($cat_events) . ')</small></div>';
+            $html .= '<div class="mc-category-title">' . $catlabel .
+                ' <small>(' . count($catevents) . ')</small></div>';
             $html .= '<div class="mc-category-events">';
 
-            foreach ($cat_events as $event) {
-                $checked = isset($selected_map[$event['class']]) ? 'checked' : '';
-                $escaped_class = htmlspecialchars($event['class'], ENT_QUOTES, 'UTF-8');
+            foreach ($catevents as $event) {
+                $checked = isset($selectedmap[$event['class']]) ? 'checked' : '';
+                $escapedclass = htmlspecialchars($event['class'], ENT_QUOTES, 'UTF-8');
 
                 $html .= '<div class="mc-event-item">';
-                $html .= '<input type="checkbox" class="event-checkbox" data-class="' . $escaped_class . '" ' . $checked . '>';
+                $html .= '<input type="checkbox" class="event-checkbox" data-class="' .
+                    $escapedclass . '" ' . $checked . '>';
                 $html .= '<label>' . s($event['name']);
                 $html .= '<span class="mc-event-class">' . s($event['class']) . '</span>';
                 $html .= '</label>';
@@ -194,11 +200,11 @@ class setting_event_selection extends \admin_setting_configtext {
 
         $html .= '</div></div>';
 
-        // Get language strings for JavaScript
-        $str_selected = get_string('event_selected_count', 'local_mc_plugin', '{COUNT}');
-        $str_all_synced = get_string('event_all_synced', 'local_mc_plugin');
-        $str_new = get_string('event_new', 'local_mc_plugin');
-        $str_removed = get_string('event_removed', 'local_mc_plugin');
+        // Get language strings for JavaScript.
+        $strselected = get_string('event_selected_count', 'local_mc_plugin', '{COUNT}');
+        $strallsynced = get_string('event_all_synced', 'local_mc_plugin');
+        $strnew = get_string('event_new', 'local_mc_plugin');
+        $strremoved = get_string('event_removed', 'local_mc_plugin');
 
         $html .= "
         <script>
@@ -209,21 +215,21 @@ class setting_event_selection extends \admin_setting_configtext {
             var selectBtn = document.getElementById(inputId + '_select_visible');
             var deselectBtn = document.getElementById(inputId + '_deselect_visible');
             var counter = document.getElementById(inputId + '_counter');
-            
-            var strSelected = '" . addslashes_js($str_selected) . "';
-            var strAllSynced = '" . addslashes_js($str_all_synced) . "';
-            var strNew = '" . addslashes_js($str_new) . "';
-            var strRemoved = '" . addslashes_js($str_removed) . "';
-            
+
+            var strSelected = '" . addslashes_js($strselected) . "';
+            var strAllSynced = '" . addslashes_js($strallsynced) . "';
+            var strNew = '" . addslashes_js($strnew) . "';
+            var strRemoved = '" . addslashes_js($strremoved) . "';
+
             function updateValue() {
                 var selected = [];
                 document.querySelectorAll('.event-checkbox:checked').forEach(function(cb) {
                     selected.push(cb.getAttribute('data-class'));
                 });
                 hiddenInput.value = selected.join(',');
-                
+
                 var syncedEvents = window.mcSyncedEvents || [];
-                
+
                 if (syncedEvents.length > 0) {
                     var toAdd = 0;
                     selected.forEach(function(evt) {
@@ -231,27 +237,29 @@ class setting_event_selection extends \admin_setting_configtext {
                             toAdd++;
                         }
                     });
-                    
+
                     var toRemove = 0;
                     syncedEvents.forEach(function(evt) {
                         if (selected.indexOf(evt) < 0) {
                             toRemove++;
                         }
                     });
-                    
+
                     if (toAdd === 0 && toRemove === 0) {
-                        counter.innerHTML = strSelected.replace('{COUNT}', selected.length) + ' <span style=\"color:#155724;\">• ' + strAllSynced + '</span>';
+                        counter.innerHTML = strSelected.replace('{COUNT}', selected.length) +
+                            ' <span style=\"color:#155724;\">• ' + strAllSynced + '</span>';
                     } else {
                         var changes = [];
                         if (toAdd > 0) changes.push(toAdd + ' ' + strNew);
                         if (toRemove > 0) changes.push(toRemove + ' ' + strRemoved);
-                        counter.innerHTML = strSelected.replace('{COUNT}', selected.length) + ' <span style=\"color:#856404;\">• ' + changes.join(', ') + '</span>';
+                        counter.innerHTML = strSelected.replace('{COUNT}', selected.length) +
+                            ' <span style=\"color:#856404;\">• ' + changes.join(', ') + '</span>';
                     }
                 } else {
                     counter.textContent = strSelected.replace('{COUNT}', selected.length);
                 }
             }
-            
+
             window.mcUpdateEventCounter = updateValue;
             updateValue();
 
@@ -270,7 +278,7 @@ class setting_event_selection extends \admin_setting_configtext {
 
             searchInput.addEventListener('keyup', function() {
                 var term = this.value.toLowerCase();
-                
+
                 document.querySelectorAll('.mc-event-item').forEach(function(item) {
                     var text = item.textContent.toLowerCase();
                     if (text.indexOf(term) > -1) {
@@ -291,16 +299,18 @@ class setting_event_selection extends \admin_setting_configtext {
             });
 
             selectBtn.addEventListener('click', function() {
-                document.querySelectorAll('.mc-event-item:not(.mc-hidden) .event-checkbox').forEach(function(cb) {
-                    cb.checked = true;
-                });
+                document.querySelectorAll('.mc-event-item:not(.mc-hidden) .event-checkbox')
+                    .forEach(function(cb) {
+                        cb.checked = true;
+                    });
                 updateValue();
             });
 
             deselectBtn.addEventListener('click', function() {
-                document.querySelectorAll('.mc-event-item:not(.mc-hidden) .event-checkbox').forEach(function(cb) {
-                    cb.checked = false;
-                });
+                document.querySelectorAll('.mc-event-item:not(.mc-hidden) .event-checkbox')
+                    .forEach(function(cb) {
+                        cb.checked = false;
+                    });
                 updateValue();
             });
         })();
