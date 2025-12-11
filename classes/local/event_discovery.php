@@ -211,6 +211,9 @@ class event_discovery {
 
     /**
      * Convert event class name to friendly readable name.
+     *
+     * @param string $eventclass The fully qualified event class name.
+     * @return string The friendly readable name.
      */
     public static function get_friendly_name(string $eventclass): string {
         $parts = explode('\\', $eventclass);
