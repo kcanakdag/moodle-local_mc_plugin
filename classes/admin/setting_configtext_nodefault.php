@@ -32,7 +32,6 @@ require_once($CFG->libdir . '/adminlib.php');
  * Text config setting that doesn't show "Default: Empty".
  */
 class setting_configtext_nodefault extends \admin_setting_configtext {
-
     /**
      * Returns the HTML for this setting.
      *
@@ -56,7 +55,7 @@ class setting_configtext_nodefault extends \admin_setting_configtext {
         ];
         $element = $OUTPUT->render_from_template('core_admin/setting_configtext', $context);
 
-        // Pass null for defaultinfo to hide "Default: Empty"
+        // Pass null for defaultinfo to hide "Default: Empty".
         return format_admin_setting($this, $this->visiblename, $element, $this->description, true, '', null, $query);
     }
 }

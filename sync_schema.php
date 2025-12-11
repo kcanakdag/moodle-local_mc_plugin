@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -68,7 +67,7 @@ if ($action === 'status') {
             'connected' => true,
             'site_name' => $data['site_name'] ?? null,
             'synced_event_count' => $data['synced_event_count'] ?? 0,
-            'synced_events' => $data['synced_events'] ?? []
+            'synced_events' => $data['synced_events'] ?? [],
         ]);
     } else {
         // Include debug info
@@ -79,8 +78,8 @@ if ($action === 'status') {
             'debug' => [
                 'url' => $status_url,
                 'http_code' => $httpcode,
-                'curl_error' => $curl_error
-            ]
+                'curl_error' => $curl_error,
+            ],
         ]);
     }
     exit;
@@ -115,7 +114,7 @@ if ($action === 'sync') {
     echo json_encode([
         'success' => $result['success'],
         'message' => $result['message'],
-        'event_count' => count($schemas)
+        'event_count' => count($schemas),
     ]);
     exit;
 }

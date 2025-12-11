@@ -35,19 +35,18 @@ require_once($CFG->dirroot . '/local/mc_plugin/lib.php');
  * and handles the OAuth-style connection flow with polling.
  */
 class setting_connect_button extends \admin_setting {
-
     /** @var bool Whether the site is currently connected */
     private $is_connected;
-    
+
     /** @var string URL to the connect.php endpoint */
     private $connect_url;
-    
+
     /** @var string URL to the ajax_save.php endpoint */
     private $ajax_save_url;
-    
+
     /** @var string MoodleConnect API base URL */
     private $api_url;
-    
+
     /** @var string Session key for CSRF protection */
     private $sesskey;
 
@@ -59,13 +58,13 @@ class setting_connect_button extends \admin_setting {
      */
     public function __construct($name, $is_connected) {
         global $CFG;
-        
+
         $this->is_connected = $is_connected;
         $this->connect_url = (new \moodle_url('/local/mc_plugin/connect.php'))->out(false);
         $this->ajax_save_url = (new \moodle_url('/local/mc_plugin/ajax_save.php'))->out(false);
         $this->api_url = local_mc_plugin_get_api_url();
         $this->sesskey = sesskey();
-        
+
         parent::__construct($name, '', '', '');
     }
 
@@ -99,10 +98,10 @@ class setting_connect_button extends \admin_setting {
         $connect_label = get_string('connect_button', 'local_mc_plugin');
         $reconnect_label = get_string('reconnect_button', 'local_mc_plugin');
         $btn_label = $this->is_connected ? $reconnect_label : $connect_label;
-        
+
         // Get frontend URL (supports separate config for development)
         $frontend_url = local_mc_plugin_get_frontend_url();
-        
+
         $html = '
         <div class="form-item row" id="moodleconnect-connect-section">
             <div class="form-label col-sm-3">
@@ -315,7 +314,7 @@ class setting_connect_button extends \admin_setting {
             connectBtn.addEventListener("click", startConnection);
         })();
         </script>';
-        
+
         return $html;
     }
 }

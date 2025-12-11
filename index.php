@@ -28,5 +28,5 @@ require_once($CFG->libdir . '/adminlib.php');
 require_login();
 require_capability('local/mc_plugin:manage', context_system::instance());
 
-// Redirect to the settings page
+// Redirect to the settings page.
 redirect(new moodle_url('/admin/settings.php', ['section' => 'local_mc_plugin']));

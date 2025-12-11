@@ -36,7 +36,6 @@ require_once($CFG->libdir . '/adminlib.php');
  * that are managed automatically via the OAuth connection flow.
  */
 class setting_readonly_text extends \admin_setting {
-
     /** @var bool Whether to mask the value (show asterisks) */
     protected $masked;
 
@@ -69,7 +68,7 @@ class setting_readonly_text extends \admin_setting {
      * @return string Empty string (no error)
      */
     public function write_setting($data) {
-        // Read-only setting, don't write anything
+        // Read-only setting, don't write anything.
         return '';
     }
 
@@ -81,21 +80,21 @@ class setting_readonly_text extends \admin_setting {
      * @return string HTML output
      */
     public function output_html($data, $query = '') {
-        $displayValue = $data;
-        
+        $displayvalue = $data;
+
         if ($this->masked && !empty($data)) {
-            // Show first 4 chars, then asterisks, then last 4 chars
+            // Show first 4 chars, then asterisks, then last 4 chars.
             $len = strlen($data);
             if ($len > 12) {
-                $displayValue = substr($data, 0, 4) . str_repeat('•', min($len - 8, 16)) . substr($data, -4);
+                $displayvalue = substr($data, 0, 4) . str_repeat('•', min($len - 8, 16)) . substr($data, -4);
             } else {
-                $displayValue = str_repeat('•', $len);
+                $displayvalue = str_repeat('•', $len);
             }
         }
-        
+
         $html = '<div class="form-text defaultsnext">';
         $html .= '<code style="padding: 4px 8px; background: #f5f5f5; border-radius: 4px; font-family: monospace;">';
-        $html .= s($displayValue);
+        $html .= s($displayvalue);
         $html .= '</code>';
         $html .= '</div>';
 

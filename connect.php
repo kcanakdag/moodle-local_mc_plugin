@@ -16,11 +16,11 @@
 
 /**
  * AJAX endpoint for OAuth-style connection flow.
- * 
+ *
  * This endpoint handles:
  * - Generating connection tokens via POST to MoodleConnect /connect/init
  * - Returning the token to JavaScript for the polling flow
- * 
+ *
  * @package    local_mc_plugin
  * @copyright  2025 Kerem Can Akdag
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -45,18 +45,18 @@ if ($action === 'init') {
     // Generate a connection token by calling MoodleConnect API
     $base_url = local_mc_plugin_get_api_url();
     $init_url = $base_url . '/connect/init';
-    
+
     // Get Moodle site info
     $moodle_url = $CFG->wwwroot;
     $moodle_site_name = $SITE->fullname;
-    
+
     $payload = [
         'moodle_url' => $moodle_url,
-        'moodle_site_name' => $moodle_site_name
+        'moodle_site_name' => $moodle_site_name,
     ];
-    
+
     $json = json_encode($payload);
-    
+
     $ch = curl_init($init_url);
     curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
     curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
@@ -65,35 +65,35 @@ if ($action === 'init') {
     curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
     curl_setopt($ch, CURLOPT_HTTPHEADER, [
         'Content-Type: application/json',
-        'Content-Length: ' . strlen($json)
+        'Content-Length: ' . strlen($json),
     ]);
-    
+
     $result = curl_exec($ch);
     $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     $curl_error = curl_error($ch);
     curl_close($ch);
-    
+
     if ($result === false) {
         echo json_encode([
             'success' => false,
-            'message' => get_string('error_connection_failed', 'local_mc_plugin', $curl_error)
+            'message' => get_string('error_connection_failed', 'local_mc_plugin', $curl_error),
         ]);
         exit;
     }
-    
+
     $response = json_decode($result, true);
-    
+
     if ($httpcode >= 200 && $httpcode < 300 && isset($response['token'])) {
         echo json_encode([
             'success' => true,
             'token' => $response['token'],
-            'expires_at' => $response['expires_at'] ?? null
+            'expires_at' => $response['expires_at'] ?? null,
         ]);
     } else {
         $error_message = $response['error'] ?? $response['message'] ?? "HTTP $httpcode";
         echo json_encode([
             'success' => false,
-            'message' => $error_message
+            'message' => $error_message,
         ]);
     }
     exit;
@@ -102,5 +102,5 @@ if ($action === 'init') {
 // Unknown action
 echo json_encode([
     'success' => false,
-    'message' => get_string('error_unknown_action', 'local_mc_plugin', $action)
+    'message' => get_string('error_unknown_action', 'local_mc_plugin', $action),
 ]);

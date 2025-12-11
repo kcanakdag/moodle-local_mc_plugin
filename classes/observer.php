@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -25,8 +24,6 @@
 
 namespace local_mc_plugin;
 
-defined('MOODLE_INTERNAL') || die();
-
 use local_mc_plugin\local\moodleconnect_client;
 use local_mc_plugin\local\dynamic_inspector;
 
@@ -49,61 +46,61 @@ class observer
      * @param \core\event\base $event The Moodle event object
      * @return void
      */
-    public static function handle_event(\core\event\base $event)
-    {
+    public static function handle_event(\core\event\base $event) {
         global $CFG;
 
-        // Debug: log ALL events to file if debug mode is on
+        // Debug: log ALL events to file if debug mode is on.
         if (get_config('local_mc_plugin', 'debug_mode')) {
             $logfile = $CFG->dataroot . '/moodleconnect_debug.log';
             $msg = date('Y-m-d H:i:s') . " | Event received: {$event->eventname}\n";
             @file_put_contents($logfile, $msg, FILE_APPEND);
         }
 
-        // Get monitored events (comma separated string from multiselect)
-        $monitored_events_str = get_config('local_mc_plugin', 'monitored_events');
-        $monitored_events = array_map('trim', explode(',', $monitored_events_str));
+        // Get monitored events (comma separated string from multiselect).
+        $monitoredeventsstr = get_config('local_mc_plugin', 'monitored_events');
+        $monitoredevents = array_map('trim', explode(',', $monitoredeventsstr));
 
-        // Normalize event name - remove leading backslash for comparison
-        // Event names from Moodle have leading \, but stored config may not
-        $eventname_normalized = ltrim($event->eventname, '\\');
-        $monitored_normalized = array_map(function ($e) {
+        // Normalize event name - remove leading backslash for comparison.
+        // Event names from Moodle have leading \, but stored config may not.
+        $eventnamenormalized = ltrim($event->eventname, '\\');
+        $monitorednormalized = array_map(function ($e) {
             return ltrim($e, '\\');
-        }, $monitored_events);
+        }, $monitoredevents);
 
-        // Allow wildcard (for debugging) or check exact match
-        if ($monitored_events_str !== '*' && !in_array($eventname_normalized, $monitored_normalized)) {
+        // Allow wildcard (for debugging) or check exact match.
+        if ($monitoredeventsstr !== '*' && !in_array($eventnamenormalized, $monitorednormalized)) {
             return;
         }
 
-        // Extract Data using the rich inspector
+        // Extract Data using the rich inspector.
         $inspector = new dynamic_inspector();
         $payload = $inspector->extract_data($event);
 
-        // Send to MoodleConnect
+        // Send to MoodleConnect.
         $result = moodleconnect_client::send_event($event->eventname, $payload);
 
-        // Debug mode: show notification and console log
+        // Debug mode: show notification and console log.
         if (get_config('local_mc_plugin', 'debug_mode')) {
             global $PAGE;
 
-            // Add console.log via inline JS
-            $log_data = json_encode([
+            // Add console.log via inline JS.
+            $logdata = json_encode([
                 'event' => $event->eventname,
                 'success' => $result['success'],
                 'message' => $result['message'],
-                'timestamp' => date('c')
+                'timestamp' => date('c'),
             ]);
 
             try {
                 $PAGE->requires->js_amd_inline("
-                    console.log('%c[MoodleConnect]', 'color: #4CAF50; font-weight: bold', {$log_data});
+                    console.log('%c[MoodleConnect]', 'color: #4CAF50; font-weight: bold', {$logdata});
                 ");
             } catch (\Exception $e) {
-                // May fail if PAGE not ready
+                // May fail if PAGE not ready.
+                unset($e);
             }
 
-            // Also show notification
+            // Also show notification.
             try {
                 if ($result['success']) {
                     \core\notification::success(
@@ -113,12 +110,13 @@ class observer
                     \core\notification::error(
                         get_string('failed_event_sent', 'local_mc_plugin', [
                             'event' => $event->eventname,
-                            'message' => $result['message']
+                            'message' => $result['message'],
                         ])
                     );
                 }
             } catch (\Exception $e) {
-                // Notification may fail in some contexts, ignore
+                // Notification may fail in some contexts, ignore.
+                unset($e);
             }
         }
     }

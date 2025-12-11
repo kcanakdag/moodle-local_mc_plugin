@@ -24,8 +24,6 @@
 
 namespace local_mc_plugin\local;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Service class for discovering all available Moodle events dynamically.
  */
@@ -80,7 +78,7 @@ class event_discovery {
         ksort($categorized);
 
         foreach ($categorized as $category => $categoryevents) {
-            usort($categoryevents, function($a, $b) {
+            usort($categoryevents, function ($a, $b) {
                 return strcmp($a['name'], $b['name']);
             });
             $categorized[$category] = $categoryevents;
@@ -184,7 +182,7 @@ class event_discovery {
                 if ($reflection->isAbstract()) {
                     continue;
                 }
-                
+
                 $doccomment = $reflection->getDocComment();
                 if ($doccomment && strpos($doccomment, '@deprecated') !== false) {
                     continue;
@@ -202,7 +200,7 @@ class event_discovery {
             ];
         }
 
-        usort($events, function($a, $b) {
+        usort($events, function ($a, $b) {
             return strcmp($a['name'], $b['name']);
         });
 
@@ -296,6 +294,8 @@ class event_discovery {
                 return '';
             }
         } catch (\Exception $e) {
+            // Gracefully handle method access errors.
+            unset($e);
         }
 
         return '';

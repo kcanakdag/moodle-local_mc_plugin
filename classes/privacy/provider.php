@@ -31,8 +31,6 @@ use core_privacy\local\request\contextlist;
 use core_privacy\local\request\userlist;
 use core_privacy\local\request\writer;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Privacy Subsystem for local_mc_plugin implementing null_provider.
  *
@@ -41,10 +39,9 @@ defined('MOODLE_INTERNAL') || die();
  * an external service (MoodleConnect API).
  */
 class provider implements
-    \core_privacy\local\metadata\provider,
     \core_privacy\local\request\core_userlist_provider,
+    \core_privacy\local\metadata\provider,
     \core_privacy\local\request\plugin\provider {
-
     /**
      * Returns meta data about this system.
      *
@@ -54,7 +51,7 @@ class provider implements
     public static function get_metadata(collection $collection): collection {
         // This plugin does not store any data locally in Moodle tables.
         // However, it transmits event data to an external service.
-        
+
         $collection->add_external_location_link(
             'moodleconnect_api',
             [
@@ -102,11 +99,11 @@ class provider implements
         // This plugin does not store any personal data locally in Moodle.
         // Data is only transmitted to the external MoodleConnect service.
         // Users should contact the MoodleConnect service directly for data export.
-        
+
         // Write a note explaining this to the user.
         $context = \context_system::instance();
         $subcontext = [get_string('pluginname', 'local_mc_plugin')];
-        
+
         writer::with_context($context)->export_data(
             $subcontext,
             (object)[

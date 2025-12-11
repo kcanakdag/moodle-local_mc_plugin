@@ -39,7 +39,6 @@ require_once($CFG->libdir . '/adminlib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class setting_event_selection extends \admin_setting_configtext {
-
     /**
      * Constructor.
      *
@@ -63,7 +62,7 @@ class setting_event_selection extends \admin_setting_configtext {
         global $OUTPUT, $PAGE;
 
         $selected_list = array_map('trim', explode(',', $data));
-        $selected_map = array_flip($selected_list); 
+        $selected_map = array_flip($selected_list);
 
         $discovery = new \local_mc_plugin\local\event_discovery();
         try {
@@ -160,7 +159,7 @@ class setting_event_selection extends \admin_setting_configtext {
         $html .= '<input type="hidden" name="' . $this->get_full_name() . '" id="' . $id . '" value="' . s($data) . '">';
 
         $html .= '<div class="mc-event-selector-wrapper">';
-        
+
         $html .= '<div class="mc-controls">';
         $html .= '<input type="text" id="' . $id . '_search" class="mc-event-search" placeholder="' . get_string('event_search_placeholder', 'local_mc_plugin') . '">';
         $html .= '<span id="' . $id . '_counter" style="font-size:0.9em;color:#666;min-width:100px;">' . get_string('event_selected_count', 'local_mc_plugin', 0) . '</span>';
@@ -181,7 +180,7 @@ class setting_event_selection extends \admin_setting_configtext {
             foreach ($cat_events as $event) {
                 $checked = isset($selected_map[$event['class']]) ? 'checked' : '';
                 $escaped_class = htmlspecialchars($event['class'], ENT_QUOTES, 'UTF-8');
-                
+
                 $html .= '<div class="mc-event-item">';
                 $html .= '<input type="checkbox" class="event-checkbox" data-class="' . $escaped_class . '" ' . $checked . '>';
                 $html .= '<label>' . s($event['name']);

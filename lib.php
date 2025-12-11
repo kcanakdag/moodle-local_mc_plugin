@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -33,16 +32,15 @@
  *
  * @return string The MoodleConnect API URL
  */
-function local_mc_plugin_get_api_url()
-{
+function local_mc_plugin_get_api_url() {
     global $CFG;
 
-    // Check for config.php override (for development)
+    // Check for config.php override (for development).
     if (!empty($CFG->local_mc_plugin_moodleconnect_url)) {
         return rtrim($CFG->local_mc_plugin_moodleconnect_url, '/');
     }
 
-    // Default production URL
+    // Default production URL.
     return 'https://moodleconnect.com/api';
 }
 
@@ -58,16 +56,15 @@ function local_mc_plugin_get_api_url()
  *
  * @return string The MoodleConnect frontend URL
  */
-function local_mc_plugin_get_frontend_url()
-{
+function local_mc_plugin_get_frontend_url() {
     global $CFG;
 
-    // Check for config.php override (for development)
+    // Check for config.php override (for development).
     if (!empty($CFG->local_mc_plugin_moodleconnect_frontend_url)) {
         return rtrim($CFG->local_mc_plugin_moodleconnect_frontend_url, '/');
     }
 
-    // Derive from API URL by removing /api suffix
-    $api_url = local_mc_plugin_get_api_url();
-    return preg_replace('/\/api\/?$/', '', $api_url);
+    // Derive from API URL by removing /api suffix.
+    $apiurl = local_mc_plugin_get_api_url();
+    return preg_replace('/\/api\/?$/', '', $apiurl);
 }

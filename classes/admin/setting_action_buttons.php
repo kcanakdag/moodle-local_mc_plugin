@@ -32,13 +32,12 @@ require_once($CFG->libdir . '/adminlib.php');
  * Custom admin setting that renders the primary action button.
  */
 class setting_action_buttons extends \admin_setting {
-
     /** @var string URL to the sync_schema.php endpoint */
     private $sync_url;
-    
+
     /** @var string URL to the ajax_save.php endpoint */
     private $ajax_save_url;
-    
+
     /** @var string Session key for CSRF protection */
     private $sesskey;
 
@@ -85,7 +84,7 @@ class setting_action_buttons extends \admin_setting {
      */
     public function output_html($data, $query = '') {
         $btn_label = get_string('btn_save_sync', 'local_mc_plugin');
-        
+
         $html = '
         <div class="form-item row" id="moodleconnect-action-section">
             <div class="form-label col-sm-3"></div>
@@ -230,7 +229,7 @@ class setting_action_buttons extends \admin_setting {
             });
         })();
         </script>';
-        
+
         return $html;
     }
 }

@@ -30,7 +30,6 @@ defined('MOODLE_INTERNAL') || die();
  * Service class for dynamically inspecting events and extracting available data fields.
  */
 class dynamic_inspector {
-
     /**
      * Get schema for a single event class (for schema sync).
      *
@@ -43,13 +42,13 @@ class dynamic_inspector {
     public function get_event_schema(string $eventclass): array {
         $fields = $this->get_mock_fields($eventclass);
         $flatfields = [];
-        
+
         foreach ($fields as $category => $categoryfields) {
             foreach ($categoryfields as $fieldname => $fieldinfo) {
                 $flatfields[] = $category . '.' . $fieldname;
             }
         }
-        
+
         return [
             'event_type' => $eventclass,
             'name' => event_discovery::get_friendly_name($eventclass),
@@ -137,7 +136,7 @@ class dynamic_inspector {
         ];
 
         $useridtoload = !empty($event->relateduserid) ? $event->relateduserid : $event->userid;
-        
+
         if (!empty($useridtoload)) {
             try {
                 $user = \core_user::get_user($useridtoload);
@@ -176,11 +175,11 @@ class dynamic_inspector {
         if (!empty($event->objecttable) && !empty($event->objectid)) {
             try {
                 $object = $event->get_record_snapshot($event->objecttable, $event->objectid);
-                
+
                 if (!$object) {
                     $object = $DB->get_record($event->objecttable, ['id' => $event->objectid]);
                 }
-                
+
                 if ($object) {
                     foreach ($object as $key => $value) {
                         $fields['object'][$key] = [
@@ -234,7 +233,8 @@ class dynamic_inspector {
                         'idnumber' => ['value' => $user->idnumber ?? '', 'type' => 'string', 'label' => 'ID Number'],
                     ];
                 }
-            } catch (\Exception $e) {}
+            } catch (\Exception $e) {
+            }
         }
 
         if (!empty($logevent->courseid) && $logevent->courseid != SITEID) {
@@ -249,7 +249,8 @@ class dynamic_inspector {
                         'startdate' => ['value' => $course->startdate, 'type' => 'datetime', 'label' => 'Start Date'],
                     ];
                 }
-            } catch (\Exception $e) {}
+            } catch (\Exception $e) {
+            }
         }
 
         if (!empty($logevent->objecttable) && !empty($logevent->objectid)) {
@@ -393,7 +394,6 @@ class dynamic_inspector {
                     }
                 }
             }
-
         } catch (\Exception $e) {
         }
 
@@ -445,8 +445,10 @@ class dynamic_inspector {
             return 'int';
         }
 
-        if (strpos($type, 'float') !== false || strpos($type, 'double') !== false ||
-            strpos($type, 'decimal') !== false || strpos($type, 'numeric') !== false) {
+        if (
+            strpos($type, 'float') !== false || strpos($type, 'double') !== false ||
+            strpos($type, 'decimal') !== false || strpos($type, 'numeric') !== false
+        ) {
             return 'float';
         }
 

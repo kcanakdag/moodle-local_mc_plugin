@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -37,8 +36,7 @@ class moodleconnect_client
      * @param mixed $data The data to sort
      * @return mixed The sorted data
      */
-    private static function sort_keys_recursive($data)
-    {
+    private static function sort_keys_recursive($data) {
         if (!is_array($data)) {
             return $data;
         }
@@ -68,8 +66,7 @@ class moodleconnect_client
      * @param string $site_secret The site secret for signing
      * @return string Hex-encoded HMAC signature
      */
-    private static function compute_signature($timestamp, $payload, $site_secret)
-    {
+    private static function compute_signature($timestamp, $payload, $site_secret) {
         global $CFG;
 
         // Sort keys recursively for consistent signature computation
@@ -88,8 +85,7 @@ class moodleconnect_client
      * @param array $data
      * @return array ['success' => bool, 'message' => string]
      */
-    public static function send_event($event_type, $data)
-    {
+    public static function send_event($event_type, $data) {
         $base_url = local_mc_plugin_get_api_url();
         $site_key = get_config('local_mc_plugin', 'site_key');
         $site_secret = get_config('local_mc_plugin', 'site_secret');
@@ -108,7 +104,7 @@ class moodleconnect_client
         $payload = [
             'site_key' => $site_key,
             'event_type' => $event_type,
-            'data' => $data
+            'data' => $data,
         ];
 
         // Compute HMAC signature
@@ -129,8 +125,7 @@ class moodleconnect_client
      * @param array $events Array of event schemas from dynamic_inspector
      * @return array ['success' => bool, 'message' => string]
      */
-    public static function sync_schema($events)
-    {
+    public static function sync_schema($events) {
         $base_url = local_mc_plugin_get_api_url();
         $site_key = get_config('local_mc_plugin', 'site_key');
         $site_secret = get_config('local_mc_plugin', 'site_secret');
@@ -148,7 +143,7 @@ class moodleconnect_client
 
         $payload = [
             'site_key' => $site_key,
-            'events' => $events
+            'events' => $events,
         ];
 
         // Compute HMAC signature
@@ -169,8 +164,7 @@ class moodleconnect_client
      * @param int $timeout Timeout in seconds
      * @return array ['success' => bool, 'message' => string]
      */
-    private static function post_json($url, $payload, $timeout = 10)
-    {
+    private static function post_json($url, $payload, $timeout = 10) {
         // Sort keys and use same JSON flags as signature computation
         $sorted_payload = self::sort_keys_recursive($payload);
         $json = json_encode($sorted_payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
@@ -183,7 +177,7 @@ class moodleconnect_client
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
             'Content-Type: application/json',
-            'Content-Length: ' . strlen($json)
+            'Content-Length: ' . strlen($json),
         ]);
 
         $result = curl_exec($ch);
@@ -210,8 +204,7 @@ class moodleconnect_client
      * @param array $payload
      * @return array ['success' => bool, 'message' => string]
      */
-    private static function post_json_async($url, $payload)
-    {
+    private static function post_json_async($url, $payload) {
         // Sort keys and use same JSON flags as signature computation
         $sorted_payload = self::sort_keys_recursive($payload);
         $json = json_encode($sorted_payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
@@ -224,7 +217,7 @@ class moodleconnect_client
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT_MS, 300);
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
             'Content-Type: application/json',
-            'Content-Length: ' . strlen($json)
+            'Content-Length: ' . strlen($json),
         ]);
         curl_setopt($ch, CURLOPT_NOBODY, false);
         curl_setopt($ch, CURLOPT_FRESH_CONNECT, true);
@@ -235,7 +228,7 @@ class moodleconnect_client
 
         if ($httpcode >= 200 && $httpcode < 300) {
             return ['success' => true, 'message' => get_string('sent', 'local_mc_plugin')];
-        } elseif ($httpcode == 0) {
+        } else if ($httpcode == 0) {
             return ['success' => true, 'message' => get_string('sent_async', 'local_mc_plugin')];
         } else {
             return ['success' => false, 'message' => "HTTP $httpcode"];

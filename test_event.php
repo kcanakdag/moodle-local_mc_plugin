@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -37,7 +36,7 @@ $data = [
     'user_id' => $USER->id,
     'username' => $USER->username,
     'site_name' => $SITE->fullname,
-    'timestamp' => time()
+    'timestamp' => time(),
 ];
 
 // Use the specific test event method

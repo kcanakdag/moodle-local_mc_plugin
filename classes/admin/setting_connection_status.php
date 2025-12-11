@@ -32,7 +32,6 @@ require_once($CFG->libdir . '/adminlib.php');
  * Custom admin setting that displays connection and sync status.
  */
 class setting_connection_status extends \admin_setting {
-
     /** @var bool Whether the site is currently connected */
     private $is_connected;
 
@@ -75,7 +74,7 @@ class setting_connection_status extends \admin_setting {
      */
     public function output_html($data, $query = '') {
         $sync_url = (new \moodle_url('/local/mc_plugin/sync_schema.php'))->out(false);
-        
+
         // Always show the dynamic status UI
         $html = '<div id="mc-connection-status">';
         $html .= '<div id="mc-status-display">';
@@ -86,7 +85,7 @@ class setting_connection_status extends \admin_setting {
         $html .= '</div>';
         $html .= '<span id="mc-test-result" style="margin-left: 10px; font-size: 0.85em;"></span>';
         $html .= '</div>';
-        
+
         // Always include the JavaScript
         $html .= '
             <script>
@@ -198,7 +197,7 @@ class setting_connection_status extends \admin_setting {
                 testConnection();
             })();
             </script>';
-        
+
         return format_admin_setting($this, $this->visiblename, $html, '', false, '', null, $query);
     }
 }

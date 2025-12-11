@@ -1,0 +1,754 @@
+ RUN  Moodle CodeSniffer standard on local_mc_plugin
+E.W.W..EWEEEWEEEEEEWWEEEWEE 27 / 27 (100%)
+
+
+
+FILE: /home/kcan/projects/moodleconnect/mc_plugin/test_event.php
+------------------------------------------------------------------------------------------------------------------------------------
+FOUND 3 ERRORS AND 2 WARNINGS AFFECTING 4 LINES
+------------------------------------------------------------------------------------------------------------------------------------
+ 31 | ERROR   | Variable "base_url" must not contain underscores.
+    |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 42 | WARNING | Inline comments must end in full-stops, exclamation marks, or question marks
+    |         | (moodle.Commenting.InlineComment.InvalidEndChar)
+ 46 | ERROR   | Variable "base_url" must not contain underscores.
+    |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 48 | ERROR   | Variable "base_url" must not contain underscores.
+    |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 48 | WARNING | Line exceeds 132 characters; contains 141 characters (moodle.Files.LineLength.TooLong)
+------------------------------------------------------------------------------------------------------------------------------------
+
+
+FILE: /home/kcan/projects/moodleconnect/mc_plugin/db/upgrade.php
+------------------------------------------------------------------------------------------------------------------------------------
+FOUND 0 ERRORS AND 1 WARNING AFFECTING 1 LINE
+------------------------------------------------------------------------------------------------------------------------------------
+ 25 | WARNING | Unexpected MOODLE_INTERNAL check. No side effects or multiple artifacts detected.
+    |         | (moodle.Files.MoodleInternal.MoodleInternalNotNeeded)
+------------------------------------------------------------------------------------------------------------------------------------
+
+
+FILE: /home/kcan/projects/moodleconnect/mc_plugin/db/events.php
+------------------------------------------------------------------------------------------------------------------------------------
+FOUND 0 ERRORS AND 1 WARNING AFFECTING 1 LINE
+------------------------------------------------------------------------------------------------------------------------------------
+ 32 | WARNING | Inline comments must end in full-stops, exclamation marks, or question marks
+    |         | (moodle.Commenting.InlineComment.InvalidEndChar)
+------------------------------------------------------------------------------------------------------------------------------------
+
+
+FILE: /home/kcan/projects/moodleconnect/mc_plugin/classes/observer.php
+------------------------------------------------------------------------------------------------------------------------------------
+FOUND 2 ERRORS AND 1 WARNING AFFECTING 3 LINES
+------------------------------------------------------------------------------------------------------------------------------------
+  27 | WARNING | Unexpected MOODLE_INTERNAL check. No side effects or multiple artifacts detected.
+     |         | (moodle.Files.MoodleInternal.MoodleInternalNotNeeded)
+ 100 | ERROR   | Empty CATCH statement detected (Generic.CodeAnalysis.EmptyStatement.DetectedCatch)
+ 118 | ERROR   | Empty CATCH statement detected (Generic.CodeAnalysis.EmptyStatement.DetectedCatch)
+------------------------------------------------------------------------------------------------------------------------------------
+
+
+FILE: /home/kcan/projects/moodleconnect/mc_plugin/classes/privacy/provider.php
+------------------------------------------------------------------------------------------------------------------------------------
+FOUND 0 ERRORS AND 2 WARNINGS AFFECTING 2 LINES
+------------------------------------------------------------------------------------------------------------------------------------
+ 34 | WARNING | Unexpected MOODLE_INTERNAL check. No side effects or multiple artifacts detected.
+    |         | (moodle.Files.MoodleInternal.MoodleInternalNotNeeded)
+ 43 | WARNING | Line exceeds 132 characters; contains 162 characters (moodle.Files.LineLength.TooLong)
+------------------------------------------------------------------------------------------------------------------------------------
+
+
+FILE: /home/kcan/projects/moodleconnect/mc_plugin/classes/local/dynamic_inspector.php
+------------------------------------------------------------------------------------------------------------------------------------
+FOUND 20 ERRORS AND 5 WARNINGS AFFECTING 18 LINES
+------------------------------------------------------------------------------------------------------------------------------------
+  27 | WARNING | Unexpected MOODLE_INTERNAL check. No side effects or multiple artifacts detected.
+     |         | (moodle.Files.MoodleInternal.MoodleInternalNotNeeded)
+ 105 | ERROR   | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+ 106 | ERROR   | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+ 115 | ERROR   | Empty CATCH statement detected (Generic.CodeAnalysis.EmptyStatement.DetectedCatch)
+ 116 | WARNING | Inline comments must end in full-stops, exclamation marks, or question marks
+     |         | (moodle.Commenting.InlineComment.InvalidEndChar)
+ 153 | ERROR   | Empty CATCH statement detected (Generic.CodeAnalysis.EmptyStatement.DetectedCatch)
+ 154 | WARNING | Inline comments must end in full-stops, exclamation marks, or question marks
+     |         | (moodle.Commenting.InlineComment.InvalidEndChar)
+ 170 | ERROR   | Empty CATCH statement detected (Generic.CodeAnalysis.EmptyStatement.DetectedCatch)
+ 171 | WARNING | Inline comments must end in full-stops, exclamation marks, or question marks
+     |         | (moodle.Commenting.InlineComment.InvalidEndChar)
+ 192 | ERROR   | Empty CATCH statement detected (Generic.CodeAnalysis.EmptyStatement.DetectedCatch)
+ 193 | WARNING | Inline comments must end in full-stops, exclamation marks, or question marks
+     |         | (moodle.Commenting.InlineComment.InvalidEndChar)
+ 236 | ERROR   | Empty CATCH statement detected (Generic.CodeAnalysis.EmptyStatement.DetectedCatch)
+ 236 | ERROR   | Empty CATCH statement must have a comment to explain why the exception is not handled
+     |         | (Squiz.Commenting.EmptyCatchComment.Missing)
+ 252 | ERROR   | Empty CATCH statement detected (Generic.CodeAnalysis.EmptyStatement.DetectedCatch)
+ 252 | ERROR   | Empty CATCH statement must have a comment to explain why the exception is not handled
+     |         | (Squiz.Commenting.EmptyCatchComment.Missing)
+ 380 | ERROR   | Empty CATCH statement detected (Generic.CodeAnalysis.EmptyStatement.DetectedCatch)
+ 380 | ERROR   | Empty CATCH statement must have a comment to explain why the exception is not handled
+     |         | (Squiz.Commenting.EmptyCatchComment.Missing)
+ 381 | ERROR   | Empty CATCH statement detected (Generic.CodeAnalysis.EmptyStatement.DetectedCatch)
+ 381 | ERROR   | Empty CATCH statement must have a comment to explain why the exception is not handled
+     |         | (Squiz.Commenting.EmptyCatchComment.Missing)
+ 393 | ERROR   | Empty CATCH statement detected (Generic.CodeAnalysis.EmptyStatement.DetectedCatch)
+ 393 | ERROR   | Empty CATCH statement must have a comment to explain why the exception is not handled
+     |         | (Squiz.Commenting.EmptyCatchComment.Missing)
+ 397 | ERROR   | Empty CATCH statement detected (Generic.CodeAnalysis.EmptyStatement.DetectedCatch)
+ 397 | ERROR   | Empty CATCH statement must have a comment to explain why the exception is not handled
+     |         | (Squiz.Commenting.EmptyCatchComment.Missing)
+ 424 | ERROR   | Empty CATCH statement detected (Generic.CodeAnalysis.EmptyStatement.DetectedCatch)
+ 424 | ERROR   | Empty CATCH statement must have a comment to explain why the exception is not handled
+     |         | (Squiz.Commenting.EmptyCatchComment.Missing)
+------------------------------------------------------------------------------------------------------------------------------------
+
+
+FILE: /home/kcan/projects/moodleconnect/mc_plugin/classes/local/moodleconnect_client.php
+------------------------------------------------------------------------------------------------------------------------------------
+FOUND 33 ERRORS AND 10 WARNINGS AFFECTING 42 LINES
+------------------------------------------------------------------------------------------------------------------------------------
+  31 | ERROR   | Missing docblock for class moodleconnect_client (moodle.Commenting.MissingDocblock.Class)
+  44 | WARNING | Inline comments must end in full-stops, exclamation marks, or question marks
+     |         | (moodle.Commenting.InlineComment.InvalidEndChar)
+  45 | ERROR   | Variable "is_assoc" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+  47 | ERROR   | Variable "is_assoc" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+  69 | ERROR   | Variable "site_secret" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+  72 | WARNING | Inline comments must end in full-stops, exclamation marks, or question marks
+     |         | (moodle.Commenting.InlineComment.InvalidEndChar)
+  73 | ERROR   | Variable "sorted_payload" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+  74 | WARNING | Inline comments must end in full-stops, exclamation marks, or question marks
+     |         | (moodle.Commenting.InlineComment.InvalidEndChar)
+  75 | ERROR   | Variable "json_payload" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+  75 | ERROR   | Variable "sorted_payload" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+  76 | ERROR   | Variable "json_payload" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+  78 | ERROR   | Variable "site_secret" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+  88 | ERROR   | Variable "event_type" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+  89 | ERROR   | Variable "base_url" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+  90 | ERROR   | Variable "site_key" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+  91 | ERROR   | Variable "site_secret" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+  93 | ERROR   | Variable "site_key" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+  97 | ERROR   | Variable "site_secret" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 101 | ERROR   | Variable "base_url" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 105 | ERROR   | Variable "site_key" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 106 | ERROR   | Variable "event_type" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 110 | WARNING | Inline comments must end in full-stops, exclamation marks, or question marks
+     |         | (moodle.Commenting.InlineComment.InvalidEndChar)
+ 111 | ERROR   | Variable "site_secret" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 113 | WARNING | Inline comments must end in full-stops, exclamation marks, or question marks
+     |         | (moodle.Commenting.InlineComment.InvalidEndChar)
+ 117 | WARNING | Inline comments must end in full-stops, exclamation marks, or question marks
+     |         | (moodle.Commenting.InlineComment.InvalidEndChar)
+ 129 | ERROR   | Variable "base_url" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 130 | ERROR   | Variable "site_key" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 131 | ERROR   | Variable "site_secret" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 133 | ERROR   | Variable "site_key" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 137 | ERROR   | Variable "site_secret" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 141 | ERROR   | Variable "base_url" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 145 | ERROR   | Variable "site_key" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 149 | WARNING | Inline comments must end in full-stops, exclamation marks, or question marks
+     |         | (moodle.Commenting.InlineComment.InvalidEndChar)
+ 150 | ERROR   | Variable "site_secret" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 152 | WARNING | Inline comments must end in full-stops, exclamation marks, or question marks
+     |         | (moodle.Commenting.InlineComment.InvalidEndChar)
+ 168 | WARNING | Inline comments must end in full-stops, exclamation marks, or question marks
+     |         | (moodle.Commenting.InlineComment.InvalidEndChar)
+ 169 | ERROR   | Variable "sorted_payload" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 170 | ERROR   | Variable "sorted_payload" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 185 | ERROR   | Variable "curl_error" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 189 | ERROR   | Variable "curl_error" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 208 | WARNING | Inline comments must end in full-stops, exclamation marks, or question marks
+     |         | (moodle.Commenting.InlineComment.InvalidEndChar)
+ 209 | ERROR   | Variable "sorted_payload" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 210 | ERROR   | Variable "sorted_payload" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+------------------------------------------------------------------------------------------------------------------------------------
+
+
+FILE: /home/kcan/projects/moodleconnect/mc_plugin/classes/local/event_discovery.php
+------------------------------------------------------------------------------------------------------------------------------------
+FOUND 2 ERRORS AND 1 WARNING AFFECTING 2 LINES
+------------------------------------------------------------------------------------------------------------------------------------
+  27 | WARNING | Unexpected MOODLE_INTERNAL check. No side effects or multiple artifacts detected.
+     |         | (moodle.Files.MoodleInternal.MoodleInternalNotNeeded)
+ 298 | ERROR   | Empty CATCH statement detected (Generic.CodeAnalysis.EmptyStatement.DetectedCatch)
+ 298 | ERROR   | Empty CATCH statement must have a comment to explain why the exception is not handled
+     |         | (Squiz.Commenting.EmptyCatchComment.Missing)
+------------------------------------------------------------------------------------------------------------------------------------
+
+
+FILE: /home/kcan/projects/moodleconnect/mc_plugin/classes/admin/setting_configtext_nodefault.php
+------------------------------------------------------------------------------------------------------------------------------------
+FOUND 0 ERRORS AND 1 WARNING AFFECTING 1 LINE
+------------------------------------------------------------------------------------------------------------------------------------
+ 58 | WARNING | Inline comments must end in full-stops, exclamation marks, or question marks
+    |         | (moodle.Commenting.InlineComment.InvalidEndChar)
+------------------------------------------------------------------------------------------------------------------------------------
+
+
+FILE: /home/kcan/projects/moodleconnect/mc_plugin/classes/admin/setting_readonly_text.php
+------------------------------------------------------------------------------------------------------------------------------------
+FOUND 4 ERRORS AND 2 WARNINGS AFFECTING 6 LINES
+------------------------------------------------------------------------------------------------------------------------------------
+ 71 | WARNING | Inline comments must end in full-stops, exclamation marks, or question marks
+    |         | (moodle.Commenting.InlineComment.InvalidEndChar)
+ 83 | ERROR   | Variable "displayValue" must be all lower-case (moodle.NamingConventions.ValidVariableName.VariableNameLowerCase)
+ 86 | WARNING | Inline comments must end in full-stops, exclamation marks, or question marks
+    |         | (moodle.Commenting.InlineComment.InvalidEndChar)
+ 89 | ERROR   | Variable "displayValue" must be all lower-case (moodle.NamingConventions.ValidVariableName.VariableNameLowerCase)
+ 91 | ERROR   | Variable "displayValue" must be all lower-case (moodle.NamingConventions.ValidVariableName.VariableNameLowerCase)
+ 97 | ERROR   | Variable "displayValue" must be all lower-case (moodle.NamingConventions.ValidVariableName.VariableNameLowerCase)
+------------------------------------------------------------------------------------------------------------------------------------
+
+
+FILE: /home/kcan/projects/moodleconnect/mc_plugin/classes/admin/setting_connection_status.php
+------------------------------------------------------------------------------------------------------------------------------------
+FOUND 18 ERRORS AND 3 WARNINGS AFFECTING 21 LINES
+------------------------------------------------------------------------------------------------------------------------------------
+  36 | ERROR   | Member variable "is_connected" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.MemberNameUnderscore)
+  44 | ERROR   | Variable "is_connected" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+  45 | ERROR   | Variable "is_connected" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+  76 | ERROR   | Variable "sync_url" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+  78 | WARNING | Inline comments must end in full-stops, exclamation marks, or question marks
+     |         | (moodle.Commenting.InlineComment.InvalidEndChar)
+  89 | WARNING | Inline comments must end in full-stops, exclamation marks, or question marks
+     |         | (moodle.Commenting.InlineComment.InvalidEndChar)
+  98 | ERROR   | Variable "sync_url" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+  99 | ERROR   | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+ 105 | ERROR   | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+ 109 | WARNING | Line exceeds 132 characters; contains 135 characters (moodle.Files.LineLength.TooLong)
+ 111 | ERROR   | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+ 114 | ERROR   | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+ 123 | ERROR   | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+ 126 | ERROR   | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+ 144 | ERROR   | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+ 157 | ERROR   | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+ 159 | ERROR   | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+ 166 | ERROR   | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+ 184 | ERROR   | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+ 187 | ERROR   | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+ 195 | ERROR   | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+------------------------------------------------------------------------------------------------------------------------------------
+
+
+FILE: /home/kcan/projects/moodleconnect/mc_plugin/classes/admin/setting_action_buttons.php
+------------------------------------------------------------------------------------------------------------------------------------
+FOUND 27 ERRORS AFFECTING 26 LINES
+------------------------------------------------------------------------------------------------------------------------------------
+  36 | ERROR | Member variable "sync_url" must not contain underscores.
+     |       | (moodle.NamingConventions.ValidVariableName.MemberNameUnderscore)
+  39 | ERROR | Member variable "ajax_save_url" must not contain underscores.
+     |       | (moodle.NamingConventions.ValidVariableName.MemberNameUnderscore)
+  51 | ERROR | Variable "is_connected" must not contain underscores.
+     |       | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+  51 | ERROR | Variable "sync_url" must not contain underscores.
+     |       | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+  53 | ERROR | Variable "sync_url" must not contain underscores.
+     |       | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+  86 | ERROR | Variable "btn_label" must not contain underscores.
+     |       | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+  94 | ERROR | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+  96 | ERROR | Variable "btn_label" must not contain underscores.
+     |       | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 104 | ERROR | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+ 111 | ERROR | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+ 121 | ERROR | Variable "btn_label" must not contain underscores.
+     |       | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 122 | ERROR | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+ 129 | ERROR | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+ 134 | ERROR | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+ 148 | ERROR | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+ 151 | ERROR | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+ 160 | ERROR | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+ 170 | ERROR | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+ 178 | ERROR | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+ 179 | ERROR | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+ 184 | ERROR | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+ 192 | ERROR | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+ 199 | ERROR | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+ 204 | ERROR | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+ 212 | ERROR | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+ 214 | ERROR | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+ 218 | ERROR | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+------------------------------------------------------------------------------------------------------------------------------------
+
+
+FILE: /home/kcan/projects/moodleconnect/mc_plugin/classes/admin/setting_event_selection.php
+------------------------------------------------------------------------------------------------------------------------------------
+FOUND 29 ERRORS AND 7 WARNINGS AFFECTING 33 LINES
+------------------------------------------------------------------------------------------------------------------------------------
+  64 | ERROR   | Variable "selected_list" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+  65 | ERROR   | Variable "selected_map" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+  65 | ERROR   | Variable "selected_list" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 164 | WARNING | Line exceeds 132 characters; contains 167 characters (moodle.Files.LineLength.TooLong)
+ 165 | WARNING | Line exceeds 132 characters; contains 174 characters (moodle.Files.LineLength.TooLong)
+ 166 | WARNING | Line exceeds 132 characters; contains 165 characters (moodle.Files.LineLength.TooLong)
+ 167 | WARNING | Line exceeds 132 characters; contains 169 characters (moodle.Files.LineLength.TooLong)
+ 172 | ERROR   | Variable "cat_events" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 173 | ERROR   | Variable "cat_label" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 174 | ERROR   | Variable "cat_label" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 174 | ERROR   | Variable "cat_label" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 177 | ERROR   | Variable "cat_label" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 177 | ERROR   | Variable "cat_events" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 180 | ERROR   | Variable "cat_events" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 181 | ERROR   | Variable "selected_map" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 182 | ERROR   | Variable "escaped_class" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 185 | ERROR   | Variable "escaped_class" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 197 | WARNING | Inline comments must end in full-stops, exclamation marks, or question marks
+     |         | (moodle.Commenting.InlineComment.InvalidEndChar)
+ 198 | ERROR   | Variable "str_selected" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 199 | ERROR   | Variable "str_all_synced" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 200 | ERROR   | Variable "str_new" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 201 | ERROR   | Variable "str_removed" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 212 | ERROR   | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+ 213 | ERROR   | Variable "str_selected" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 214 | ERROR   | Variable "str_all_synced" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 215 | ERROR   | Variable "str_new" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 216 | ERROR   | Variable "str_removed" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 217 | ERROR   | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+ 224 | ERROR   | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+ 226 | ERROR   | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+ 234 | ERROR   | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+ 241 | ERROR   | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+ 243 | WARNING | Line exceeds 132 characters; contains 158 characters (moodle.Files.LineLength.TooLong)
+ 248 | WARNING | Line exceeds 132 characters; contains 164 characters (moodle.Files.LineLength.TooLong)
+ 254 | ERROR   | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+ 273 | ERROR   | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+------------------------------------------------------------------------------------------------------------------------------------
+
+
+FILE: /home/kcan/projects/moodleconnect/mc_plugin/classes/admin/setting_connect_button.php
+------------------------------------------------------------------------------------------------------------------------------------
+FOUND 49 ERRORS AND 1 WARNING AFFECTING 45 LINES
+------------------------------------------------------------------------------------------------------------------------------------
+  39 | ERROR   | Member variable "is_connected" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.MemberNameUnderscore)
+  42 | ERROR   | Member variable "connect_url" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.MemberNameUnderscore)
+  45 | ERROR   | Member variable "ajax_save_url" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.MemberNameUnderscore)
+  48 | ERROR   | Member variable "api_url" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.MemberNameUnderscore)
+  59 | ERROR   | Variable "is_connected" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+  62 | ERROR   | Variable "is_connected" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+  98 | ERROR   | Variable "connect_label" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+  99 | ERROR   | Variable "reconnect_label" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 100 | ERROR   | Variable "btn_label" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 100 | ERROR   | Variable "reconnect_label" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 100 | ERROR   | Variable "connect_label" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 102 | WARNING | Inline comments must end in full-stops, exclamation marks, or question marks
+     |         | (moodle.Commenting.InlineComment.InvalidEndChar)
+ 103 | ERROR   | Variable "frontend_url" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 116 | ERROR   | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+ 117 | ERROR   | Line exceeds maximum limit of 180 characters; contains 189 characters (moodle.Files.LineLength.MaxExceeded)
+ 118 | ERROR   | Variable "btn_label" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 123 | ERROR   | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+ 130 | ERROR   | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+ 135 | ERROR   | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+ 142 | ERROR   | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+ 146 | ERROR   | Variable "frontend_url" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 149 | ERROR   | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+ 153 | ERROR   | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+ 171 | ERROR   | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+ 175 | ERROR   | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+ 180 | ERROR   | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+ 187 | ERROR   | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+ 190 | ERROR   | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+ 196 | ERROR   | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+ 207 | ERROR   | Variable "reconnect_label" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 211 | ERROR   | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+ 218 | ERROR   | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+ 229 | ERROR   | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+ 232 | ERROR   | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+ 239 | ERROR   | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+ 245 | ERROR   | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+ 264 | ERROR   | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+ 270 | ERROR   | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+ 274 | ERROR   | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+ 284 | ERROR   | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+ 288 | ERROR   | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+ 291 | ERROR   | Variable "reconnect_label" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 291 | ERROR   | Variable "connect_label" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 295 | ERROR   | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+ 298 | ERROR   | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+ 303 | ERROR   | Variable "reconnect_label" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 303 | ERROR   | Variable "connect_label" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 309 | ERROR   | Variable "reconnect_label" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 309 | ERROR   | Variable "connect_label" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 313 | ERROR   | Whitespace found at end of line within string (moodle.WhiteSpace.WhiteSpaceInStrings.EndLine)
+------------------------------------------------------------------------------------------------------------------------------------
+
+
+FILE: /home/kcan/projects/moodleconnect/mc_plugin/debug.php
+------------------------------------------------------------------------------------------------------------------------------------
+FOUND 20 ERRORS AND 7 WARNINGS AFFECTING 23 LINES
+------------------------------------------------------------------------------------------------------------------------------------
+ 38 | WARNING | Inline comments must end in full-stops, exclamation marks, or question marks
+    |         | (moodle.Commenting.InlineComment.InvalidEndChar)
+ 39 | ERROR   | Variable "base_url" must not contain underscores.
+    |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 40 | ERROR   | Variable "site_key" must not contain underscores.
+    |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 41 | ERROR   | Variable "monitored_events" must not contain underscores.
+    |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 42 | ERROR   | Variable "debug_mode" must not contain underscores.
+    |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 46 | WARNING | Line exceeds 132 characters; contains 141 characters (moodle.Files.LineLength.TooLong)
+ 47 | ERROR   | Line exceeds maximum limit of 180 characters; contains 197 characters (moodle.Files.LineLength.MaxExceeded)
+ 48 | ERROR   | Variable "site_key" must not contain underscores.
+    |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 48 | WARNING | Line exceeds 132 characters; contains 178 characters (moodle.Files.LineLength.TooLong)
+ 49 | ERROR   | Variable "debug_mode" must not contain underscores.
+    |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 49 | ERROR   | Line exceeds maximum limit of 180 characters; contains 202 characters (moodle.Files.LineLength.MaxExceeded)
+ 50 | ERROR   | Variable "monitored_events" must not contain underscores.
+    |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 50 | ERROR   | Line exceeds maximum limit of 180 characters; contains 191 characters (moodle.Files.LineLength.MaxExceeded)
+ 53 | WARNING | Inline comments must end in full-stops, exclamation marks, or question marks
+    |         | (moodle.Commenting.InlineComment.InvalidEndChar)
+ 57 | WARNING | Inline comments must end in full-stops, exclamation marks, or question marks
+    |         | (moodle.Commenting.InlineComment.InvalidEndChar)
+ 58 | ERROR   | Variable "our_observers" must not contain underscores.
+    |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 59 | ERROR   | Variable "obs_list" must not contain underscores.
+    |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 60 | ERROR   | Variable "obs_list" must not contain underscores.
+    |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 65 | ERROR   | Variable "our_observers" must not contain underscores.
+    |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 70 | ERROR   | Variable "our_observers" must not contain underscores.
+    |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 73 | ERROR   | Variable "our_observers" must not contain underscores.
+    |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 73 | WARNING | Line exceeds 132 characters; contains 142 characters (moodle.Files.LineLength.TooLong)
+ 75 | ERROR   | Variable "our_observers" must not contain underscores.
+    |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 76 | ERROR   | The use of function print_r() is forbidden (moodle.PHP.ForbiddenFunctions.Found)
+ 81 | WARNING | Inline comments must end in full-stops, exclamation marks, or question marks
+    |         | (moodle.Commenting.InlineComment.InvalidEndChar)
+ 85 | ERROR   | Variable "log_content" must not contain underscores.
+    |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 86 | ERROR   | Variable "log_content" must not contain underscores.
+    |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+------------------------------------------------------------------------------------------------------------------------------------
+
+
+FILE: /home/kcan/projects/moodleconnect/mc_plugin/version.php
+------------------------------------------------------------------------------------------------------------------------------------
+FOUND 0 ERRORS AND 2 WARNINGS AFFECTING 2 LINES
+------------------------------------------------------------------------------------------------------------------------------------
+ 28 | WARNING | Inline comments must end in full-stops, exclamation marks, or question marks
+    |         | (moodle.Commenting.InlineComment.InvalidEndChar)
+ 29 | WARNING | Inline comments must end in full-stops, exclamation marks, or question marks
+    |         | (moodle.Commenting.InlineComment.InvalidEndChar)
+------------------------------------------------------------------------------------------------------------------------------------
+
+
+FILE: /home/kcan/projects/moodleconnect/mc_plugin/index.php
+------------------------------------------------------------------------------------------------------------------------------------
+FOUND 0 ERRORS AND 1 WARNING AFFECTING 1 LINE
+------------------------------------------------------------------------------------------------------------------------------------
+ 31 | WARNING | Inline comments must end in full-stops, exclamation marks, or question marks
+    |         | (moodle.Commenting.InlineComment.InvalidEndChar)
+------------------------------------------------------------------------------------------------------------------------------------
+
+
+FILE: /home/kcan/projects/moodleconnect/mc_plugin/settings.php
+------------------------------------------------------------------------------------------------------------------------------------
+FOUND 10 ERRORS AND 10 WARNINGS AFFECTING 18 LINES
+------------------------------------------------------------------------------------------------------------------------------------
+  30 | WARNING | Inline comments must start with a capital letter, digit or 3-dots sequence
+     |         | (moodle.Commenting.InlineComment.NotCapital)
+  39 | WARNING | Inline comments must end in full-stops, exclamation marks, or question marks
+     |         | (moodle.Commenting.InlineComment.InvalidEndChar)
+  40 | ERROR   | Variable "site_key" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+  41 | ERROR   | Variable "site_secret" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+  42 | ERROR   | Variable "is_connected" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+  42 | ERROR   | Variable "site_key" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+  42 | ERROR   | Variable "site_secret" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+  44 | WARNING | Inline comments must end in full-stops, exclamation marks, or question marks
+     |         | (moodle.Commenting.InlineComment.InvalidEndChar)
+  47 | ERROR   | Variable "is_connected" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+  50 | WARNING | Inline comments must end in full-stops, exclamation marks, or question marks
+     |         | (moodle.Commenting.InlineComment.InvalidEndChar)
+  53 | ERROR   | Variable "is_connected" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+  56 | WARNING | Inline comments must end in full-stops, exclamation marks, or question marks
+     |         | (moodle.Commenting.InlineComment.InvalidEndChar)
+  58 | WARNING | Inline comments must start with a capital letter, digit or 3-dots sequence
+     |         | (moodle.Commenting.InlineComment.NotCapital)
+  67 | WARNING | Inline comments must end in full-stops, exclamation marks, or question marks
+     |         | (moodle.Commenting.InlineComment.InvalidEndChar)
+  75 | WARNING | Inline comments must start with a capital letter, digit or 3-dots sequence
+     |         | (moodle.Commenting.InlineComment.NotCapital)
+  84 | WARNING | Inline comments must end in full-stops, exclamation marks, or question marks
+     |         | (moodle.Commenting.InlineComment.InvalidEndChar)
+  92 | WARNING | Inline comments must start with a capital letter, digit or 3-dots sequence
+     |         | (moodle.Commenting.InlineComment.NotCapital)
+  95 | ERROR   | Variable "sync_url" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+  99 | ERROR   | Variable "is_connected" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 100 | ERROR   | Variable "sync_url" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+------------------------------------------------------------------------------------------------------------------------------------
+
+
+FILE: /home/kcan/projects/moodleconnect/mc_plugin/sync_schema.php
+------------------------------------------------------------------------------------------------------------------------------------
+FOUND 22 ERRORS AND 6 WARNINGS AFFECTING 25 LINES
+------------------------------------------------------------------------------------------------------------------------------------
+  37 | WARNING | Inline comments must start with a capital letter, digit or 3-dots sequence
+     |         | (moodle.Commenting.InlineComment.NotCapital)
+  43 | ERROR   | Variable "base_url" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+  44 | ERROR   | Variable "test_url" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+  44 | ERROR   | Variable "base_url" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+  46 | ERROR   | Variable "site_key" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+  48 | ERROR   | Variable "site_key" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+  53 | WARNING | Inline comments must end in full-stops, exclamation marks, or question marks
+     |         | (moodle.Commenting.InlineComment.InvalidEndChar)
+  54 | ERROR   | Variable "status_url" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+  54 | ERROR   | Variable "base_url" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+  54 | ERROR   | Variable "site_key" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+  55 | ERROR   | Variable "status_url" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+  60 | ERROR   | Variable "curl_error" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+  73 | WARNING | Inline comments must end in full-stops, exclamation marks, or question marks
+     |         | (moodle.Commenting.InlineComment.InvalidEndChar)
+  79 | ERROR   | Variable "status_url" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+  81 | ERROR   | Variable "curl_error" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+  88 | WARNING | Inline comments must start with a capital letter, digit or 3-dots sequence
+     |         | (moodle.Commenting.InlineComment.NotCapital)
+  94 | ERROR   | Variable "site_key" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+  95 | ERROR   | Variable "base_url" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+  97 | ERROR   | Variable "site_key" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 102 | ERROR   | Variable "monitored_events" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 103 | ERROR   | Variable "monitored_events" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 105 | WARNING | Inline comments must end in full-stops, exclamation marks, or question marks
+     |         | (moodle.Commenting.InlineComment.InvalidEndChar)
+ 122 | WARNING | Inline comments must start with a capital letter, digit or 3-dots sequence
+     |         | (moodle.Commenting.InlineComment.NotCapital)
+ 134 | ERROR   | Variable "site_key" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 135 | ERROR   | Variable "monitored_events" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 137 | ERROR   | Variable "site_key" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 145 | ERROR   | Variable "monitored_events" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 147 | ERROR   | Variable "site_key" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+------------------------------------------------------------------------------------------------------------------------------------
+
+
+FILE: /home/kcan/projects/moodleconnect/mc_plugin/connect.php
+------------------------------------------------------------------------------------------------------------------------------------
+FOUND 12 ERRORS AND 4 WARNINGS AFFECTING 15 LINES
+------------------------------------------------------------------------------------------------------------------------------------
+  37 | WARNING | Inline comments must end in full-stops, exclamation marks, or question marks
+     |         | (moodle.Commenting.InlineComment.InvalidEndChar)
+  45 | WARNING | Inline comments must end in full-stops, exclamation marks, or question marks
+     |         | (moodle.Commenting.InlineComment.InvalidEndChar)
+  46 | ERROR   | Variable "base_url" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+  47 | ERROR   | Variable "init_url" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+  47 | ERROR   | Variable "base_url" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+  49 | WARNING | Inline comments must end in full-stops, exclamation marks, or question marks
+     |         | (moodle.Commenting.InlineComment.InvalidEndChar)
+  50 | ERROR   | Variable "moodle_url" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+  51 | ERROR   | Variable "moodle_site_name" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+  54 | ERROR   | Variable "moodle_url" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+  55 | ERROR   | Variable "moodle_site_name" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+  60 | ERROR   | Variable "init_url" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+  73 | ERROR   | Variable "curl_error" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+  79 | ERROR   | Variable "curl_error" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+  93 | ERROR   | Variable "error_message" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+  96 | ERROR   | Variable "error_message" must not contain underscores.
+     |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 102 | WARNING | Inline comments must end in full-stops, exclamation marks, or question marks
+     |         | (moodle.Commenting.InlineComment.InvalidEndChar)
+------------------------------------------------------------------------------------------------------------------------------------
+
+
+FILE: /home/kcan/projects/moodleconnect/mc_plugin/lang/en/local_mc_plugin.php
+------------------------------------------------------------------------------------------------------------------------------------
+FOUND 0 ERRORS AND 16 WARNINGS AFFECTING 16 LINES
+------------------------------------------------------------------------------------------------------------------------------------
+  30 | WARNING | Inline comments must end in full-stops, exclamation marks, or question marks
+     |         | (moodle.Commenting.InlineComment.InvalidEndChar)
+  36 | WARNING | Inline comments must end in full-stops, exclamation marks, or question marks
+     |         | (moodle.Commenting.InlineComment.InvalidEndChar)
+  46 | WARNING | Inline comments must end in full-stops, exclamation marks, or question marks
+     |         | (moodle.Commenting.InlineComment.InvalidEndChar)
+  52 | WARNING | Inline comments must end in full-stops, exclamation marks, or question marks
+     |         | (moodle.Commenting.InlineComment.InvalidEndChar)
+  69 | WARNING | Inline comments must end in full-stops, exclamation marks, or question marks
+     |         | (moodle.Commenting.InlineComment.InvalidEndChar)
+  73 | WARNING | Inline comments must end in full-stops, exclamation marks, or question marks
+     |         | (moodle.Commenting.InlineComment.InvalidEndChar)
+  77 | WARNING | Inline comments must end in full-stops, exclamation marks, or question marks
+     |         | (moodle.Commenting.InlineComment.InvalidEndChar)
+  81 | WARNING | Inline comments must end in full-stops, exclamation marks, or question marks
+     |         | (moodle.Commenting.InlineComment.InvalidEndChar)
+  90 | WARNING | Inline comments must end in full-stops, exclamation marks, or question marks
+     |         | (moodle.Commenting.InlineComment.InvalidEndChar)
+  93 | WARNING | Inline comments must end in full-stops, exclamation marks, or question marks
+     |         | (moodle.Commenting.InlineComment.InvalidEndChar)
+ 108 | WARNING | Inline comments must end in full-stops, exclamation marks, or question marks
+     |         | (moodle.Commenting.InlineComment.InvalidEndChar)
+ 118 | WARNING | Inline comments must end in full-stops, exclamation marks, or question marks
+     |         | (moodle.Commenting.InlineComment.InvalidEndChar)
+ 125 | WARNING | Inline comments must end in full-stops, exclamation marks, or question marks
+     |         | (moodle.Commenting.InlineComment.InvalidEndChar)
+ 128 | WARNING | Inline comments must end in full-stops, exclamation marks, or question marks
+     |         | (moodle.Commenting.InlineComment.InvalidEndChar)
+ 136 | WARNING | Inline comments must end in full-stops, exclamation marks, or question marks
+     |         | (moodle.Commenting.InlineComment.InvalidEndChar)
+ 156 | WARNING | Inline comments must end in full-stops, exclamation marks, or question marks
+     |         | (moodle.Commenting.InlineComment.InvalidEndChar)
+------------------------------------------------------------------------------------------------------------------------------------
+
+
+FILE: /home/kcan/projects/moodleconnect/mc_plugin/lib.php
+------------------------------------------------------------------------------------------------------------------------------------
+FOUND 2 ERRORS AND 4 WARNINGS AFFECTING 6 LINES
+------------------------------------------------------------------------------------------------------------------------------------
+ 38 | WARNING | Inline comments must end in full-stops, exclamation marks, or question marks
+    |         | (moodle.Commenting.InlineComment.InvalidEndChar)
+ 43 | WARNING | Inline comments must end in full-stops, exclamation marks, or question marks
+    |         | (moodle.Commenting.InlineComment.InvalidEndChar)
+ 62 | WARNING | Inline comments must end in full-stops, exclamation marks, or question marks
+    |         | (moodle.Commenting.InlineComment.InvalidEndChar)
+ 67 | WARNING | Inline comments must end in full-stops, exclamation marks, or question marks
+    |         | (moodle.Commenting.InlineComment.InvalidEndChar)
+ 68 | ERROR   | Variable "api_url" must not contain underscores.
+    |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 69 | ERROR   | Variable "api_url" must not contain underscores.
+    |         | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+------------------------------------------------------------------------------------------------------------------------------------
+
+
+FILE: /home/kcan/projects/moodleconnect/mc_plugin/ajax_save.php
+------------------------------------------------------------------------------------------------------------------------------------
+FOUND 6 ERRORS AFFECTING 6 LINES
+------------------------------------------------------------------------------------------------------------------------------------
+ 54 | ERROR | Variable "monitored_events" must not contain underscores.
+    |       | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 55 | ERROR | Variable "debug_mode" must not contain underscores.
+    |       | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 70 | ERROR | Variable "monitored_events" must not contain underscores.
+    |       | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 71 | ERROR | Variable "monitored_events" must not contain underscores.
+    |       | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 75 | ERROR | Variable "debug_mode" must not contain underscores.
+    |       | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+ 76 | ERROR | Variable "debug_mode" must not contain underscores.
+    |       | (moodle.NamingConventions.ValidVariableName.VariableNameUnderscore)
+------------------------------------------------------------------------------------------------------------------------------------
+
+Time: 375ms; Memory: 18MB
+

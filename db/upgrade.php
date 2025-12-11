@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -23,8 +22,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Upgrade function for the MoodleConnect plugin.
  *
@@ -33,8 +30,7 @@ defined('MOODLE_INTERNAL') || die();
  * @param int $oldversion The version we are upgrading from
  * @return bool Always returns true
  */
-function xmldb_local_mc_plugin_upgrade($oldversion)
-{
+function xmldb_local_mc_plugin_upgrade($oldversion) {
     global $DB;
     $dbman = $DB->get_manager();
 
@@ -46,7 +42,7 @@ function xmldb_local_mc_plugin_upgrade($oldversion)
             'local_mc_plugin_sync',
             'local_mc_plugin_schema_cache',
             'local_mc_plugin_entity_map',
-            'local_mc_plugin_template'
+            'local_mc_plugin_template',
         ];
 
         foreach ($tables as $tablename) {
