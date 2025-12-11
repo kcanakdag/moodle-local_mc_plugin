@@ -18,7 +18,7 @@
  * Dynamic inspector service for extracting available fields from Moodle events.
  *
  * @package    local_mc_plugin
- * @copyright  2025 Moodle
+ * @copyright  2025 Kerem Can Akdag
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 

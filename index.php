@@ -18,7 +18,7 @@
  * Main entry point for MoodleConnect - redirects to settings page.
  *
  * @package    local_mc_plugin
- * @copyright  2025 MoodleConnect
+ * @copyright  2025 Kerem Can Akdag
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
