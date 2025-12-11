@@ -66,3 +66,18 @@ $string['sync_schema_desc'] = 'Sync event schemas to MoodleConnect for trigger c
 
 // Debug notifications
 $string['debug_event_triggered'] = 'MoodleConnect Debug: Event "{$a->event}" triggered and sent.';
+
+// Privacy API
+$string['privacy:metadata:moodleconnect_api'] = 'The MoodleConnect plugin transmits event data to the external MoodleConnect service for integration with third-party tools. This data is sent in real-time when monitored events occur in Moodle.';
+$string['privacy:metadata:moodleconnect_api:userid'] = 'The user ID from Moodle, used to identify the user associated with the event.';
+$string['privacy:metadata:moodleconnect_api:username'] = 'The username of the user associated with the event.';
+$string['privacy:metadata:moodleconnect_api:email'] = 'The email address of the user associated with the event.';
+$string['privacy:metadata:moodleconnect_api:firstname'] = 'The first name of the user associated with the event.';
+$string['privacy:metadata:moodleconnect_api:lastname'] = 'The last name of the user associated with the event.';
+$string['privacy:metadata:moodleconnect_api:idnumber'] = 'The ID number of the user (if set) associated with the event.';
+$string['privacy:metadata:moodleconnect_api:courseid'] = 'The course ID associated with the event (if applicable).';
+$string['privacy:metadata:moodleconnect_api:coursename'] = 'The course name associated with the event (if applicable).';
+$string['privacy:metadata:moodleconnect_api:eventtype'] = 'The type of Moodle event that occurred (e.g., user_created, course_viewed).';
+$string['privacy:metadata:moodleconnect_api:eventdata'] = 'Additional event-specific data that may include personal information depending on the event type and configuration.';
+$string['privacy:metadata:moodleconnect_api:timecreated'] = 'The timestamp when the event occurred in Moodle.';
+$string['privacy:export:note'] = 'This plugin does not store personal data locally in Moodle. Event data is transmitted to the MoodleConnect service (https://moodleconnect.com) for integration with external tools. To request export or deletion of data transmitted to MoodleConnect, please contact the service administrator or visit the MoodleConnect dashboard.';
