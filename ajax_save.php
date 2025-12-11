@@ -30,16 +30,24 @@ require_capability('moodle/site:config', context_system::instance());
 header('Content-Type: application/json');
 
 $action = optional_param('action', '', PARAM_ALPHA);
-// Use PARAM_RAW for site_key/site_secret as they contain base64url characters (-, _)
-$site_key = optional_param('site_key', null, PARAM_RAW);
-$site_secret = optional_param('site_secret', null, PARAM_RAW);
+// Use PARAM_RAW for site_key/site_secret as they contain base64url characters (-, _).
+// Accept both camelCase (from JS) and snake_case (legacy) parameter names.
+$sitekey = optional_param('siteKey', null, PARAM_RAW);
+$sitesecret = optional_param('siteSecret', null, PARAM_RAW);
+// Fallback to snake_case for backwards compatibility.
+if ($sitekey === null) {
+    $sitekey = optional_param('site_key', null, PARAM_RAW);
+}
+if ($sitesecret === null) {
+    $sitesecret = optional_param('site_secret', null, PARAM_RAW);
+}
 
-// Validate site_key and site_secret format (base64url: alphanumeric, -, _)
-if ($site_key !== null && !preg_match('/^[A-Za-z0-9_-]+$/', $site_key)) {
+// Validate site_key and site_secret format (base64url: alphanumeric, -, _).
+if ($sitekey !== null && !preg_match('/^[A-Za-z0-9_-]+$/', $sitekey)) {
     echo json_encode(['success' => false, 'message' => get_string('error_invalid_site_key_format', 'local_mc_plugin')]);
     exit;
 }
-if ($site_secret !== null && !preg_match('/^[A-Za-z0-9_-]+$/', $site_secret)) {
+if ($sitesecret !== null && !preg_match('/^[A-Za-z0-9_-]+$/', $sitesecret)) {
     echo json_encode(['success' => false, 'message' => get_string('error_invalid_site_secret_format', 'local_mc_plugin')]);
     exit;
 }
@@ -49,13 +57,13 @@ $debug_mode = optional_param('debug_mode', null, PARAM_INT);
 if ($action === 'save') {
     $saved = [];
     
-    if ($site_key !== null) {
-        set_config('site_key', $site_key, 'local_mc_plugin');
+    if ($sitekey !== null) {
+        set_config('site_key', $sitekey, 'local_mc_plugin');
         $saved[] = 'site_key';
     }
     
-    if ($site_secret !== null) {
-        set_config('site_secret', $site_secret, 'local_mc_plugin');
+    if ($sitesecret !== null) {
+        set_config('site_secret', $sitesecret, 'local_mc_plugin');
         $saved[] = 'site_secret';
     }
     

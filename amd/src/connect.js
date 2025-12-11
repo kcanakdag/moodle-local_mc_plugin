@@ -175,8 +175,8 @@ define(['jquery'], function($) {
             data: {
                 action: 'save',
                 sesskey: config.sesskey,
-                site_key: siteKey,
-                site_secret: siteSecret
+                siteKey: siteKey,
+                siteSecret: siteSecret
             },
             dataType: 'json'
         }).done(function(response) {
