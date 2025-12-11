@@ -29,10 +29,24 @@ defined('MOODLE_INTERNAL') || die();
 use local_mc_plugin\local\moodleconnect_client;
 use local_mc_plugin\local\dynamic_inspector;
 
+/**
+ * Event observer class for capturing and forwarding Moodle events to MoodleConnect.
+ *
+ * @package    local_mc_plugin
+ * @copyright  2025 Kerem Can Akdag
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class observer {
     
     /**
      * Generic handler for ALL events.
+     *
+     * This method is called for every event that occurs in Moodle. It checks if the event
+     * is in the monitored events list, extracts the event data, and sends it to MoodleConnect.
+     * In debug mode, it also logs events to a file and displays notifications.
+     *
+     * @param \core\event\base $event The Moodle event object
+     * @return void
      */
     public static function handle_event(\core\event\base $event) {
         global $CFG;

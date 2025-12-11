@@ -33,6 +33,12 @@ class dynamic_inspector {
 
     /**
      * Get schema for a single event class (for schema sync).
+     *
+     * Returns a structured array containing the event type, friendly name, component,
+     * and a flat list of available fields in dot notation (e.g., "user.email").
+     *
+     * @param string $eventclass Fully qualified event class name
+     * @return array Schema array with keys: event_type, name, component, fields
      */
     public function get_event_schema(string $eventclass): array {
         $fields = $this->get_mock_fields($eventclass);
@@ -54,6 +60,9 @@ class dynamic_inspector {
 
     /**
      * Get schemas for multiple event classes.
+     *
+     * @param array $eventclasses Array of fully qualified event class names
+     * @return array Array of schema arrays
      */
     public function get_event_schemas(array $eventclasses): array {
         $schemas = [];
@@ -68,6 +77,13 @@ class dynamic_inspector {
 
     /**
      * Extract data from a live event instance.
+     *
+     * Extracts user, course, object, and event metadata from a triggered event.
+     * Returns a structured array with categories (user, course, object, event) containing
+     * field information with values, types, and labels.
+     *
+     * @param \core\event\base $event The event instance to extract data from
+     * @return array Structured array of extracted data organized by category
      */
     public function extract_data(\core\event\base $event): array {
         return $this->extract_fields_from_event($event);
@@ -75,6 +91,12 @@ class dynamic_inspector {
 
     /**
      * Get sample data from recent events of the specified class.
+     *
+     * Attempts to find a recent event of the specified type in the log store
+     * and extract its data. Falls back to mock data if no recent events are found.
+     *
+     * @param string $eventclass Fully qualified event class name
+     * @return array Structured array of sample data organized by category
      */
     public function get_sample_data(string $eventclass): array {
         global $DB;
@@ -98,6 +120,12 @@ class dynamic_inspector {
         return $this->get_mock_fields($eventclass);
     }
 
+    /**
+     * Extract fields from a live event instance.
+     *
+     * @param \core\event\base $event The event instance
+     * @return array Structured array of extracted fields
+     */
     private function extract_fields_from_event(\core\event\base $event): array {
         global $DB;
 
@@ -176,6 +204,13 @@ class dynamic_inspector {
         return $fields;
     }
 
+    /**
+     * Extract fields from a log entry.
+     *
+     * @param \stdClass $logevent Log entry from logstore_standard_log table
+     * @param string $eventclass Fully qualified event class name
+     * @return array Structured array of extracted fields
+     */
     private function extract_fields_from_log(\stdClass $logevent, string $eventclass): array {
         global $DB;
 
@@ -247,6 +282,15 @@ class dynamic_inspector {
         return $fields;
     }
 
+    /**
+     * Generate mock field structure for an event class.
+     *
+     * Used when no real event data is available. Returns a structure with null values
+     * but correct field names and types based on the event's object table schema.
+     *
+     * @param string $eventclass Fully qualified event class name
+     * @return array Structured array of mock fields
+     */
     private function get_mock_fields(string $eventclass): array {
         $objectfields = $this->get_object_fields_from_event_class($eventclass);
 
@@ -275,6 +319,12 @@ class dynamic_inspector {
         ];
     }
 
+    /**
+     * Get object fields from an event class definition.
+     *
+     * @param string $eventclass Fully qualified event class name
+     * @return array Array of field definitions
+     */
     private function get_object_fields_from_event_class(string $eventclass): array {
         $objecttable = $this->get_objecttable_from_class($eventclass);
 
@@ -285,6 +335,15 @@ class dynamic_inspector {
         return $this->get_fields_from_table_schema($objecttable);
     }
 
+    /**
+     * Extract the object table name from an event class.
+     *
+     * Uses reflection to determine which database table the event's object refers to.
+     * Tries multiple methods: static property, instance creation, and mapping method.
+     *
+     * @param string $eventclass Fully qualified event class name
+     * @return string|null The table name, or null if not determinable
+     */
     private function get_objecttable_from_class(string $eventclass): ?string {
         if (!class_exists($eventclass)) {
             return null;
@@ -341,6 +400,12 @@ class dynamic_inspector {
         return null;
     }
 
+    /**
+     * Get field definitions from a database table schema.
+     *
+     * @param string $tablename Database table name (without prefix)
+     * @return array Array of field definitions with null values
+     */
     private function get_fields_from_table_schema(string $tablename): array {
         global $DB;
 
@@ -362,6 +427,12 @@ class dynamic_inspector {
         return $fields;
     }
 
+    /**
+     * Map database column type to field type.
+     *
+     * @param object $column Column definition object from get_columns()
+     * @return string Field type: 'int', 'float', 'bool', 'datetime', or 'string'
+     */
     private function map_db_type_to_field_type($column): string {
         $type = strtolower($column->type ?? '');
         $name = strtolower($column->name ?? '');
@@ -386,6 +457,12 @@ class dynamic_inspector {
         return 'string';
     }
 
+    /**
+     * Detect the type of a value.
+     *
+     * @param mixed $value The value to analyze
+     * @return string Field type: 'int', 'float', 'bool', 'datetime', or 'string'
+     */
     private function detect_type($value): string {
         if (is_null($value)) {
             return 'string';
@@ -409,12 +486,24 @@ class dynamic_inspector {
         return 'string';
     }
 
+    /**
+     * Format a field key into a human-readable label.
+     *
+     * @param string $key Field key (e.g., "first_name")
+     * @return string Formatted label (e.g., "First Name")
+     */
     private function format_label(string $key): string {
         $label = str_replace('_', ' ', $key);
         $label = ucwords($label);
         return $label;
     }
 
+    /**
+     * Extract component name from event class.
+     *
+     * @param string $eventclass Fully qualified event class name
+     * @return string Component name (e.g., "core", "mod_forum")
+     */
     private function extract_component(string $eventclass): string {
         $parts = explode('\\', $eventclass);
         if (count($parts) > 0) {
@@ -423,6 +512,13 @@ class dynamic_inspector {
         return 'unknown';
     }
 
+    /**
+     * Get a nested value from extracted data using dot notation.
+     *
+     * @param array $data Extracted event data structure
+     * @param string $path Dot notation path (e.g., "user.email")
+     * @return mixed|null The value at the path, or null if not found
+     */
     public function get_nested_value(array $data, string $path) {
         $parts = explode('.', $path);
 

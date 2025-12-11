@@ -33,6 +33,15 @@ require_once($CFG->libdir . '/adminlib.php');
  */
 class setting_configtext_nodefault extends \admin_setting_configtext {
 
+    /**
+     * Returns the HTML for this setting.
+     *
+     * Overrides parent to hide the "Default: Empty" text.
+     *
+     * @param mixed $data Current value
+     * @param string $query Search query
+     * @return string HTML output
+     */
     public function output_html($data, $query = '') {
         global $OUTPUT;
 

@@ -36,12 +36,27 @@ require_once($CFG->dirroot . '/local/mc_plugin/lib.php');
  */
 class setting_connect_button extends \admin_setting {
 
+    /** @var bool Whether the site is currently connected */
     private $is_connected;
+    
+    /** @var string URL to the connect.php endpoint */
     private $connect_url;
+    
+    /** @var string URL to the ajax_save.php endpoint */
     private $ajax_save_url;
+    
+    /** @var string MoodleConnect API base URL */
     private $api_url;
+    
+    /** @var string Session key for CSRF protection */
     private $sesskey;
 
+    /**
+     * Constructor.
+     *
+     * @param string $name Unique setting name
+     * @param bool $is_connected Whether the site is currently connected
+     */
     public function __construct($name, $is_connected) {
         global $CFG;
         
@@ -54,14 +69,32 @@ class setting_connect_button extends \admin_setting {
         parent::__construct($name, '', '', '');
     }
 
+    /**
+     * Returns current value of this setting.
+     *
+     * @return bool Always returns true (this is a button, not a stored value)
+     */
     public function get_setting() {
         return true;
     }
 
+    /**
+     * This setting is not stored, so write does nothing.
+     *
+     * @param mixed $data Unused
+     * @return string Empty string (no error)
+     */
     public function write_setting($data) {
         return '';
     }
 
+    /**
+     * Returns the HTML for this setting.
+     *
+     * @param mixed $data Current value
+     * @param string $query Search query
+     * @return string HTML output
+     */
     public function output_html($data, $query = '') {
         $connect_label = get_string('connect_button', 'local_mc_plugin');
         $reconnect_label = get_string('reconnect_button', 'local_mc_plugin');

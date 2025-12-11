@@ -28,12 +28,37 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir . '/adminlib.php');
 
+/**
+ * Custom admin setting for event selection with search and filtering.
+ *
+ * Provides an interactive UI for selecting which Moodle events to monitor,
+ * with search, category filtering, and bulk selection capabilities.
+ *
+ * @package    local_mc_plugin
+ * @copyright  2025 Kerem Can Akdag
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class setting_event_selection extends \admin_setting_configtext {
 
+    /**
+     * Constructor.
+     *
+     * @param string $name Unique setting name
+     * @param string $visiblename Localised label
+     * @param string $description Localised description
+     * @param mixed $defaultsetting Default value
+     */
     public function __construct($name, $visiblename, $description, $defaultsetting) {
         parent::__construct($name, $visiblename, $description, $defaultsetting, PARAM_RAW);
     }
 
+    /**
+     * Return the HTML for this setting.
+     *
+     * @param mixed $data Current value
+     * @param string $query Search query
+     * @return string HTML output
+     */
     public function output_html($data, $query = '') {
         global $OUTPUT, $PAGE;
 

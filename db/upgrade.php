@@ -24,6 +24,14 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Upgrade function for the MoodleConnect plugin.
+ *
+ * Handles database schema changes when upgrading from older versions.
+ *
+ * @param int $oldversion The version we are upgrading from
+ * @return bool Always returns true
+ */
 function xmldb_local_mc_plugin_upgrade($oldversion) {
     global $DB;
     $dbman = $DB->get_manager();

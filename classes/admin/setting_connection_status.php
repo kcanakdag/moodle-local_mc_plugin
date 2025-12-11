@@ -33,21 +33,46 @@ require_once($CFG->libdir . '/adminlib.php');
  */
 class setting_connection_status extends \admin_setting {
 
+    /** @var bool Whether the site is currently connected */
     private $is_connected;
 
+    /**
+     * Constructor.
+     *
+     * @param string $name Unique setting name
+     * @param bool $is_connected Whether the site is currently connected
+     */
     public function __construct($name, $is_connected) {
         $this->is_connected = $is_connected;
         parent::__construct($name, get_string('connection_status', 'local_mc_plugin'), '', '');
     }
 
+    /**
+     * Returns current value of this setting.
+     *
+     * @return bool Always returns true (this is a status display, not a stored value)
+     */
     public function get_setting() {
         return true;
     }
 
+    /**
+     * This setting is not stored, so write does nothing.
+     *
+     * @param mixed $data Unused
+     * @return string Empty string (no error)
+     */
     public function write_setting($data) {
         return '';
     }
 
+    /**
+     * Returns the HTML for this setting.
+     *
+     * @param mixed $data Current value
+     * @param string $query Search query
+     * @return string HTML output
+     */
     public function output_html($data, $query = '') {
         $sync_url = (new \moodle_url('/local/mc_plugin/sync_schema.php'))->out(false);
         

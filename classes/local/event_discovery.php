@@ -38,6 +38,11 @@ class event_discovery {
 
     /**
      * Get all available Moodle events.
+     *
+     * Returns a cached list of all discoverable events in the Moodle installation.
+     * The list is cached for performance.
+     *
+     * @return array Array of event information arrays
      */
     public function get_all_events(): array {
         $cache = \cache::make('local_mc_plugin', 'mc_metadata');
@@ -55,6 +60,10 @@ class event_discovery {
 
     /**
      * Get events grouped by category.
+     *
+     * Returns events organized by component/category with alphabetical sorting.
+     *
+     * @return array Associative array with category names as keys and event arrays as values
      */
     public function get_events_by_category(): array {
         $events = $this->get_all_events();
@@ -82,6 +91,11 @@ class event_discovery {
 
     /**
      * Search events by query string.
+     *
+     * Searches event names, class names, components, and descriptions for the query.
+     *
+     * @param string $query Search query string
+     * @return array Array of matching event information arrays
      */
     public function search_events(string $query): array {
         if (empty(trim($query))) {
@@ -110,6 +124,9 @@ class event_discovery {
 
     /**
      * Get detailed information about a specific event.
+     *
+     * @param string $eventclass Fully qualified event class name
+     * @return array|null Event information array, or null if not found
      */
     public function get_event_info(string $eventclass): ?array {
         $events = $this->get_all_events();
@@ -125,6 +142,10 @@ class event_discovery {
 
     /**
      * Clear the event cache.
+     *
+     * Forces a fresh discovery of events on the next request.
+     *
+     * @return void
      */
     public function clear_cache(): void {
         $cache = \cache::make('local_mc_plugin', 'mc_metadata');
@@ -133,6 +154,11 @@ class event_discovery {
 
     /**
      * Discover all events from Moodle components.
+     *
+     * Scans all Moodle components for event classes and filters out abstract
+     * and deprecated events.
+     *
+     * @return array Array of event information arrays
      */
     private function discover_events(): array {
         global $CFG;
@@ -196,6 +222,9 @@ class event_discovery {
 
     /**
      * Get category name for an event based on its component.
+     *
+     * @param string $eventclass Fully qualified event class name
+     * @return string Human-readable category name
      */
     private function get_category(string $eventclass): string {
         $component = $this->get_component($eventclass);
@@ -232,6 +261,9 @@ class event_discovery {
 
     /**
      * Extract component name from event class.
+     *
+     * @param string $eventclass Fully qualified event class name
+     * @return string Component name (e.g., "core", "mod_forum")
      */
     private function get_component(string $eventclass): string {
         $parts = explode('\\', $eventclass);
@@ -251,6 +283,9 @@ class event_discovery {
 
     /**
      * Get event description from the event class.
+     *
+     * @param string $eventclass Fully qualified event class name
+     * @return string Event description (currently returns empty string)
      */
     private function get_description(string $eventclass): string {
         try {
