@@ -115,7 +115,7 @@ final class observer_test extends \advanced_testcase {
 
         // Set monitored events but no site_key.
         set_config('monitored_events', '\core\event\user_loggedin', 'local_mc_plugin');
-        unset_config('site_key', 'local_mc_plugin');
+        set_config('site_key', '', 'local_mc_plugin');
 
         // Create event.
         $user = $this->getDataGenerator()->create_user();

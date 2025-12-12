@@ -41,7 +41,7 @@ final class moodleconnect_client_test extends \advanced_testcase {
     public function test_send_event_missing_site_key(): void {
         $this->resetAfterTest(true);
 
-        unset_config('site_key', 'local_mc_plugin');
+        set_config('site_key', '', 'local_mc_plugin');
         set_config('site_secret', 'test_secret', 'local_mc_plugin');
 
         $result = moodleconnect_client::send_event('\core\event\user_created', ['test' => 'data']);
@@ -59,7 +59,7 @@ final class moodleconnect_client_test extends \advanced_testcase {
         $this->resetAfterTest(true);
 
         set_config('site_key', 'test_key', 'local_mc_plugin');
-        unset_config('site_secret', 'local_mc_plugin');
+        set_config('site_secret', '', 'local_mc_plugin');
 
         $result = moodleconnect_client::send_event('\core\event\user_created', ['test' => 'data']);
 
@@ -73,7 +73,7 @@ final class moodleconnect_client_test extends \advanced_testcase {
     public function test_sync_schema_missing_site_key(): void {
         $this->resetAfterTest(true);
 
-        unset_config('site_key', 'local_mc_plugin');
+        set_config('site_key', '', 'local_mc_plugin');
         set_config('site_secret', 'test_secret', 'local_mc_plugin');
 
         $result = moodleconnect_client::sync_schema([]);
@@ -89,7 +89,7 @@ final class moodleconnect_client_test extends \advanced_testcase {
         $this->resetAfterTest(true);
 
         set_config('site_key', 'test_key', 'local_mc_plugin');
-        unset_config('site_secret', 'local_mc_plugin');
+        set_config('site_secret', '', 'local_mc_plugin');
 
         $result = moodleconnect_client::sync_schema([]);
 
