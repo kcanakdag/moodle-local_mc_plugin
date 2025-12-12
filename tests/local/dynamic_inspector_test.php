@@ -209,7 +209,6 @@ final class dynamic_inspector_test extends \advanced_testcase {
         // Create event with valid course but test that missing course is handled.
         $event = \core\event\user_loggedin::create([
             'objectid' => $user->id,
-            'context' => \context_system::instance(),
             'userid' => $user->id,
             'other' => ['username' => $user->username],
         ]);

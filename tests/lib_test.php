@@ -25,6 +25,9 @@
 
 namespace local_mc_plugin;
 
+// Require lib.php to load the functions being tested.
+require_once(__DIR__ . '/../lib.php');
+
 /**
  * Test cases for lib.php functions.
  *

@@ -372,8 +372,8 @@ class dynamic_inspector {
             }
 
             if ($reflection->isSubclassOf('\core\event\base') && !$reflection->isAbstract()) {
+                // Try without context first (some events auto-set it from userid).
                 $dummydata = [
-                    'context' => \context_system::instance(),
                     'objectid' => 1,
                     'userid' => 1,
                     'relateduserid' => 1,
@@ -385,7 +385,20 @@ class dynamic_inspector {
                         return $event->objecttable;
                     }
                 } catch (\Exception $e) {
-                    // Event creation may fail for some event types - ignore.
+                    // Try with explicit context if first attempt failed.
+                    try {
+                        $dummydata['context'] = \context_system::instance();
+                        $event = $eventclass::create($dummydata);
+                        if (!empty($event->objecttable)) {
+                            return $event->objecttable;
+                        }
+                    } catch (\Exception $e2) {
+                        // Event creation may fail for some event types - ignore.
+                        unset($e2);
+                    } catch (\Error $e2) {
+                        // Event creation may fail for some event types - ignore.
+                        unset($e2);
+                    }
                     unset($e);
                 } catch (\Error $e) {
                     // Event creation may fail for some event types - ignore.
