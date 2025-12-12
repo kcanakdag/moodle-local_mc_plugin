@@ -46,16 +46,16 @@ if ($action === 'init') {
     $cachekey = 'connect_attempts_' . $USER->id;
     $cache = \cache::make('local_mc_plugin', 'mc_metadata');
     $attempts = $cache->get($cachekey);
-    
+
     if ($attempts === false) {
         $attempts = ['count' => 0, 'reset_time' => time() + 60];
     }
-    
+
     // Reset counter if time window expired.
     if (time() > $attempts['reset_time']) {
         $attempts = ['count' => 0, 'reset_time' => time() + 60];
     }
-    
+
     if ($attempts['count'] >= 5) {
         echo json_encode([
             'success' => false,
@@ -63,7 +63,7 @@ if ($action === 'init') {
         ]);
         exit;
     }
-    
+
     $attempts['count']++;
     $cache->set($cachekey, $attempts);
     // Generate a connection token by calling MoodleConnect API.

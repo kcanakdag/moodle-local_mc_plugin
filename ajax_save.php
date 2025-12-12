@@ -89,7 +89,7 @@ if ($action === 'save') {
                 // Normalize class name (remove leading backslash).
                 $class = ltrim($class, '\\');
                 $fullclass = '\\' . $class;
-                
+
                 // Check if class exists and is a valid event.
                 if (!class_exists($fullclass)) {
                     echo json_encode(['success' => false, 'message' => 'Invalid event class: ' . $class]);
