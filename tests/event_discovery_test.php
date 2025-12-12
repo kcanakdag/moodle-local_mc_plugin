@@ -35,7 +35,6 @@ namespace local_mc_plugin\local;
  * @covers     \local_mc_plugin\local\event_discovery
  */
 class event_discovery_test extends \advanced_testcase {
-
     /**
      * Test get_all_events returns array of events.
      */

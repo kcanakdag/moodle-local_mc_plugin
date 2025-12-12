@@ -35,7 +35,6 @@ namespace local_mc_plugin\local;
  * @covers     \local_mc_plugin\local\moodleconnect_client
  */
 class moodleconnect_client_test extends \advanced_testcase {
-
     /**
      * Test send_event returns error when site_key is missing.
      */

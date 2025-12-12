@@ -36,7 +36,6 @@ namespace local_mc_plugin;
  * @covers     ::local_mc_plugin_get_frontend_url
  */
 class lib_test extends \advanced_testcase {
-
     /**
      * Test get_api_url returns default production URL.
      */
@@ -129,3 +128,4 @@ class lib_test extends \advanced_testcase {
         $url = local_mc_plugin_get_frontend_url();
         $this->assertEquals('http://localhost:5000', $url);
     }
+}

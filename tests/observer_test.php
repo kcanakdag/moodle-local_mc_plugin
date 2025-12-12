@@ -35,7 +35,6 @@ namespace local_mc_plugin;
  * @covers     \local_mc_plugin\observer
  */
 class observer_test extends \advanced_testcase {
-
     /**
      * Test that handle_event ignores events not in monitored list.
      */

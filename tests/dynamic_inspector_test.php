@@ -35,7 +35,6 @@ namespace local_mc_plugin\local;
  * @covers     \local_mc_plugin\local\dynamic_inspector
  */
 class dynamic_inspector_test extends \advanced_testcase {
-
     /**
      * Test get_event_schema returns correct structure.
      */
