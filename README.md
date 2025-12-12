@@ -3,6 +3,7 @@
 [![Moodle Plugin](https://img.shields.io/badge/Moodle-4.0%2B-orange.svg)](https://moodle.org)
 [![PHP Version](https://img.shields.io/badge/PHP-8.1%2B-blue.svg)](https://php.net)
 [![License](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](LICENSE)
+[![Coding Standards](https://img.shields.io/badge/Coding%20Standards-Compliant-brightgreen.svg)](https://moodledev.io/general/development/policies/codingstyle)
 
 The official Moodle plugin for [MoodleConnect](https://moodleconnect.com) - a micro-SaaS platform that bridges Moodle LMS events to external tools like Airtable, webhooks, and more.
 
@@ -220,6 +221,20 @@ For full privacy details, see the [MoodleConnect Privacy Policy](https://moodlec
 - **Issue Tracker**: [GitHub Issues](https://github.com/kcanakdag/moodle-local_mc_plugin/issues)
 - **Email Support**: support@moodleconnect.com
 
+## Code Quality
+
+This plugin is **fully compliant with Moodle coding standards**:
+
+- ✅ Zero phpcs errors and warnings
+- ✅ All variables follow Moodle naming conventions (no underscores)
+- ✅ Proper inline comment formatting
+- ✅ Complete PHPDoc documentation
+- ✅ Line length limits respected (132/180 characters)
+- ✅ Proper error handling documentation
+- ✅ Moodle-approved function usage
+
+The plugin has been validated using the official [moodle-plugin-ci](https://github.com/moodlehq/moodle-plugin-ci) tool and passes all code quality checks required for the Moodle Plugin Directory.
+
 ## Contributing
 
 We welcome contributions! If you'd like to contribute:
@@ -230,7 +245,11 @@ We welcome contributions! If you'd like to contribute:
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-Please ensure your code follows [Moodle coding standards](https://moodledev.io/general/development/policies/codingstyle).
+Please ensure your code follows [Moodle coding standards](https://moodledev.io/general/development/policies/codingstyle). Run phpcs before submitting:
+
+```bash
+/path/to/moodle-plugin-ci/bin/moodle-plugin-ci phpcs .
+```
 
 ## License
 
