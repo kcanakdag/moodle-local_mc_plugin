@@ -45,7 +45,7 @@ final class lib_test extends \advanced_testcase {
 
         unset($CFG->local_mc_plugin_moodleconnect_url);
 
-        $url = local_mc_plugin_get_api_url();
+        $url = \local_mc_plugin_get_api_url();
         $this->assertEquals('https://moodleconnect.com/api', $url);
     }
 
@@ -58,7 +58,7 @@ final class lib_test extends \advanced_testcase {
 
         $CFG->local_mc_plugin_moodleconnect_url = 'http://localhost:5000/api';
 
-        $url = local_mc_plugin_get_api_url();
+        $url = \local_mc_plugin_get_api_url();
         $this->assertEquals('http://localhost:5000/api', $url);
     }
 
@@ -71,7 +71,7 @@ final class lib_test extends \advanced_testcase {
 
         $CFG->local_mc_plugin_moodleconnect_url = 'http://localhost:5000/api/';
 
-        $url = local_mc_plugin_get_api_url();
+        $url = \local_mc_plugin_get_api_url();
         $this->assertEquals('http://localhost:5000/api', $url);
     }
 
@@ -85,7 +85,7 @@ final class lib_test extends \advanced_testcase {
         unset($CFG->local_mc_plugin_moodleconnect_url);
         unset($CFG->local_mc_plugin_moodleconnect_frontend_url);
 
-        $url = local_mc_plugin_get_frontend_url();
+        $url = \local_mc_plugin_get_frontend_url();
         $this->assertEquals('https://moodleconnect.com', $url);
     }
 
@@ -98,7 +98,7 @@ final class lib_test extends \advanced_testcase {
 
         $CFG->local_mc_plugin_moodleconnect_frontend_url = 'http://localhost:5173';
 
-        $url = local_mc_plugin_get_frontend_url();
+        $url = \local_mc_plugin_get_frontend_url();
         $this->assertEquals('http://localhost:5173', $url);
     }
 
@@ -111,7 +111,7 @@ final class lib_test extends \advanced_testcase {
 
         $CFG->local_mc_plugin_moodleconnect_frontend_url = 'http://localhost:5173/';
 
-        $url = local_mc_plugin_get_frontend_url();
+        $url = \local_mc_plugin_get_frontend_url();
         $this->assertEquals('http://localhost:5173', $url);
     }
 
@@ -125,7 +125,7 @@ final class lib_test extends \advanced_testcase {
         $CFG->local_mc_plugin_moodleconnect_url = 'http://localhost:5000/api';
         unset($CFG->local_mc_plugin_moodleconnect_frontend_url);
 
-        $url = local_mc_plugin_get_frontend_url();
+        $url = \local_mc_plugin_get_frontend_url();
         $this->assertEquals('http://localhost:5000', $url);
     }
 }
