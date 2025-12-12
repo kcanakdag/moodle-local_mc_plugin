@@ -169,9 +169,14 @@ class setting_action_buttons extends \admin_setting {
             }
 
             function syncEvents(callback) {
-                fetch(syncUrl + "?action=sync", {
+                var params = new URLSearchParams();
+                params.append("action", "sync");
+                params.append("sesskey", sesskey);
+
+                fetch(syncUrl, {
                     method: "POST",
-                    headers: { "Content-Type": "application/json" }
+                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                    body: params.toString()
                 })
                 .then(function(r) { return r.json(); })
                 .then(function(data) {

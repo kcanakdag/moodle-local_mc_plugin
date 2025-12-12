@@ -36,6 +36,13 @@ $action = optional_param('action', '', PARAM_ALPHA);
 
 // AJAX: Check connection status.
 if ($action === 'status') {
+    // Use POST for sesskey protection (prevent sesskey leakage in logs/history).
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        header('Content-Type: application/json');
+        echo json_encode(['configured' => false, 'connected' => false, 'error' => 'Invalid request method']);
+        exit;
+    }
+    require_sesskey();
     header('Content-Type: application/json');
 
     $baseurl = local_mc_plugin_get_api_url();
@@ -85,6 +92,13 @@ if ($action === 'status') {
 
 // AJAX: Sync event schemas.
 if ($action === 'sync') {
+    // Use POST for sesskey protection.
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        header('Content-Type: application/json');
+        echo json_encode(['success' => false, 'message' => 'Invalid request method']);
+        exit;
+    }
+    require_sesskey();
     header('Content-Type: application/json');
 
     $sitekey = get_config('local_mc_plugin', 'site_key');

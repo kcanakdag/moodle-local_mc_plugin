@@ -35,6 +35,9 @@ class setting_connection_status extends \admin_setting {
     /** @var bool Whether the site is currently connected */
     private $isconnected;
 
+    /** @var string Session key for CSRF protection */
+    private $sesskey;
+
     /**
      * Constructor.
      *
@@ -43,6 +46,7 @@ class setting_connection_status extends \admin_setting {
      */
     public function __construct($name, $isconnected) {
         $this->isconnected = $isconnected;
+        $this->sesskey = sesskey();
         parent::__construct($name, get_string('connection_status', 'local_mc_plugin'), '', '');
     }
 
@@ -96,6 +100,7 @@ class setting_connection_status extends \admin_setting {
                 var statusDot = document.getElementById("mc-status-dot");
                 var syncStatus = document.getElementById("mc-sync-status");
                 var syncUrl = "' . $syncurl . '";
+                var sesskey = "' . $this->sesskey . '";
 
                 function getSelectedEventCount() {
                     var eventsInput = document.querySelector("input[name=\"s_local_mc_plugin_monitored_events\"]");
@@ -171,7 +176,15 @@ class setting_connection_status extends \admin_setting {
                     syncStatus.textContent = "";
                     testResult.innerHTML = "";
 
-                    fetch(syncUrl + "?action=status", { method: "GET" })
+                    var params = new URLSearchParams();
+                    params.append("action", "status");
+                    params.append("sesskey", sesskey);
+
+                    fetch(syncUrl, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                        body: params.toString()
+                    })
                     .then(function(r) { return r.json(); })
                     .then(function(data) {
                         if (data.connected) {

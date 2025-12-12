@@ -42,6 +42,30 @@ header('Content-Type: application/json');
 $action = required_param('action', PARAM_ALPHA);
 
 if ($action === 'init') {
+    // Rate limiting: max 5 connection attempts per minute per user.
+    $cachekey = 'connect_attempts_' . $USER->id;
+    $cache = \cache::make('local_mc_plugin', 'mc_metadata');
+    $attempts = $cache->get($cachekey);
+    
+    if ($attempts === false) {
+        $attempts = ['count' => 0, 'reset_time' => time() + 60];
+    }
+    
+    // Reset counter if time window expired.
+    if (time() > $attempts['reset_time']) {
+        $attempts = ['count' => 0, 'reset_time' => time() + 60];
+    }
+    
+    if ($attempts['count'] >= 5) {
+        echo json_encode([
+            'success' => false,
+            'message' => 'Too many connection attempts. Please wait a minute and try again.',
+        ]);
+        exit;
+    }
+    
+    $attempts['count']++;
+    $cache->set($cachekey, $attempts);
     // Generate a connection token by calling MoodleConnect API.
     $baseurl = local_mc_plugin_get_api_url();
     $initurl = $baseurl . '/connect/init';

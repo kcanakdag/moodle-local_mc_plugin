@@ -42,14 +42,28 @@ if ($sitesecret === null) {
     $sitesecret = optional_param('site_secret', null, PARAM_RAW);
 }
 
-// Validate site_key and site_secret format (base64url: alphanumeric, -, _).
-if ($sitekey !== null && !preg_match('/^[A-Za-z0-9_-]+$/', $sitekey)) {
-    echo json_encode(['success' => false, 'message' => get_string('error_invalid_site_key_format', 'local_mc_plugin')]);
-    exit;
+// Validate site_key and site_secret format (base64url: alphanumeric, -, _) and length.
+if ($sitekey !== null) {
+    $keylen = strlen($sitekey);
+    if ($keylen < 16 || $keylen > 128) {
+        echo json_encode(['success' => false, 'message' => 'Invalid site key length (must be 16-128 characters)']);
+        exit;
+    }
+    if (!preg_match('/^[A-Za-z0-9_-]+$/', $sitekey)) {
+        echo json_encode(['success' => false, 'message' => get_string('error_invalid_site_key_format', 'local_mc_plugin')]);
+        exit;
+    }
 }
-if ($sitesecret !== null && !preg_match('/^[A-Za-z0-9_-]+$/', $sitesecret)) {
-    echo json_encode(['success' => false, 'message' => get_string('error_invalid_site_secret_format', 'local_mc_plugin')]);
-    exit;
+if ($sitesecret !== null) {
+    $secretlen = strlen($sitesecret);
+    if ($secretlen < 16 || $secretlen > 128) {
+        echo json_encode(['success' => false, 'message' => 'Invalid site secret length (must be 16-128 characters)']);
+        exit;
+    }
+    if (!preg_match('/^[A-Za-z0-9_-]+$/', $sitesecret)) {
+        echo json_encode(['success' => false, 'message' => get_string('error_invalid_site_secret_format', 'local_mc_plugin')]);
+        exit;
+    }
 }
 $monitoredevents = optional_param('monitored_events', null, PARAM_RAW);
 $debugmode = optional_param('debug_mode', null, PARAM_INT);
@@ -68,6 +82,25 @@ if ($action === 'save') {
     }
 
     if ($monitoredevents !== null) {
+        // Validate that all event classes are valid.
+        if (!empty(trim($monitoredevents))) {
+            $classes = array_filter(array_map('trim', explode(',', $monitoredevents)));
+            foreach ($classes as $class) {
+                // Normalize class name (remove leading backslash).
+                $class = ltrim($class, '\\');
+                $fullclass = '\\' . $class;
+                
+                // Check if class exists and is a valid event.
+                if (!class_exists($fullclass)) {
+                    echo json_encode(['success' => false, 'message' => 'Invalid event class: ' . $class]);
+                    exit;
+                }
+                if (!is_subclass_of($fullclass, '\\core\\event\\base')) {
+                    echo json_encode(['success' => false, 'message' => 'Class is not a valid event: ' . $class]);
+                    exit;
+                }
+            }
+        }
         set_config('monitored_events', $monitoredevents, 'local_mc_plugin');
         $saved[] = 'monitored_events';
     }

@@ -49,12 +49,12 @@ echo '<tr><td>' . get_string('debug_api_url', 'local_mc_plugin') . '</td><td>' .
     (local_mc_plugin_get_api_url() ?: '<em>' . get_string('debug_not_set', 'local_mc_plugin') . '</em>') .
     '</td></tr>';
 echo '<tr><td>' . get_string('debug_site_key', 'local_mc_plugin') . '</td><td>' .
-    ($sitekey ?: '<em>' . get_string('debug_not_set', 'local_mc_plugin') . '</em>') . '</td></tr>';
+    (s($sitekey) ?: '<em>' . get_string('debug_not_set', 'local_mc_plugin') . '</em>') . '</td></tr>';
 echo '<tr><td>' . get_string('debug_debug_mode', 'local_mc_plugin') . '</td><td>' .
     ($debugmode ? get_string('debug_on', 'local_mc_plugin') : get_string('debug_off', 'local_mc_plugin')) .
     '</td></tr>';
 echo '<tr><td>' . get_string('debug_monitored_events', 'local_mc_plugin') . '</td><td>' .
-    ($monitoredevents ?: '<em>' . get_string('debug_none', 'local_mc_plugin') . '</em>') . '</td></tr>';
+    (s($monitoredevents) ?: '<em>' . get_string('debug_none', 'local_mc_plugin') . '</em>') . '</td></tr>';
 echo '</table>';
 
 // Check event observers.
