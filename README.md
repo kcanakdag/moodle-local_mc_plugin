@@ -1,7 +1,7 @@
 # MoodleConnect Plugin
 
 [![Moodle Plugin](https://img.shields.io/badge/Moodle-4.0%2B-orange.svg)](https://moodle.org)
-[![PHP Version](https://img.shields.io/badge/PHP-8.1%2B-blue.svg)](https://php.net)
+[![PHP Version](https://img.shields.io/badge/PHP-7.4%2B-blue.svg)](https://php.net)
 [![License](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](LICENSE)
 [![Coding Standards](https://img.shields.io/badge/Coding%20Standards-Compliant-brightgreen.svg)](https://moodledev.io/general/development/policies/codingstyle)
 
@@ -24,7 +24,7 @@ MoodleConnect enables Moodle administrators to automatically sync events (user c
 ## Requirements
 
 - **Moodle**: 4.0 or higher
-- **PHP**: 8.1 or higher
+- **PHP**: 7.4 or higher
 - **MoodleConnect Account**: Free account at [moodleconnect.com](https://moodleconnect.com)
 
 ## Installation
