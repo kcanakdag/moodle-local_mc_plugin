@@ -34,11 +34,11 @@ namespace local_mc_plugin\local;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_mc_plugin\local\moodleconnect_client
  */
-class moodleconnect_client_test extends \advanced_testcase {
+final class moodleconnect_client_test extends \advanced_testcase {
     /**
      * Test send_event returns error when site_key is missing.
      */
-    public function test_send_event_missing_site_key() {
+    public function test_send_event_missing_site_key(): void {
         $this->resetAfterTest(true);
 
         unset_config('site_key', 'local_mc_plugin');
@@ -55,7 +55,7 @@ class moodleconnect_client_test extends \advanced_testcase {
     /**
      * Test send_event returns error when site_secret is missing.
      */
-    public function test_send_event_missing_site_secret() {
+    public function test_send_event_missing_site_secret(): void {
         $this->resetAfterTest(true);
 
         set_config('site_key', 'test_key', 'local_mc_plugin');
@@ -70,7 +70,7 @@ class moodleconnect_client_test extends \advanced_testcase {
     /**
      * Test sync_schema returns error when site_key is missing.
      */
-    public function test_sync_schema_missing_site_key() {
+    public function test_sync_schema_missing_site_key(): void {
         $this->resetAfterTest(true);
 
         unset_config('site_key', 'local_mc_plugin');
@@ -85,7 +85,7 @@ class moodleconnect_client_test extends \advanced_testcase {
     /**
      * Test sync_schema returns error when site_secret is missing.
      */
-    public function test_sync_schema_missing_site_secret() {
+    public function test_sync_schema_missing_site_secret(): void {
         $this->resetAfterTest(true);
 
         set_config('site_key', 'test_key', 'local_mc_plugin');
@@ -100,7 +100,7 @@ class moodleconnect_client_test extends \advanced_testcase {
     /**
      * Test send_event with valid configuration.
      */
-    public function test_send_event_with_valid_config() {
+    public function test_send_event_with_valid_config(): void {
         $this->resetAfterTest(true);
 
         set_config('site_key', 'test_key', 'local_mc_plugin');
@@ -118,7 +118,7 @@ class moodleconnect_client_test extends \advanced_testcase {
     /**
      * Test sync_schema with valid configuration.
      */
-    public function test_sync_schema_with_valid_config() {
+    public function test_sync_schema_with_valid_config(): void {
         $this->resetAfterTest(true);
 
         set_config('site_key', 'test_key', 'local_mc_plugin');

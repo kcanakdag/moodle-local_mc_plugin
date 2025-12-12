@@ -35,11 +35,11 @@ namespace local_mc_plugin;
  * @covers     ::local_mc_plugin_get_api_url
  * @covers     ::local_mc_plugin_get_frontend_url
  */
-class lib_test extends \advanced_testcase {
+final class lib_test extends \advanced_testcase {
     /**
      * Test get_api_url returns default production URL.
      */
-    public function test_get_api_url_default() {
+    public function test_get_api_url_default(): void {
         global $CFG;
         $this->resetAfterTest(true);
 
@@ -52,7 +52,7 @@ class lib_test extends \advanced_testcase {
     /**
      * Test get_api_url returns custom URL from config.
      */
-    public function test_get_api_url_custom() {
+    public function test_get_api_url_custom(): void {
         global $CFG;
         $this->resetAfterTest(true);
 
@@ -65,7 +65,7 @@ class lib_test extends \advanced_testcase {
     /**
      * Test get_api_url strips trailing slash.
      */
-    public function test_get_api_url_strips_trailing_slash() {
+    public function test_get_api_url_strips_trailing_slash(): void {
         global $CFG;
         $this->resetAfterTest(true);
 
@@ -78,7 +78,7 @@ class lib_test extends \advanced_testcase {
     /**
      * Test get_frontend_url derives from API URL.
      */
-    public function test_get_frontend_url_derived() {
+    public function test_get_frontend_url_derived(): void {
         global $CFG;
         $this->resetAfterTest(true);
 
@@ -92,7 +92,7 @@ class lib_test extends \advanced_testcase {
     /**
      * Test get_frontend_url returns custom URL from config.
      */
-    public function test_get_frontend_url_custom() {
+    public function test_get_frontend_url_custom(): void {
         global $CFG;
         $this->resetAfterTest(true);
 
@@ -105,7 +105,7 @@ class lib_test extends \advanced_testcase {
     /**
      * Test get_frontend_url strips trailing slash.
      */
-    public function test_get_frontend_url_strips_trailing_slash() {
+    public function test_get_frontend_url_strips_trailing_slash(): void {
         global $CFG;
         $this->resetAfterTest(true);
 
@@ -118,7 +118,7 @@ class lib_test extends \advanced_testcase {
     /**
      * Test get_frontend_url derives correctly from custom API URL.
      */
-    public function test_get_frontend_url_derived_from_custom_api() {
+    public function test_get_frontend_url_derived_from_custom_api(): void {
         global $CFG;
         $this->resetAfterTest(true);
 

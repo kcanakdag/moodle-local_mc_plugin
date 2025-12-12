@@ -34,11 +34,11 @@ namespace local_mc_plugin\local;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_mc_plugin\local\event_discovery
  */
-class event_discovery_test extends \advanced_testcase {
+final class event_discovery_test extends \advanced_testcase {
     /**
      * Test get_all_events returns array of events.
      */
-    public function test_get_all_events() {
+    public function test_get_all_events(): void {
         $this->resetAfterTest(true);
 
         $discovery = new event_discovery();
@@ -59,7 +59,7 @@ class event_discovery_test extends \advanced_testcase {
     /**
      * Test get_events_by_category groups events correctly.
      */
-    public function test_get_events_by_category() {
+    public function test_get_events_by_category(): void {
         $this->resetAfterTest(true);
 
         $discovery = new event_discovery();
@@ -79,7 +79,7 @@ class event_discovery_test extends \advanced_testcase {
     /**
      * Test search_events finds matching events.
      */
-    public function test_search_events() {
+    public function test_search_events(): void {
         $this->resetAfterTest(true);
 
         $discovery = new event_discovery();
@@ -102,7 +102,7 @@ class event_discovery_test extends \advanced_testcase {
     /**
      * Test search_events with empty query returns all events.
      */
-    public function test_search_events_empty_query() {
+    public function test_search_events_empty_query(): void {
         $this->resetAfterTest(true);
 
         $discovery = new event_discovery();
@@ -115,7 +115,7 @@ class event_discovery_test extends \advanced_testcase {
     /**
      * Test get_event_info returns correct event.
      */
-    public function test_get_event_info() {
+    public function test_get_event_info(): void {
         $this->resetAfterTest(true);
 
         $discovery = new event_discovery();
@@ -135,7 +135,7 @@ class event_discovery_test extends \advanced_testcase {
     /**
      * Test get_event_info returns null for non-existent event.
      */
-    public function test_get_event_info_not_found() {
+    public function test_get_event_info_not_found(): void {
         $this->resetAfterTest(true);
 
         $discovery = new event_discovery();
@@ -147,7 +147,7 @@ class event_discovery_test extends \advanced_testcase {
     /**
      * Test get_friendly_name converts class to readable name.
      */
-    public function test_get_friendly_name() {
+    public function test_get_friendly_name(): void {
         $name = event_discovery::get_friendly_name('\core\event\user_created');
         $this->assertEquals('User Created', $name);
 
@@ -158,7 +158,7 @@ class event_discovery_test extends \advanced_testcase {
     /**
      * Test clear_cache clears the event cache.
      */
-    public function test_clear_cache() {
+    public function test_clear_cache(): void {
         $this->resetAfterTest(true);
 
         $discovery = new event_discovery();
@@ -178,7 +178,7 @@ class event_discovery_test extends \advanced_testcase {
     /**
      * Test caching works correctly.
      */
-    public function test_caching() {
+    public function test_caching(): void {
         $this->resetAfterTest(true);
 
         $discovery = new event_discovery();

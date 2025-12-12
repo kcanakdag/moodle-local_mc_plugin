@@ -34,11 +34,11 @@ namespace local_mc_plugin;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_mc_plugin\observer
  */
-class observer_test extends \advanced_testcase {
+final class observer_test extends \advanced_testcase {
     /**
      * Test that handle_event ignores events not in monitored list.
      */
-    public function test_handle_event_ignores_unmonitored_events() {
+    public function test_handle_event_ignores_unmonitored_events(): void {
         $this->resetAfterTest(true);
 
         // Set monitored events to a specific event.
@@ -62,7 +62,7 @@ class observer_test extends \advanced_testcase {
     /**
      * Test that handle_event processes monitored events.
      */
-    public function test_handle_event_processes_monitored_events() {
+    public function test_handle_event_processes_monitored_events(): void {
         $this->resetAfterTest(true);
 
         // Set monitored events.
@@ -86,7 +86,7 @@ class observer_test extends \advanced_testcase {
     /**
      * Test that handle_event works with wildcard.
      */
-    public function test_handle_event_with_wildcard() {
+    public function test_handle_event_with_wildcard(): void {
         $this->resetAfterTest(true);
 
         // Set wildcard.
@@ -110,7 +110,7 @@ class observer_test extends \advanced_testcase {
     /**
      * Test that handle_event handles missing site_key gracefully.
      */
-    public function test_handle_event_missing_site_key() {
+    public function test_handle_event_missing_site_key(): void {
         $this->resetAfterTest(true);
 
         // Set monitored events but no site_key.
@@ -133,7 +133,7 @@ class observer_test extends \advanced_testcase {
     /**
      * Test debug mode logging.
      */
-    public function test_handle_event_debug_mode() {
+    public function test_handle_event_debug_mode(): void {
         global $CFG;
         $this->resetAfterTest(true);
 

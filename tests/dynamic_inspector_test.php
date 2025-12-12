@@ -34,11 +34,11 @@ namespace local_mc_plugin\local;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_mc_plugin\local\dynamic_inspector
  */
-class dynamic_inspector_test extends \advanced_testcase {
+final class dynamic_inspector_test extends \advanced_testcase {
     /**
      * Test get_event_schema returns correct structure.
      */
-    public function test_get_event_schema() {
+    public function test_get_event_schema(): void {
         $this->resetAfterTest(true);
 
         $inspector = new dynamic_inspector();
@@ -58,7 +58,7 @@ class dynamic_inspector_test extends \advanced_testcase {
     /**
      * Test get_event_schemas with multiple events.
      */
-    public function test_get_event_schemas() {
+    public function test_get_event_schemas(): void {
         $this->resetAfterTest(true);
 
         $inspector = new dynamic_inspector();
@@ -76,7 +76,7 @@ class dynamic_inspector_test extends \advanced_testcase {
     /**
      * Test extract_data from live event.
      */
-    public function test_extract_data() {
+    public function test_extract_data(): void {
         $this->resetAfterTest(true);
 
         $user = $this->getDataGenerator()->create_user([
@@ -109,7 +109,7 @@ class dynamic_inspector_test extends \advanced_testcase {
     /**
      * Test get_nested_value retrieves correct values.
      */
-    public function test_get_nested_value() {
+    public function test_get_nested_value(): void {
         $this->resetAfterTest(true);
 
         $inspector = new dynamic_inspector();
@@ -133,7 +133,7 @@ class dynamic_inspector_test extends \advanced_testcase {
     /**
      * Test get_sample_data returns mock data when no events exist.
      */
-    public function test_get_sample_data_mock() {
+    public function test_get_sample_data_mock(): void {
         $this->resetAfterTest(true);
 
         $inspector = new dynamic_inspector();
@@ -149,7 +149,7 @@ class dynamic_inspector_test extends \advanced_testcase {
     /**
      * Test extract_data with course event.
      */
-    public function test_extract_data_with_course() {
+    public function test_extract_data_with_course(): void {
         $this->resetAfterTest(true);
 
         $course = $this->getDataGenerator()->create_course([
@@ -177,7 +177,7 @@ class dynamic_inspector_test extends \advanced_testcase {
     /**
      * Test extract_data handles missing user gracefully.
      */
-    public function test_extract_data_missing_user() {
+    public function test_extract_data_missing_user(): void {
         $this->resetAfterTest(true);
 
         $course = $this->getDataGenerator()->create_course();
@@ -200,7 +200,7 @@ class dynamic_inspector_test extends \advanced_testcase {
     /**
      * Test extract_data handles missing course gracefully.
      */
-    public function test_extract_data_missing_course() {
+    public function test_extract_data_missing_course(): void {
         $this->resetAfterTest(true);
 
         $user = $this->getDataGenerator()->create_user();
