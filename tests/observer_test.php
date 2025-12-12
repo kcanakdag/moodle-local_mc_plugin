@@ -50,7 +50,6 @@ final class observer_test extends \advanced_testcase {
         $user = $this->getDataGenerator()->create_user();
         $event = \core\event\user_loggedin::create([
             'userid' => $user->id,
-            'context' => \context_system::instance(),
             'other' => ['username' => $user->username],
         ]);
 
@@ -98,7 +97,6 @@ final class observer_test extends \advanced_testcase {
         $user = $this->getDataGenerator()->create_user();
         $event = \core\event\user_loggedin::create([
             'userid' => $user->id,
-            'context' => \context_system::instance(),
             'other' => ['username' => $user->username],
         ]);
 
@@ -121,7 +119,6 @@ final class observer_test extends \advanced_testcase {
         $user = $this->getDataGenerator()->create_user();
         $event = \core\event\user_loggedin::create([
             'userid' => $user->id,
-            'context' => \context_system::instance(),
             'other' => ['username' => $user->username],
         ]);
 
@@ -147,7 +144,6 @@ final class observer_test extends \advanced_testcase {
         $user = $this->getDataGenerator()->create_user();
         $event = \core\event\user_loggedin::create([
             'userid' => $user->id,
-            'context' => \context_system::instance(),
             'other' => ['username' => $user->username],
         ]);
 

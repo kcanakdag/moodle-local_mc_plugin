@@ -376,6 +376,7 @@ class dynamic_inspector {
                     'context' => \context_system::instance(),
                     'objectid' => 1,
                     'userid' => 1,
+                    'relateduserid' => 1,
                 ];
 
                 try {
