@@ -372,6 +372,7 @@ class dynamic_inspector {
             }
 
             if ($reflection->isSubclassOf('\core\event\base') && !$reflection->isAbstract()) {
+                global $CFG;
                 // Try without context first (some events auto-set it from userid).
                 $dummydata = [
                     'objectid' => 1,
@@ -386,16 +387,28 @@ class dynamic_inspector {
                     }
                 } catch (\Exception $e) {
                     // Try with explicit context if first attempt failed.
+                    // Suppress debugging warnings as some events auto-set context.
                     try {
+                        $debuglevel = $CFG->debug ?? null;
+                        $CFG->debug = 0;
                         $dummydata['context'] = \context_system::instance();
                         $event = $eventclass::create($dummydata);
+                        if ($debuglevel !== null) {
+                            $CFG->debug = $debuglevel;
+                        }
                         if (!empty($event->objecttable)) {
                             return $event->objecttable;
                         }
                     } catch (\Exception $e2) {
+                        if ($debuglevel !== null) {
+                            $CFG->debug = $debuglevel;
+                        }
                         // Event creation may fail for some event types - ignore.
                         unset($e2);
                     } catch (\Error $e2) {
+                        if ($debuglevel !== null) {
+                            $CFG->debug = $debuglevel;
+                        }
                         // Event creation may fail for some event types - ignore.
                         unset($e2);
                     }

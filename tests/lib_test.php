@@ -25,6 +25,8 @@
 
 namespace local_mc_plugin;
 
+defined('MOODLE_INTERNAL') || die();
+
 // Require lib.php to load the functions being tested.
 require_once(__DIR__ . '/../lib.php');
 
