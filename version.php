@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_mc_plugin';
-$plugin->version   = 2025121400;      // Full CI/CD, testing, and security improvements.
+$plugin->version   = 2025121401;      // Full CI/CD, testing, and security improvements.
 $plugin->requires  = 2022041900;      // Moodle 4.0+.
 $plugin->maturity  = MATURITY_STABLE;
 $plugin->release   = 'v3.2.0';
