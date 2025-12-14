@@ -214,12 +214,23 @@ This plugin transmits event data from your Moodle site to the MoodleConnect serv
 
 For full privacy details, see the [MoodleConnect Privacy Policy](https://moodleconnect.com/privacy).
 
-## Support and Documentation
+## Documentation
+
+For comprehensive guides and detailed information, visit our **[GitHub Wiki](https://github.com/kcanakdag/moodle-local_mc_plugin/wiki)**:
+
+- **[Installation Guide](https://github.com/kcanakdag/moodle-local_mc_plugin/wiki/Installation)** - Detailed installation methods
+- **[Configuration Guide](https://github.com/kcanakdag/moodle-local_mc_plugin/wiki/Configuration)** - Complete setup walkthrough
+- **[Events Reference](https://github.com/kcanakdag/moodle-local_mc_plugin/wiki/Events)** - Available Moodle events and usage
+- **[Triggers Guide](https://github.com/kcanakdag/moodle-local_mc_plugin/wiki/Triggers)** - Creating automations and field mappings
+- **[Troubleshooting](https://github.com/kcanakdag/moodle-local_mc_plugin/wiki/Troubleshooting)** - Common issues and solutions
+- **[FAQ](https://github.com/kcanakdag/moodle-local_mc_plugin/wiki/FAQ)** - Frequently asked questions
+- **[Privacy & GDPR](https://github.com/kcanakdag/moodle-local_mc_plugin/wiki/Privacy)** - Data handling and compliance
+
+## Support
 
 - **MoodleConnect Dashboard**: [moodleconnect.com](https://moodleconnect.com)
-- **Documentation**: [moodleconnect.com/docs](https://moodleconnect.com/docs)
 - **Issue Tracker**: [GitHub Issues](https://github.com/kcanakdag/moodle-local_mc_plugin/issues)
-- **Email Support**: support@moodleconnect.com
+- **Email Support**: kerem@moodleconnect.com
 
 ## Code Quality
 
