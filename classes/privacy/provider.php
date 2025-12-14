@@ -39,8 +39,8 @@ use core_privacy\local\request\writer;
  * an external service (MoodleConnect API).
  */
 class provider implements
-    \core_privacy\local\request\core_userlist_provider,
     \core_privacy\local\metadata\provider,
+    \core_privacy\local\request\core_userlist_provider,
     \core_privacy\local\request\plugin\provider {
     /**
      * Returns meta data about this system.
