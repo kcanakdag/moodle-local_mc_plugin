@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.0.0] - 2025-12-15
+
+### Added
+- **Output API Implementation**: Complete refactor of the admin interface to use Moodle's Output API (Renderers, Renderables, Templates).
+- **Mustache Templates**: Modern, responsive UI components for:
+  - Event Selector (with search, filtering, and bulk actions)
+  - Connection Status (dynamic updates via AJAX)
+  - Action Buttons (loading states and feedback)
+- **AMD Modules**: Full migration of JavaScript logic to modular, dependency-managed AMD files.
+- **Client-Side Rendering**: Dynamic UI updates using `core/templates` for better performance and user experience.
+
+### Changed
+- **Admin Settings**: Replaced legacy `admin_setting_configtext` with custom setting classes that delegate to the Output API.
+- **JavaScript Architecture**: Removed all inline JavaScript; logic is now encapsulated in `amd/src/local/admin/*.js`.
+- **Styling**: Cleaned up CSS and leveraged Bootstrap utility classes for consistent design.
+- **Code Structure**: Improved separation of concerns between logic (PHP classes), presentation (Mustache), and behavior (JS).
+
+### Removed
+- Legacy inline HTML generation in admin settings.
+- Unused CSS styles and redundant code.
+
 ## [3.2.0] - 2025-12-14
 
 ### Added
