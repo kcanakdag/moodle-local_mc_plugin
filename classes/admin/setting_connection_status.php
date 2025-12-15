@@ -38,15 +38,20 @@ class setting_connection_status extends \admin_setting {
     /** @var string Session key for CSRF protection */
     private $sesskey;
 
+    /** @var string Event input ID for counter refresh */
+    private $eventinputid;
+
     /**
      * Constructor.
      *
      * @param string $name Unique setting name
      * @param bool $isconnected Whether the site is currently connected
+     * @param string $eventinputid Event selector input ID (optional)
      */
-    public function __construct($name, $isconnected) {
+    public function __construct($name, $isconnected, $eventinputid = '') {
         $this->isconnected = $isconnected;
         $this->sesskey = sesskey();
+        $this->eventinputid = $eventinputid;
         parent::__construct($name, get_string('connection_status', 'local_mc_plugin'), '', '');
     }
 
@@ -77,9 +82,11 @@ class setting_connection_status extends \admin_setting {
      * @return string HTML output
      */
     public function output_html($data, $query = '') {
+        global $PAGE;
+
         $syncurl = (new \moodle_url('/local/mc_plugin/sync_schema.php'))->out(false);
 
-        // Always show the dynamic status UI.
+        // Build the status display HTML.
         $html = '<div id="mc-connection-status">';
         $html .= '<div id="mc-status-display">';
         $html .= '<span id="mc-status-dot" style="color: #6c757d; margin-right: 6px;">●</span>';
@@ -90,133 +97,12 @@ class setting_connection_status extends \admin_setting {
         $html .= '<span id="mc-test-result" style="margin-left: 10px; font-size: 0.85em;"></span>';
         $html .= '</div>';
 
-        // Always include the JavaScript.
-        $html .= '
-            <script>
-            (function() {
-                var testResult = document.getElementById("mc-test-result");
-                var statusText = document.getElementById("mc-status-text");
-                var siteName = document.getElementById("mc-site-name");
-                var statusDot = document.getElementById("mc-status-dot");
-                var syncStatus = document.getElementById("mc-sync-status");
-                var syncUrl = "' . $syncurl . '";
-                var sesskey = "' . $this->sesskey . '";
-
-                function getSelectedEventCount() {
-                    var eventsInput = document.querySelector("input[name=\"s_local_mc_plugin_monitored_events\"]");
-                    if (!eventsInput || !eventsInput.value) return 0;
-                    return eventsInput.value.split(",").filter(function(e) { return e.trim() !== ""; }).length;
-                }
-
-                function getSelectedEvents() {
-                    var eventsInput = document.querySelector("input[name=\"s_local_mc_plugin_monitored_events\"]");
-                    if (!eventsInput || !eventsInput.value) return [];
-                    return eventsInput.value.split(",").map(function(e) { return e.trim(); }).filter(function(e) {
-                        return e !== "";
-                    });
-                }
-
-                function updateStatus(connected, siteName_val, syncedCount, syncedEvents, message) {
-                    window.mcSyncedEvents = syncedEvents || [];
-
-                    if (connected) {
-                        statusDot.style.color = "#28a745";
-                        statusText.style.color = "#155724";
-                        statusText.textContent = "Connected";
-                        if (siteName_val) {
-                            siteName.textContent = "(" + siteName_val + ")";
-                        }
-                        testResult.innerHTML = "";
-
-                        var selectedCount = getSelectedEventCount();
-                        var selectedEvents = getSelectedEvents();
-
-                        if (syncedCount === 0) {
-                            syncStatus.innerHTML = "<span style=\"color: #856404;\">• Events not synced yet</span>";
-                        } else if (syncedCount === selectedCount && syncedEvents) {
-                            var allMatch = selectedEvents.every(function(e) { return syncedEvents.indexOf(e) >= 0; });
-                            if (allMatch) {
-                                syncStatus.innerHTML = "<span style=\"color: #155724;\">• " + syncedCount +
-                                    " events synced</span>";
-                            } else {
-                                syncStatus.innerHTML = "<span style=\"color: #856404;\">• Events changed, " +
-                                    "click Save & Sync</span>";
-                            }
-                        } else {
-                            var diff = selectedCount - syncedCount;
-                            if (diff > 0) {
-                                syncStatus.innerHTML = "<span style=\"color: #856404;\">• " + diff +
-                                    " new event(s) to sync</span>";
-                            } else {
-                                syncStatus.innerHTML = "<span style=\"color: #856404;\">• Events changed, " +
-                                    "click Save & Sync</span>";
-                            }
-                        }
-
-                        if (typeof window.mcUpdateEventCounter === "function") {
-                            window.mcUpdateEventCounter();
-                        }
-                    } else {
-                        statusDot.style.color = "#dc3545";
-                        statusText.style.color = "#721c24";
-                        statusText.textContent = "Not connected";
-                        siteName.textContent = "";
-                        syncStatus.textContent = "";
-                        testResult.innerHTML = "<span style=\"color: #dc3545;\">" +
-                            (message || "Connection failed") + "</span>";
-                    }
-                }
-
-
-
-                function testConnection() {
-                    statusDot.style.color = "#6c757d";
-                    statusText.style.color = "#6c757d";
-                    statusText.textContent = "Checking...";
-                    syncStatus.textContent = "";
-                    testResult.innerHTML = "";
-
-                    var params = new URLSearchParams();
-                    params.append("action", "status");
-                    params.append("sesskey", sesskey);
-
-                    fetch(syncUrl, {
-                        method: "POST",
-                        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                        body: params.toString()
-                    })
-                    .then(function(r) { return r.json(); })
-                    .then(function(data) {
-                        if (data.connected) {
-                            updateStatus(true, data.site_name, data.synced_event_count || 0, data.synced_events || []);
-                        } else if (data.error) {
-                            updateStatus(false, null, 0, [], data.error);
-                        } else if (data.configured) {
-                            updateStatus(false, null, 0, [], "Click Connect to link your site");
-                        } else {
-                            updateStatus(false, null, 0, [], "Click Connect to link your Moodle site");
-                        }
-                    })
-                    .catch(function(err) {
-                        updateStatus(false, null, 0, [], err.message);
-                    });
-                }
-
-                // Expose testConnection globally so action buttons can call it.
-                window.mcTestConnection = testConnection;
-
-                // Expose function to update status with error message (for sync failures).
-                window.mcUpdateStatusWithError = function(errorMessage) {
-                    statusDot.style.color = "#dc3545";
-                    statusText.style.color = "#721c24";
-                    statusText.textContent = "Sync failed";
-                    syncStatus.innerHTML = "<span style=\"color: #dc3545;\">• " + errorMessage + "</span>";
-                };
-
-                // Initial check on page load.
-                testConnection();
-            })();
-            </script>';
+        // Initialize the AMD module.
+        $PAGE->requires->js_call_amd('local_mc_plugin/admin', 'initConnectionStatus', [[
+            'syncUrl' => $syncurl,
+            'sesskey' => $this->sesskey,
+            'eventInputId' => $this->eventinputid,
+        ]]);
 
         return format_admin_setting($this, $this->visiblename, $html, '', false, '', null, $query);
     }

@@ -68,7 +68,10 @@ class setting_event_selection extends \admin_setting_configtext {
         try {
             $events = $discovery->get_all_events();
         } catch (\Exception $e) {
-            return $OUTPUT->notification(get_string('error_loading_events', 'local_mc_plugin', $e->getMessage()), 'notifyproblem');
+            return $OUTPUT->notification(
+                get_string('error_loading_events', 'local_mc_plugin', $e->getMessage()),
+                'notifyproblem'
+            );
         }
 
         $grouped = [];
@@ -200,122 +203,8 @@ class setting_event_selection extends \admin_setting_configtext {
 
         $html .= '</div></div>';
 
-        // Get language strings for JavaScript.
-        $strselected = get_string('event_selected_count', 'local_mc_plugin', '{COUNT}');
-        $strallsynced = get_string('event_all_synced', 'local_mc_plugin');
-        $strnew = get_string('event_new', 'local_mc_plugin');
-        $strremoved = get_string('event_removed', 'local_mc_plugin');
-
-        $html .= "
-        <script>
-        (function() {
-            var inputId = '" . $id . "';
-            var hiddenInput = document.getElementById(inputId);
-            var searchInput = document.getElementById(inputId + '_search');
-            var selectBtn = document.getElementById(inputId + '_select_visible');
-            var deselectBtn = document.getElementById(inputId + '_deselect_visible');
-            var counter = document.getElementById(inputId + '_counter');
-
-            var strSelected = '" . addslashes_js($strselected) . "';
-            var strAllSynced = '" . addslashes_js($strallsynced) . "';
-            var strNew = '" . addslashes_js($strnew) . "';
-            var strRemoved = '" . addslashes_js($strremoved) . "';
-
-            function updateValue() {
-                var selected = [];
-                document.querySelectorAll('.event-checkbox:checked').forEach(function(cb) {
-                    selected.push(cb.getAttribute('data-class'));
-                });
-                hiddenInput.value = selected.join(',');
-
-                var syncedEvents = window.mcSyncedEvents || [];
-
-                if (syncedEvents.length > 0) {
-                    var toAdd = 0;
-                    selected.forEach(function(evt) {
-                        if (syncedEvents.indexOf(evt) < 0) {
-                            toAdd++;
-                        }
-                    });
-
-                    var toRemove = 0;
-                    syncedEvents.forEach(function(evt) {
-                        if (selected.indexOf(evt) < 0) {
-                            toRemove++;
-                        }
-                    });
-
-                    if (toAdd === 0 && toRemove === 0) {
-                        counter.innerHTML = strSelected.replace('{COUNT}', selected.length) +
-                            ' <span style=\"color:#155724;\">• ' + strAllSynced + '</span>';
-                    } else {
-                        var changes = [];
-                        if (toAdd > 0) changes.push(toAdd + ' ' + strNew);
-                        if (toRemove > 0) changes.push(toRemove + ' ' + strRemoved);
-                        counter.innerHTML = strSelected.replace('{COUNT}', selected.length) +
-                            ' <span style=\"color:#856404;\">• ' + changes.join(', ') + '</span>';
-                    }
-                } else {
-                    counter.textContent = strSelected.replace('{COUNT}', selected.length);
-                }
-            }
-
-            window.mcUpdateEventCounter = updateValue;
-            updateValue();
-
-            document.addEventListener('change', function(e) {
-                if (e.target.classList.contains('event-checkbox')) {
-                    updateValue();
-                }
-            });
-
-            document.querySelectorAll('.mc-category-title').forEach(function(title) {
-                title.addEventListener('click', function() {
-                    var events = this.nextElementSibling;
-                    events.style.display = events.style.display === 'none' ? 'block' : 'none';
-                });
-            });
-
-            searchInput.addEventListener('keyup', function() {
-                var term = this.value.toLowerCase();
-
-                document.querySelectorAll('.mc-event-item').forEach(function(item) {
-                    var text = item.textContent.toLowerCase();
-                    if (text.indexOf(term) > -1) {
-                        item.classList.remove('mc-hidden');
-                    } else {
-                        item.classList.add('mc-hidden');
-                    }
-                });
-
-                document.querySelectorAll('.mc-category').forEach(function(cat) {
-                    var visible = cat.querySelectorAll('.mc-event-item:not(.mc-hidden)').length;
-                    if (visible === 0) {
-                        cat.classList.add('mc-hidden');
-                    } else {
-                        cat.classList.remove('mc-hidden');
-                    }
-                });
-            });
-
-            selectBtn.addEventListener('click', function() {
-                document.querySelectorAll('.mc-event-item:not(.mc-hidden) .event-checkbox')
-                    .forEach(function(cb) {
-                        cb.checked = true;
-                    });
-                updateValue();
-            });
-
-            deselectBtn.addEventListener('click', function() {
-                document.querySelectorAll('.mc-event-item:not(.mc-hidden) .event-checkbox')
-                    .forEach(function(cb) {
-                        cb.checked = false;
-                    });
-                updateValue();
-            });
-        })();
-        </script>
-        ";
+        // Initialize the AMD module.
+        $PAGE->requires->js_call_amd('local_mc_plugin/admin', 'initEventSelector', [['inputId' => $id]]);
 
         return format_admin_setting($this, $this->visiblename, $html, $this->description, true, '', '', $query);
     }

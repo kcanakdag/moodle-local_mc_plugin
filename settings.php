@@ -46,9 +46,12 @@ if ($hassiteconfig) {
     ));
 
     // Connection Status Display.
+    // The event input ID follows Moodle's pattern: id_s_<plugin>_<setting>.
+    $eventinputid = 'id_s_local_mc_plugin_monitored_events';
     $settings->add(new \local_mc_plugin\admin\setting_connection_status(
         'local_mc_plugin/connection_status',
-        $isconnected
+        $isconnected,
+        $eventinputid
     ));
 
     // Site Key and Secret are stored internally but not displayed to users.

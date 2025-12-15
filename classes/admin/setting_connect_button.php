@@ -47,6 +47,9 @@ class setting_connect_button extends \admin_setting {
     /** @var string MoodleConnect API base URL */
     private $apiurl;
 
+    /** @var string MoodleConnect frontend URL */
+    private $frontendurl;
+
     /** @var string Session key for CSRF protection */
     private $sesskey;
 
@@ -63,6 +66,7 @@ class setting_connect_button extends \admin_setting {
         $this->connecturl = (new \moodle_url('/local/mc_plugin/connect.php'))->out(false);
         $this->ajaxsaveurl = (new \moodle_url('/local/mc_plugin/ajax_save.php'))->out(false);
         $this->apiurl = local_mc_plugin_get_api_url();
+        $this->frontendurl = local_mc_plugin_get_frontend_url();
         $this->sesskey = sesskey();
 
         parent::__construct($name, '', '', '');
@@ -95,12 +99,11 @@ class setting_connect_button extends \admin_setting {
      * @return string HTML output
      */
     public function output_html($data, $query = '') {
+        global $PAGE;
+
         $connectlabel = get_string('connect_button', 'local_mc_plugin');
         $reconnectlabel = get_string('reconnect_button', 'local_mc_plugin');
         $btnlabel = $this->isconnected ? $reconnectlabel : $connectlabel;
-
-        // Get frontend URL (supports separate config for development).
-        $frontendurl = local_mc_plugin_get_frontend_url();
 
         $html = '
         <div class="form-item row" id="moodleconnect-connect-section">
@@ -109,7 +112,8 @@ class setting_connect_button extends \admin_setting {
             </div>
             <div class="form-setting col-sm-9">
                 <div id="mc-connect-container">
-                    <div id="mc-connect-status" style="display: none; padding: 12px; border-radius: 6px; margin-bottom: 15px;">
+                    <div id="mc-connect-status" style="display: none; padding: 12px; border-radius: 6px;
+                        margin-bottom: 15px;">
                         <span id="mc-connect-status-icon"></span>
                         <span id="mc-connect-status-text"></span>
                     </div>
@@ -128,204 +132,17 @@ class setting_connect_button extends \admin_setting {
                     </p>
                 </div>
             </div>
-        </div>
+        </div>';
 
-        <script>
-        (function() {
-            var POLL_INTERVAL = 3000;
-            var MAX_POLL_ATTEMPTS = 60;
-
-            var connectBtn = document.getElementById("mc-connect-btn");
-            var btnText = document.getElementById("mc-connect-btn-text");
-            var btnSpinner = document.getElementById("mc-connect-btn-spinner");
-            var statusDiv = document.getElementById("mc-connect-status");
-            var statusIcon = document.getElementById("mc-connect-status-icon");
-            var statusText = document.getElementById("mc-connect-status-text");
-
-            var connectUrl = "' . $this->connecturl . '";
-            var saveUrl = "' . $this->ajaxsaveurl . '";
-            var apiUrl = "' . $this->apiurl . '";
-            var frontendUrl = "' . $frontendurl . '";
-            var sesskey = "' . $this->sesskey . '";
-            var isConnected = ' . ($this->isconnected ? 'true' : 'false') . ';
-
-            var pollTimer = null;
-            var pollAttempts = 0;
-            var currentToken = null;
-
-            function showStatus(type, message) {
-                statusDiv.style.display = "block";
-                if (type === "waiting") {
-                    statusDiv.style.background = "#fff3cd";
-                    statusDiv.style.color = "#856404";
-                    statusIcon.innerHTML = "<span class=\"spinner-border spinner-border-sm\" " +
-                        "style=\"margin-right: 8px;\"></span>";
-                } else if (type === "success") {
-                    statusDiv.style.background = "#d4edda";
-                    statusDiv.style.color = "#155724";
-                    statusIcon.innerHTML = "✓ ";
-                } else if (type === "error") {
-                    statusDiv.style.background = "#f8d7da";
-                    statusDiv.style.color = "#721c24";
-                    statusIcon.innerHTML = "✗ ";
-                }
-                statusText.textContent = message;
-            }
-
-            function hideStatus() {
-                statusDiv.style.display = "none";
-            }
-
-            function setLoading(loading) {
-                connectBtn.disabled = loading;
-                btnSpinner.style.display = loading ? "inline-block" : "none";
-            }
-
-            function stopPolling() {
-                if (pollTimer) {
-                    clearInterval(pollTimer);
-                    pollTimer = null;
-                }
-            }
-
-            function saveCredentials(siteKey, siteSecret) {
-                showStatus("waiting", "' . get_string('connect_saving', 'local_mc_plugin') . '");
-
-                var params = new URLSearchParams();
-                params.append("action", "save");
-                params.append("sesskey", sesskey);
-                params.append("site_key", siteKey);
-                params.append("site_secret", siteSecret);
-
-                fetch(saveUrl, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                    body: params.toString()
-                })
-                .then(function(r) { return r.json(); })
-                .then(function(data) {
-                    setLoading(false);
-                    if (data.success) {
-                        showStatus("success", "' . get_string('connect_success', 'local_mc_plugin') . '");
-                        btnText.textContent = "' . s($reconnectlabel) . '";
-                        connectBtn.classList.remove("btn-primary");
-                        connectBtn.classList.add("btn-outline-primary");
-                        isConnected = true;
-
-                        // Update the connection status display
-                        if (typeof window.mcTestConnection === "function") {
-                            setTimeout(function() {
-                                window.mcTestConnection(true);
-                            }, 500);
-                        }
-
-                    } else {
-                        showStatus("error", data.message ||
-                            "' . get_string('connect_save_failed', 'local_mc_plugin') . '");
-                    }
-                })
-                .catch(function(err) {
-                    setLoading(false);
-                    showStatus("error", "' . get_string('connect_save_failed', 'local_mc_plugin') .
-                        ': " + err.message);
-                });
-            }
-
-            function pollStatus() {
-                pollAttempts++;
-
-                if (pollAttempts > MAX_POLL_ATTEMPTS) {
-                    stopPolling();
-                    setLoading(false);
-                    showStatus("error", "' . get_string('connect_timeout', 'local_mc_plugin') . '");
-                    return;
-                }
-
-                fetch(apiUrl + "/connect/status?token=" + encodeURIComponent(currentToken))
-                .then(function(r) { return r.json(); })
-                .then(function(data) {
-                    if (data.status === "completed") {
-                        stopPolling();
-
-                        if (data.site_key && data.site_secret) {
-                            saveCredentials(data.site_key, data.site_secret);
-                        } else {
-                            setLoading(false);
-                            showStatus("error",
-                                "' . get_string('connect_credentials_retrieved', 'local_mc_plugin') . '");
-                        }
-                    } else if (data.status === "expired") {
-                        stopPolling();
-                        setLoading(false);
-                        showStatus("error", "' . get_string('connect_token_expired', 'local_mc_plugin') . '");
-                    }
-                    // If pending, continue polling
-                })
-                .catch(function(err) {
-                    // Network error, but continue polling
-                    console.warn("Poll failed:", err);
-                });
-            }
-
-            function startConnection() {
-                hideStatus();
-                setLoading(true);
-                btnText.textContent = "' . get_string('connect_initializing', 'local_mc_plugin') . '";
-                pollAttempts = 0;
-
-                var params = new URLSearchParams();
-                params.append("action", "init");
-                params.append("sesskey", sesskey);
-
-                fetch(connectUrl, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                    body: params.toString()
-                })
-                .then(function(r) { return r.json(); })
-                .then(function(data) {
-                    if (data.success && data.token) {
-                        currentToken = data.token;
-
-                        // Open MoodleConnect in a new tab
-                        var connectPageUrl = frontendUrl + "/connect?token=" +
-                            encodeURIComponent(data.token);
-                        var connectWindow = window.open(connectPageUrl, "_blank");
-
-                        if (!connectWindow) {
-                            setLoading(false);
-                            btnText.textContent = isConnected ? "' . s($reconnectlabel) .
-                                '" : "' . s($connectlabel) . '";
-                            showStatus("error",
-                                "' . get_string('connect_popup_blocked', 'local_mc_plugin') . '");
-                            return;
-                        }
-
-                        btnText.textContent = "' . get_string('connect_waiting_btn', 'local_mc_plugin') . '";
-                        showStatus("waiting", "' . get_string('connect_waiting', 'local_mc_plugin') . '");
-
-                        // Start polling
-                        pollTimer = setInterval(pollStatus, POLL_INTERVAL);
-                    } else {
-                        setLoading(false);
-                        btnText.textContent = isConnected ? "' . s($reconnectlabel) .
-                            '" : "' . s($connectlabel) . '";
-                        showStatus("error", data.message ||
-                            "' . get_string('connect_init_failed', 'local_mc_plugin') . '");
-                    }
-                })
-                .catch(function(err) {
-                    setLoading(false);
-                    btnText.textContent = isConnected ? "' . s($reconnectlabel) .
-                        '" : "' . s($connectlabel) . '";
-                    showStatus("error", "' . get_string('connect_init_failed', 'local_mc_plugin') .
-                        ': " + err.message);
-                });
-            }
-
-            connectBtn.addEventListener("click", startConnection);
-        })();
-        </script>';
+        // Initialize the AMD module.
+        $PAGE->requires->js_call_amd('local_mc_plugin/admin', 'initConnect', [[
+            'connectUrl' => $this->connecturl,
+            'saveUrl' => $this->ajaxsaveurl,
+            'apiUrl' => $this->apiurl,
+            'frontendUrl' => $this->frontendurl,
+            'sesskey' => $this->sesskey,
+            'isConnected' => $this->isconnected,
+        ]]);
 
         return $html;
     }
