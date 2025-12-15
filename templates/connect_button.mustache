@@ -1,0 +1,83 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_mc_plugin/connect_button
+
+    Connect button for MoodleConnect OAuth flow.
+
+    Classes required for JS:
+    * none
+
+    Data attributes required for JS:
+    * data-action="connect" - Identifies the connect button
+    * data-region="connect-status" - Status message container
+    * data-region="button-text" - Button text span
+    * data-region="button-spinner" - Loading spinner container
+
+    Context variables required for this template:
+    * connecturl (string) - URL to connect.php
+    * saveurl (string) - URL to ajax_save.php
+    * apiurl (string) - MoodleConnect API URL
+    * frontendurl (string) - MoodleConnect frontend URL
+    * sesskey (string) - CSRF token
+    * isconnected (bool) - Current connection state
+    * buttonclass (string) - CSS class for button (btn-primary or btn-outline-primary)
+
+    Example context (json):
+    {
+        "connecturl": "/local/mc_plugin/connect.php",
+        "saveurl": "/local/mc_plugin/ajax_save.php",
+        "apiurl": "https://moodleconnect.com/api",
+        "frontendurl": "https://moodleconnect.com",
+        "sesskey": "abc123",
+        "isconnected": false,
+        "buttonclass": "btn-primary"
+    }
+}}
+<div class="local_mc_plugin_connect_button">
+    {{! Status message area - hidden by default }}
+    <div data-region="connect-status" class="alert d-none mb-3" role="alert">
+        <span data-region="status-icon"></span>
+        <span data-region="status-text"></span>
+    </div>
+
+    {{! Connect button }}
+    <button type="button"
+            data-action="connect"
+            data-connecturl="{{connecturl}}"
+            data-saveurl="{{saveurl}}"
+            data-apiurl="{{apiurl}}"
+            data-frontendurl="{{frontendurl}}"
+            data-sesskey="{{sesskey}}"
+            class="btn {{buttonclass}}">
+        <span data-region="button-text">
+            {{#isconnected}}
+                {{#str}} reconnect_button, local_mc_plugin {{/str}}
+            {{/isconnected}}
+            {{^isconnected}}
+                {{#str}} connect_button, local_mc_plugin {{/str}}
+            {{/isconnected}}
+        </span>
+        <span data-region="button-spinner" class="d-none ml-2">
+            {{> core/loading }}
+        </span>
+    </button>
+
+    <p class="form-text text-muted mt-2">
+        {{#str}} connect_button_desc, local_mc_plugin {{/str}}
+    </p>
+</div>

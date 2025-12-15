@@ -2,6 +2,7 @@
  * Event selector module for the admin settings page.
  *
  * Handles event search, filtering, and bulk selection.
+ * Uses data-* attributes from event_selector.mustache template.
  *
  * @module     local_mc_plugin/local/admin/event_selector
  * @copyright  2025 Kerem Can Akdag
@@ -16,6 +17,15 @@ let syncedEvents = [];
 
 /** @type {Object} Language strings */
 let strings = {};
+
+/** @type {HTMLElement|null} Event selector container */
+let container = null;
+
+/** @type {HTMLElement|null} Hidden input element */
+let hiddenInput = null;
+
+/** @type {HTMLElement|null} Counter element */
+let counterEl = null;
 
 /**
  * Load language strings.
@@ -39,30 +49,27 @@ const loadStrings = async() => {
 };
 
 /**
- * Get the hidden input element.
- *
- * @param {string} inputId The input element ID
- * @returns {HTMLElement|null}
- */
-const getHiddenInput = (inputId) => document.getElementById(inputId);
-
-/**
  * Update the hidden input value with selected events.
- *
- * @param {string} inputId The input element ID
  */
-const updateValue = (inputId) => {
-    const hiddenInput = getHiddenInput(inputId);
-    const counter = document.querySelector(Selectors.events.counter(inputId));
-
-    if (!hiddenInput || !counter) {
+const updateValue = () => {
+    if (!hiddenInput || !counterEl) {
         return;
     }
 
     const selected = [];
-    document.querySelectorAll(`${Selectors.events.checkbox}:checked`).forEach((cb) => {
-        selected.push(cb.getAttribute('data-class'));
+    // Use data-action selector for checkboxes from template
+    const checkboxes = container ?
+        container.querySelectorAll(`${Selectors.events.checkbox}:checked`) :
+        document.querySelectorAll(`${Selectors.events.checkbox}:checked, ${Selectors.events.legacyCheckbox}:checked`);
+
+    checkboxes.forEach((cb) => {
+        // Get class from parent mc-event-item's data-class attribute
+        const eventItem = cb.closest(Selectors.events.eventItem);
+        if (eventItem && eventItem.dataset.class) {
+            selected.push(eventItem.dataset.class);
+        }
     });
+
     hiddenInput.value = selected.join(',');
 
     // Update counter with sync status
@@ -71,8 +78,8 @@ const updateValue = (inputId) => {
         const toRemove = syncedEvents.filter((evt) => !selected.includes(evt)).length;
 
         if (toAdd === 0 && toRemove === 0) {
-            counter.innerHTML = strings.selectedCount.replace('{$a}', selected.length) +
-                ` <span style="color:#155724;">• ${strings.allSynced}</span>`;
+            counterEl.innerHTML = strings.selectedCount.replace('{$a}', selected.length) +
+                ` <span class="text-success">• ${strings.allSynced}</span>`;
         } else {
             const changes = [];
             if (toAdd > 0) {
@@ -81,13 +88,14 @@ const updateValue = (inputId) => {
             if (toRemove > 0) {
                 changes.push(`${toRemove} ${strings.removed}`);
             }
-            counter.innerHTML = strings.selectedCount.replace('{$a}', selected.length) +
-                ` <span style="color:#856404;">• ${changes.join(', ')}</span>`;
+            counterEl.innerHTML = strings.selectedCount.replace('{$a}', selected.length) +
+                ` <span class="text-warning">• ${changes.join(', ')}</span>`;
         }
     } else {
-        counter.textContent = strings.selectedCount.replace('{$a}', selected.length);
+        counterEl.textContent = strings.selectedCount.replace('{$a}', selected.length);
     }
 };
+
 
 /**
  * Filter events based on search term.
@@ -96,8 +104,11 @@ const updateValue = (inputId) => {
  */
 const filterEvents = (term) => {
     const lowerTerm = term.toLowerCase();
+    const eventItems = container ?
+        container.querySelectorAll(Selectors.events.eventItem) :
+        document.querySelectorAll(Selectors.events.eventItem);
 
-    document.querySelectorAll(Selectors.events.eventItem).forEach((item) => {
+    eventItems.forEach((item) => {
         const text = item.textContent.toLowerCase();
         if (text.includes(lowerTerm)) {
             item.classList.remove(Selectors.events.hiddenClass);
@@ -107,7 +118,11 @@ const filterEvents = (term) => {
     });
 
     // Hide empty categories
-    document.querySelectorAll(Selectors.events.category).forEach((cat) => {
+    const categories = container ?
+        container.querySelectorAll(Selectors.events.category) :
+        document.querySelectorAll(Selectors.events.category);
+
+    categories.forEach((cat) => {
         const visible = cat.querySelectorAll(`${Selectors.events.eventItem}:not(.${Selectors.events.hiddenClass})`).length;
         if (visible === 0) {
             cat.classList.add(Selectors.events.hiddenClass);
@@ -119,28 +134,32 @@ const filterEvents = (term) => {
 
 /**
  * Select all visible checkboxes.
- *
- * @param {string} inputId The input element ID
  */
-const selectVisible = (inputId) => {
-    document.querySelectorAll(`${Selectors.events.eventItem}:not(.${Selectors.events.hiddenClass}) ${Selectors.events.checkbox}`)
-        .forEach((cb) => {
-            cb.checked = true;
-        });
-    updateValue(inputId);
+const selectVisible = () => {
+    const selector = `${Selectors.events.eventItem}:not(.${Selectors.events.hiddenClass}) ${Selectors.events.checkbox}`;
+    const checkboxes = container ?
+        container.querySelectorAll(selector) :
+        document.querySelectorAll(selector);
+
+    checkboxes.forEach((cb) => {
+        cb.checked = true;
+    });
+    updateValue();
 };
 
 /**
  * Deselect all visible checkboxes.
- *
- * @param {string} inputId The input element ID
  */
-const deselectVisible = (inputId) => {
-    document.querySelectorAll(`${Selectors.events.eventItem}:not(.${Selectors.events.hiddenClass}) ${Selectors.events.checkbox}`)
-        .forEach((cb) => {
-            cb.checked = false;
-        });
-    updateValue(inputId);
+const deselectVisible = () => {
+    const selector = `${Selectors.events.eventItem}:not(.${Selectors.events.hiddenClass}) ${Selectors.events.checkbox}`;
+    const checkboxes = container ?
+        container.querySelectorAll(selector) :
+        document.querySelectorAll(selector);
+
+    checkboxes.forEach((cb) => {
+        cb.checked = false;
+    });
+    updateValue();
 };
 
 /**
@@ -155,54 +174,105 @@ export const setSyncedEvents = (events) => {
 /**
  * Trigger a counter update (called from other modules).
  *
- * @param {string} inputId The input element ID
+ * @param {string} [inputId] The input element ID (for backward compatibility, ignored)
  */
-export const refreshCounter = (inputId) => {
-    updateValue(inputId);
+export const refreshCounter = (inputId) => { // eslint-disable-line no-unused-vars
+    updateValue();
 };
 
 /**
  * Initialize the event selector.
  *
- * @param {string} inputId The hidden input element ID
+ * Finds elements using data-* attribute selectors from the template.
+ * Falls back to legacy ID-based selectors for backward compatibility.
+ *
+ * @param {string} [inputId] The hidden input element ID (for backward compatibility)
  */
-export const init = async(inputId) => {
+export const init = async(inputId = null) => {
     await loadStrings();
 
-    // Initial counter update
-    updateValue(inputId);
+    // Find the event selector container using data-region attribute
+    container = document.querySelector(Selectors.events.container);
 
-    // Checkbox change handler
+    if (container) {
+        // Find elements within container using data-* selectors
+        hiddenInput = container.querySelector(Selectors.events.hiddenInput);
+        counterEl = container.querySelector(Selectors.events.counter);
+
+        // Search input handler
+        const searchInput = container.querySelector(Selectors.events.searchInput);
+        if (searchInput) {
+            searchInput.addEventListener('keyup', (e) => {
+                filterEvents(e.target.value);
+            });
+        }
+
+        // Select/deselect visible buttons
+        const selectBtn = container.querySelector(Selectors.events.selectVisibleBtn);
+        if (selectBtn) {
+            selectBtn.addEventListener('click', selectVisible);
+        }
+
+        const deselectBtn = container.querySelector(Selectors.events.deselectVisibleBtn);
+        if (deselectBtn) {
+            deselectBtn.addEventListener('click', deselectVisible);
+        }
+
+        // Category collapse/expand
+        container.querySelectorAll(Selectors.events.categoryTitle).forEach((title) => {
+            title.style.cursor = 'pointer';
+            title.addEventListener('click', () => {
+                const events = title.nextElementSibling;
+                if (events) {
+                    events.style.display = events.style.display === 'none' ? 'block' : 'none';
+                }
+            });
+        });
+    } else if (inputId) {
+        // Fallback to legacy ID-based selectors
+        hiddenInput = document.getElementById(inputId);
+        counterEl = document.querySelector(Selectors.events.legacyCounter(inputId));
+
+        // Search input handler (legacy)
+        const searchInput = document.querySelector(Selectors.events.legacySearchInput(inputId));
+        if (searchInput) {
+            searchInput.addEventListener('keyup', (e) => {
+                filterEvents(e.target.value);
+            });
+        }
+
+        // Select/deselect visible buttons (legacy)
+        const selectBtn = document.querySelector(Selectors.events.legacySelectVisibleBtn(inputId));
+        if (selectBtn) {
+            selectBtn.addEventListener('click', selectVisible);
+        }
+
+        const deselectBtn = document.querySelector(Selectors.events.legacyDeselectVisibleBtn(inputId));
+        if (deselectBtn) {
+            deselectBtn.addEventListener('click', deselectVisible);
+        }
+
+        // Category collapse/expand (legacy)
+        document.querySelectorAll(Selectors.events.categoryTitle).forEach((title) => {
+            title.style.cursor = 'pointer';
+            title.addEventListener('click', () => {
+                const events = title.nextElementSibling;
+                if (events) {
+                    events.style.display = events.style.display === 'none' ? 'block' : 'none';
+                }
+            });
+        });
+    }
+
+    // Initial counter update
+    updateValue();
+
+    // Checkbox change handler (delegated to document for dynamic content)
     document.addEventListener('change', (e) => {
-        if (e.target.classList.contains('event-checkbox')) {
-            updateValue(inputId);
+        // Check for both template and legacy checkbox selectors
+        if (e.target.matches(Selectors.events.checkbox) ||
+            e.target.matches(Selectors.events.legacyCheckbox)) {
+            updateValue();
         }
     });
-
-    // Category collapse/expand
-    document.querySelectorAll(Selectors.events.categoryTitle).forEach((title) => {
-        title.addEventListener('click', () => {
-            const events = title.nextElementSibling;
-            events.style.display = events.style.display === 'none' ? 'block' : 'none';
-        });
-    });
-
-    // Search input
-    const searchInput = document.querySelector(Selectors.events.searchInput(inputId));
-    if (searchInput) {
-        searchInput.addEventListener('keyup', (e) => {
-            filterEvents(e.target.value);
-        });
-    }
-
-    // Select/deselect visible buttons
-    const selectBtn = document.querySelector(Selectors.events.selectVisibleBtn(inputId));
-    if (selectBtn) {
-        selectBtn.addEventListener('click', () => selectVisible(inputId));
-    }
-
-    const deselectBtn = document.querySelector(Selectors.events.deselectVisibleBtn(inputId));
-    if (deselectBtn) {
-        deselectBtn.addEventListener('click', () => deselectVisible(inputId));
-    }
 };

@@ -14,6 +14,32 @@ import * as ActionButtons from './local/admin/action_buttons';
 import * as Connect from './connect';
 
 /**
+ * Hide Moodle's default save button since we use custom AJAX saving.
+ * Uses a theme-agnostic approach by finding submit buttons in the admin form.
+ */
+const hideDefaultSaveButton = () => {
+    const form = document.getElementById('adminsettings');
+    if (!form) {
+        return;
+    }
+
+    // Find all submit buttons in the form
+    const submitButtons = form.querySelectorAll('button[type="submit"]');
+    submitButtons.forEach(btn => {
+        // Skip our custom buttons
+        if (btn.closest('.local_mc_plugin_action_buttons') || btn.closest('[data-region="action-buttons"]')) {
+            return;
+        }
+
+        // Hide the button's container (try .row first, then parent div)
+        const container = btn.closest('.row') || btn.parentElement;
+        if (container) {
+            container.style.display = 'none';
+        }
+    });
+};
+
+/**
  * Initialize the event selector component.
  *
  * @param {Object} cfg Configuration object
@@ -32,6 +58,8 @@ export const initEventSelector = (cfg) => {
  * @param {string} cfg.eventInputId Event selector input ID for counter refresh
  */
 export const initConnectionStatus = (cfg) => {
+    // Hide default save button when connection status initializes
+    hideDefaultSaveButton();
     ConnectionStatus.init(cfg);
 };
 

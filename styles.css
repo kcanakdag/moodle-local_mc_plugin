@@ -1,0 +1,189 @@
+/**
+ * MoodleConnect plugin styles.
+ *
+ * This file is part of Moodle - http://moodle.org/
+ *
+ * Moodle is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Moodle is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package    local_mc_plugin
+ * @copyright  2025 Kerem Can Akdag
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+/* ==========================================================================
+   Connect Button Component
+   ========================================================================== */
+
+.local_mc_plugin_connect_button {
+    /* Component wrapper - no additional styles needed, uses Bootstrap */
+}
+
+.local_mc_plugin_connect_button [data-region="connect-status"] {
+    padding: 12px;
+    border-radius: 6px;
+}
+
+.local_mc_plugin_connect_button [data-action="connect"] {
+    padding: 10px 24px;
+    font-size: 15px;
+}
+
+/* ==========================================================================
+   Connection Status Component
+   ========================================================================== */
+
+.local_mc_plugin_connection_status {
+    /* Component wrapper */
+}
+
+.local_mc_plugin_connection_status [data-region="status-dot"] {
+    margin-right: 6px;
+}
+
+.local_mc_plugin_connection_status [data-region="status-text"] {
+    font-weight: 500;
+}
+
+/* ==========================================================================
+   Event Selector Component
+   ========================================================================== */
+
+.local_mc_plugin_event_selector {
+    /* Component wrapper */
+}
+
+/* Control bar */
+.local_mc_plugin_event_selector .mc-controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* Event list container */
+.local_mc_plugin_event_selector .mc-event-list {
+    max-height: 400px;
+    overflow-y: auto;
+    background: #fff;
+}
+
+/* Category styling */
+.local_mc_plugin_event_selector .mc-category {
+    margin-bottom: 15px;
+}
+
+.local_mc_plugin_event_selector .mc-category:last-child {
+    margin-bottom: 0;
+}
+
+.local_mc_plugin_event_selector .mc-category-title {
+    font-weight: bold;
+    background: #f5f5f5;
+    padding: 8px 12px;
+    border-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+}
+
+.local_mc_plugin_event_selector .mc-category-title:hover {
+    background: #ebebeb;
+}
+
+.local_mc_plugin_event_selector .mc-category-events {
+    padding-left: 10px;
+    margin-top: 8px;
+}
+
+/* Event item styling */
+.local_mc_plugin_event_selector .mc-event-item {
+    padding: 4px 0;
+}
+
+.local_mc_plugin_event_selector .mc-event-item label {
+    cursor: pointer;
+    font-weight: normal;
+    margin-bottom: 0;
+}
+
+.local_mc_plugin_event_selector .mc-event-name {
+    display: block;
+}
+
+/* Hidden class for search filtering */
+.local_mc_plugin_event_selector .mc-hidden {
+    display: none !important;
+}
+
+/* ==========================================================================
+   Action Buttons Component
+   ========================================================================== */
+
+.local_mc_plugin_action_buttons {
+    padding-top: 15px;
+    border-top: 1px solid #dee2e6;
+}
+
+.local_mc_plugin_action_buttons [data-action="save-sync"] {
+    padding: 10px 24px;
+    font-size: 15px;
+}
+
+.local_mc_plugin_action_buttons [data-region="action-result"] {
+    padding: 12px;
+    border-radius: 6px;
+}
+
+/* ==========================================================================
+   Dynamic Status Templates (JS-rendered)
+   ========================================================================== */
+
+/* Connection status dynamic template */
+.local_mc_plugin_connection_status .status-dot {
+    font-size: 1.2em;
+}
+
+/* ==========================================================================
+   Utility Classes
+   ========================================================================== */
+
+/* Generic hidden class for event filtering (used by JavaScript) */
+.mc-hidden {
+    display: none !important;
+}
+
+/* ==========================================================================
+   Readonly Text Component
+   ========================================================================== */
+
+.local_mc_plugin_readonly_text code {
+    padding: 4px 8px;
+    background: #f5f5f5;
+    border-radius: 4px;
+    font-family: monospace;
+}
+
+/* ==========================================================================
+   Admin Settings Page Overrides
+   ========================================================================== */
+
+/* Hide Moodle default save button since we handle saving via AJAX */
+#page-admin-settings-local_mc_plugin .offset-sm-3.col-sm-3 button[type="submit"],
+#page-admin-settings-local_mc_plugin div.offset-sm-3 > button[type="submit"],
+#page-admin-settings-local_mc_plugin #adminsettings .row > .offset-sm-3 > button[type="submit"],
+#page-admin-settings-local_mc_plugin form#adminsettings > div.row:last-child {
+    display: none !important;
+}

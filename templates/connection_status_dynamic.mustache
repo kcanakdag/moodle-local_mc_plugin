@@ -1,0 +1,62 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_mc_plugin/connection_status_dynamic
+
+    Dynamic connection status content for JavaScript rendering.
+
+    This template is rendered client-side via Templates.renderForPromise()
+    to update the connection status display after API calls.
+
+    Classes required for JS:
+    * none
+
+    Data attributes required for JS:
+    * none
+
+    Context variables required for this template:
+    * connected (bool) - Whether the site is connected
+    * statusclass (string) - CSS class for status text (text-success or text-danger)
+    * dotclass (string) - CSS class for status dot (text-success or text-danger)
+    * statustext (string) - Status text to display
+    * sitename (string) - Connected site name (optional)
+    * hassitename (bool) - Whether sitename is present
+    * syncstatus (string) - Sync status text (optional)
+    * hassyncstatus (bool) - Whether syncstatus is present
+
+    Example context (json):
+    {
+        "connected": true,
+        "statusclass": "text-success",
+        "dotclass": "text-success",
+        "statustext": "Connected",
+        "sitename": "My Moodle Site",
+        "hassitename": true,
+        "syncstatus": "5 events synced",
+        "hassyncstatus": true
+    }
+}}
+<div class="d-flex align-items-center flex-wrap">
+    <span class="{{dotclass}} mr-2" aria-hidden="true">●</span>
+    <span class="{{statusclass}} font-weight-bold" data-region="status-text">{{statustext}}</span>
+    {{#hassyncstatus}}
+        <span class="text-muted ml-3" data-region="sync-status">{{syncstatus}}</span>
+    {{/hassyncstatus}}
+    {{#hassitename}}
+        <span class="text-muted ml-2">({{sitename}})</span>
+    {{/hassitename}}
+</div>

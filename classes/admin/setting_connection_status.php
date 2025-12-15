@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Custom admin setting that displays connection and sync status.
+ * Custom admin setting that displays connection status and connect button.
  *
  * @package    local_mc_plugin
  * @copyright  2025 Kerem Can Akdag
@@ -27,31 +27,30 @@ namespace local_mc_plugin\admin;
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir . '/adminlib.php');
+require_once($CFG->dirroot . '/local/mc_plugin/lib.php');
+
+use local_mc_plugin\output\connection_status;
 
 /**
- * Custom admin setting that displays connection and sync status.
+ * Custom admin setting that displays connection status and connect button.
  */
 class setting_connection_status extends \admin_setting {
-    /** @var bool Whether the site is currently connected */
-    private $isconnected;
-
-    /** @var string Session key for CSRF protection */
-    private $sesskey;
-
     /** @var string Event input ID for counter refresh */
     private $eventinputid;
+
+    /** @var bool Whether the site is currently connected */
+    private $isconnected;
 
     /**
      * Constructor.
      *
      * @param string $name Unique setting name
-     * @param bool $isconnected Whether the site is currently connected
      * @param string $eventinputid Event selector input ID (optional)
+     * @param bool $isconnected Whether the site is currently connected
      */
-    public function __construct($name, $isconnected, $eventinputid = '') {
-        $this->isconnected = $isconnected;
-        $this->sesskey = sesskey();
+    public function __construct($name, $eventinputid = '', $isconnected = false) {
         $this->eventinputid = $eventinputid;
+        $this->isconnected = $isconnected;
         parent::__construct($name, get_string('connection_status', 'local_mc_plugin'), '', '');
     }
 
@@ -84,25 +83,35 @@ class setting_connection_status extends \admin_setting {
     public function output_html($data, $query = '') {
         global $PAGE;
 
+        // Get the plugin renderer.
+        $renderer = $PAGE->get_renderer('local_mc_plugin');
+
+        // Build URLs and config.
         $syncurl = (new \moodle_url('/local/mc_plugin/sync_schema.php'))->out(false);
+        $connecturl = (new \moodle_url('/local/mc_plugin/connect.php'))->out(false);
+        $saveurl = (new \moodle_url('/local/mc_plugin/ajax_save.php'))->out(false);
+        $apiurl = local_mc_plugin_get_api_url();
+        $frontendurl = local_mc_plugin_get_frontend_url();
+        $sesskey = sesskey();
 
-        // Build the status display HTML.
-        $html = '<div id="mc-connection-status">';
-        $html .= '<div id="mc-status-display">';
-        $html .= '<span id="mc-status-dot" style="color: #6c757d; margin-right: 6px;">●</span>';
-        $html .= '<span id="mc-status-text" style="color: #6c757d; font-weight: 500;">Not configured</span>';
-        $html .= '<span id="mc-site-name" style="margin-left: 8px; color: #666;"></span>';
-        $html .= '<span id="mc-sync-status" style="margin-left: 12px; font-size: 0.9em; color: #666;"></span>';
-        $html .= '</div>';
-        $html .= '<span id="mc-test-result" style="margin-left: 10px; font-size: 0.85em;"></span>';
-        $html .= '</div>';
+        // Create the renderable with all data including connect button.
+        $status = new connection_status(
+            $syncurl,
+            $sesskey,
+            $this->eventinputid,
+            $this->isconnected,
+            $connecturl,
+            $saveurl,
+            $apiurl,
+            $frontendurl
+        );
 
-        // Initialize the AMD module.
-        $PAGE->requires->js_call_amd('local_mc_plugin/admin', 'initConnectionStatus', [[
-            'syncUrl' => $syncurl,
-            'sesskey' => $this->sesskey,
-            'eventInputId' => $this->eventinputid,
-        ]]);
+        // Render using the Output API.
+        $html = $renderer->render($status);
+
+        // Initialize the AMD modules with config from renderable.
+        $PAGE->requires->js_call_amd('local_mc_plugin/admin', 'initConnectionStatus', [$status->get_js_config()]);
+        $PAGE->requires->js_call_amd('local_mc_plugin/admin', 'initConnect', [$status->get_connect_js_config()]);
 
         return format_admin_setting($this, $this->visiblename, $html, '', false, '', null, $query);
     }

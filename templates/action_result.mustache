@@ -1,0 +1,54 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_mc_plugin/action_result
+
+    Action result message for JavaScript rendering.
+
+    This template is rendered client-side via Templates.renderForPromise()
+    to display success or error messages after save/sync operations.
+
+    Classes required for JS:
+    * none
+
+    Data attributes required for JS:
+    * none
+
+    Context variables required for this template:
+    * success (bool) - Whether the operation was successful
+    * message (string) - Message text to display
+    * alertclass (string) - CSS class for alert (alert-success or alert-danger)
+
+    Example context (json):
+    {
+        "success": true,
+        "message": "Settings saved. Synced 5 event(s) to MoodleConnect",
+        "alertclass": "alert-success"
+    }
+}}
+<div class="alert {{alertclass}} alert-dismissible fade show" role="alert">
+    {{#success}}
+        <span class="mr-1" aria-hidden="true">✓</span>
+    {{/success}}
+    {{^success}}
+        <span class="mr-1" aria-hidden="true">✗</span>
+    {{/success}}
+    {{message}}
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>

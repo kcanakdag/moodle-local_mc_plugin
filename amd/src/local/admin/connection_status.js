@@ -1,7 +1,8 @@
 /**
  * Connection status module for the admin settings page.
  *
- * Handles status display and polling.
+ * Handles status display and polling using Mustache templates
+ * for dynamic UI updates.
  *
  * @module     local_mc_plugin/local/admin/connection_status
  * @copyright  2025 Kerem Can Akdag
@@ -11,12 +12,20 @@
 import Selectors from './selectors';
 import * as Repository from './repository';
 import * as EventSelector from './event_selector';
+import * as TemplateHelper from './templates';
+import {get_string as getString} from 'core/str';
 
 /** @type {Object} Configuration */
 let config = {};
 
 /** @type {string} Event selector input ID for refreshing counter */
 let eventInputId = '';
+
+/** @type {HTMLElement|null} Status container element */
+let statusContainer = null;
+
+/** @type {HTMLElement|null} Status content element for template rendering */
+let statusContent = null;
 
 /**
  * Get the count of selected events from the form.
@@ -44,8 +53,36 @@ const getSelectedEvents = () => {
     return eventsInput.value.split(',').map((e) => e.trim()).filter((e) => e !== '');
 };
 
+
 /**
- * Update the status display.
+ * Build sync status text based on selected and synced events.
+ *
+ * @param {number} syncedCount Number of synced events
+ * @param {Array} syncedEvents Array of synced event names
+ * @returns {Promise<string|null>} Sync status text or null
+ */
+const buildSyncStatusText = async(syncedCount, syncedEvents) => {
+    const selectedCount = getSelectedEventCount();
+    const selectedEvents = getSelectedEvents();
+
+    if (syncedCount === 0) {
+        return await getString('status_events_not_synced', 'local_mc_plugin');
+    }
+
+    if (syncedCount === selectedCount && syncedEvents) {
+        const allMatch = selectedEvents.every((e) => syncedEvents.includes(e));
+        if (allMatch) {
+            const str = await getString('status_events_synced', 'local_mc_plugin', syncedCount);
+            return str;
+        }
+    }
+
+    // Events changed
+    return await getString('status_events_changed', 'local_mc_plugin');
+};
+
+/**
+ * Update the status display using template rendering.
  *
  * @param {boolean} connected Whether connected
  * @param {string|null} siteName Site name if connected
@@ -53,114 +90,76 @@ const getSelectedEvents = () => {
  * @param {Array} syncedEvents Array of synced event names
  * @param {string|null} message Error message if not connected
  */
-const updateStatus = (connected, siteName, syncedCount, syncedEvents, message) => {
-    const statusDot = document.querySelector(Selectors.status.dot);
-    const statusText = document.querySelector(Selectors.status.text);
-    const siteNameEl = document.querySelector(Selectors.status.siteName);
-    const syncStatus = document.querySelector(Selectors.status.syncStatus);
-    const testResult = document.querySelector(Selectors.status.testResult);
-
-    if (!statusDot || !statusText) {
+const updateStatus = async(connected, siteName, syncedCount, syncedEvents, message) => {
+    if (!statusContent) {
         return;
     }
 
     // Update event selector with synced events
     EventSelector.setSyncedEvents(syncedEvents);
 
+    let statusText;
+    let syncStatus = null;
+
     if (connected) {
-        statusDot.style.color = '#28a745';
-        statusText.style.color = '#155724';
-        statusText.textContent = 'Connected';
-
-        if (siteName && siteNameEl) {
-            siteNameEl.textContent = `(${siteName})`;
-        }
-
-        if (testResult) {
-            testResult.innerHTML = '';
-        }
-
-        const selectedCount = getSelectedEventCount();
-        const selectedEvents = getSelectedEvents();
-
-        if (syncStatus) {
-            if (syncedCount === 0) {
-                syncStatus.innerHTML = '<span style="color: #856404;">• Events not synced yet</span>';
-            } else if (syncedCount === selectedCount && syncedEvents) {
-                const allMatch = selectedEvents.every((e) => syncedEvents.includes(e));
-                if (allMatch) {
-                    syncStatus.innerHTML = `<span style="color: #155724;">• ${syncedCount} events synced</span>`;
-                } else {
-                    syncStatus.innerHTML = '<span style="color: #856404;">• Events changed, click Save & Sync</span>';
-                }
-            } else {
-                const diff = selectedCount - syncedCount;
-                if (diff > 0) {
-                    syncStatus.innerHTML = `<span style="color: #856404;">• ${diff} new event(s) to sync</span>`;
-                } else {
-                    syncStatus.innerHTML = '<span style="color: #856404;">• Events changed, click Save & Sync</span>';
-                }
-            }
-        }
+        statusText = await getString('status_connected', 'local_mc_plugin');
+        syncStatus = await buildSyncStatusText(syncedCount, syncedEvents);
 
         // Refresh event selector counter
         if (eventInputId) {
             EventSelector.refreshCounter(eventInputId);
         }
     } else {
-        statusDot.style.color = '#dc3545';
-        statusText.style.color = '#721c24';
-        statusText.textContent = 'Not connected';
-
-        if (siteNameEl) {
-            siteNameEl.textContent = '';
-        }
-        if (syncStatus) {
-            syncStatus.textContent = '';
-        }
-        if (testResult) {
-            testResult.innerHTML = `<span style="color: #dc3545;">${message || 'Connection failed'}</span>`;
-        }
+        statusText = message || await getString('status_not_connected', 'local_mc_plugin');
     }
+
+    // Build context and render template
+    const context = TemplateHelper.buildConnectionStatusContext(
+        connected,
+        statusText,
+        siteName,
+        syncStatus
+    );
+
+    await TemplateHelper.renderConnectionStatus(statusContent, context);
 };
 
 /**
  * Test the connection and update status.
  */
 export const testConnection = async() => {
-    const statusDot = document.querySelector(Selectors.status.dot);
-    const statusText = document.querySelector(Selectors.status.text);
-    const syncStatus = document.querySelector(Selectors.status.syncStatus);
-    const testResult = document.querySelector(Selectors.status.testResult);
+    if (!statusContent) {
+        return;
+    }
 
-    if (statusDot) {
-        statusDot.style.color = '#6c757d';
-    }
-    if (statusText) {
-        statusText.style.color = '#6c757d';
-        statusText.textContent = 'Checking...';
-    }
-    if (syncStatus) {
-        syncStatus.textContent = '';
-    }
-    if (testResult) {
-        testResult.innerHTML = '';
-    }
+    // Show loading state - render with checking text
+    const checkingText = await getString('connect_initializing', 'local_mc_plugin');
+    const loadingContext = {
+        connected: false,
+        statusclass: 'text-muted',
+        dotclass: 'text-muted',
+        statustext: checkingText,
+        hassitename: false,
+        hassyncstatus: false,
+    };
+    await TemplateHelper.renderConnectionStatus(statusContent, loadingContext);
 
     try {
         const data = await Repository.getConnectionStatus(config.syncUrl, config.sesskey);
 
         if (data.connected) {
-            updateStatus(true, data.site_name, data.synced_event_count || 0, data.synced_events || []);
+            await updateStatus(true, data.site_name, data.synced_event_count || 0, data.synced_events || []);
         } else if (data.error) {
-            updateStatus(false, null, 0, [], data.error);
+            await updateStatus(false, null, 0, [], data.error);
         } else if (data.configured) {
-            updateStatus(false, null, 0, [], 'Click Connect to link your site');
+            const msg = await getString('status_click_connect', 'local_mc_plugin');
+            await updateStatus(false, null, 0, [], msg);
         } else {
-            updateStatus(false, null, 0, [], 'Click Connect to link your Moodle site');
+            const msg = await getString('status_click_connect_link', 'local_mc_plugin');
+            await updateStatus(false, null, 0, [], msg);
         }
     } catch (err) {
-        updateStatus(false, null, 0, [], err.message);
+        await updateStatus(false, null, 0, [], err.message);
     }
 };
 
@@ -169,34 +168,54 @@ export const testConnection = async() => {
  *
  * @param {string} errorMessage The error message
  */
-export const updateStatusWithError = (errorMessage) => {
-    const statusDot = document.querySelector(Selectors.status.dot);
-    const statusText = document.querySelector(Selectors.status.text);
-    const syncStatus = document.querySelector(Selectors.status.syncStatus);
+export const updateStatusWithError = async(errorMessage) => {
+    if (!statusContent) {
+        return;
+    }
 
-    if (statusDot) {
-        statusDot.style.color = '#dc3545';
-    }
-    if (statusText) {
-        statusText.style.color = '#721c24';
-        statusText.textContent = 'Sync failed';
-    }
-    if (syncStatus) {
-        syncStatus.innerHTML = `<span style="color: #dc3545;">• ${errorMessage}</span>`;
-    }
+    const syncFailedText = await getString('status_sync_failed', 'local_mc_plugin');
+    const context = {
+        connected: false,
+        statusclass: 'text-danger',
+        dotclass: 'text-danger',
+        statustext: syncFailedText,
+        hassitename: false,
+        syncstatus: errorMessage,
+        hassyncstatus: true,
+    };
+
+    await TemplateHelper.renderConnectionStatus(statusContent, context);
 };
 
 /**
  * Initialize the connection status module.
  *
- * @param {Object} cfg Configuration object
- * @param {string} cfg.syncUrl URL to sync_schema.php
- * @param {string} cfg.sesskey Moodle session key
- * @param {string} cfg.eventInputId Event selector input ID
+ * Reads configuration from data attributes on the container element.
+ *
+ * @param {Object} [cfg] Optional configuration object (for backward compatibility)
+ * @param {string} [cfg.syncUrl] URL to sync_schema.php
+ * @param {string} [cfg.sesskey] Moodle session key
+ * @param {string} [cfg.eventInputId] Event selector input ID
  */
-export const init = (cfg) => {
-    config = cfg;
-    eventInputId = cfg.eventInputId || '';
+export const init = (cfg = null) => {
+    // Find the status container
+    statusContainer = document.querySelector(Selectors.status.container);
+
+    if (statusContainer) {
+        // Read config from data attributes
+        config = {
+            syncUrl: statusContainer.dataset.syncurl || (cfg && cfg.syncUrl) || '',
+            sesskey: statusContainer.dataset.sesskey || (cfg && cfg.sesskey) || '',
+        };
+        eventInputId = statusContainer.dataset.eventinputid || (cfg && cfg.eventInputId) || '';
+
+        // Find the content area for template rendering
+        statusContent = statusContainer.querySelector(Selectors.status.content);
+    } else if (cfg) {
+        // Fallback to passed config (backward compatibility)
+        config = cfg;
+        eventInputId = cfg.eventInputId || '';
+    }
 
     // Initial status check
     testConnection();

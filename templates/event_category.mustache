@@ -1,0 +1,55 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_mc_plugin/event_category
+
+    Event category partial for the event selector.
+
+    Classes required for JS:
+    * mc-category - Container class for category grouping
+
+    Data attributes required for JS:
+    * data-region="event-category" - Identifies category container
+
+    Context variables required for this template:
+    * name (string) - Category display name (e.g., "Core", "Mod Assign")
+    * count (int) - Number of events in this category
+    * events (array) - Array of event objects for event_item partial
+
+    Example context (json):
+    {
+        "name": "Core",
+        "count": 42,
+        "events": [
+            {
+                "classname": "\\core\\event\\user_created",
+                "displayname": "User created",
+                "checked": true
+            }
+        ]
+    }
+}}
+<div class="mc-category mb-3" data-region="event-category">
+    <div class="mc-category-title font-weight-bold mb-2">
+        {{name}} <span class="badge badge-secondary">{{count}}</span>
+    </div>
+    <div class="mc-category-events pl-3">
+        {{#events}}
+            {{> local_mc_plugin/event_item }}
+        {{/events}}
+    </div>
+</div>

@@ -6,11 +6,14 @@
  * - Polling for connection completion
  * - Storing credentials on success
  *
+ * Uses data-* attributes from connect_button.mustache template.
+ *
  * @module     local_mc_plugin/connect
  * @copyright  2025 Kerem Can Akdag
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+import Selectors from './local/admin/selectors';
 import * as Repository from './local/admin/repository';
 import * as ConnectionStatus from './local/admin/connection_status';
 import {get_strings as getStrings} from 'core/str';
@@ -35,6 +38,25 @@ let currentToken = null;
 
 /** @type {boolean} Whether currently connected */
 let isConnected = false;
+
+/** @type {HTMLElement|null} Connect button */
+let connectBtn = null;
+
+/** @type {HTMLElement|null} Button text element */
+let btnText = null;
+
+/** @type {HTMLElement|null} Button spinner element */
+let btnSpinner = null;
+
+/** @type {HTMLElement|null} Status div element */
+let statusDiv = null;
+
+/** @type {HTMLElement|null} Status icon element */
+let statusIcon = null;
+
+/** @type {HTMLElement|null} Status text element */
+let statusText = null;
+
 
 /**
  * Load language strings.
@@ -76,18 +98,31 @@ const loadStrings = async() => {
 };
 
 /**
- * Get DOM elements.
+ * Find DOM elements using data-* attribute selectors.
  *
- * @returns {Object} DOM elements
+ * Falls back to legacy ID-based selectors for backward compatibility.
  */
-const getElements = () => ({
-    connectBtn: document.getElementById('mc-connect-btn'),
-    btnText: document.getElementById('mc-connect-btn-text'),
-    btnSpinner: document.getElementById('mc-connect-btn-spinner'),
-    statusDiv: document.getElementById('mc-connect-status'),
-    statusIcon: document.getElementById('mc-connect-status-icon'),
-    statusText: document.getElementById('mc-connect-status-text'),
-});
+const findElements = () => {
+    // Try data-* attribute selectors first (from template)
+    const container = document.querySelector(Selectors.connect.container);
+
+    if (container) {
+        connectBtn = container.querySelector(Selectors.connect.button);
+        btnText = container.querySelector(Selectors.connect.buttonText);
+        btnSpinner = container.querySelector(Selectors.connect.buttonSpinner);
+        statusDiv = container.querySelector(Selectors.connect.statusDiv);
+        statusIcon = container.querySelector(Selectors.connect.statusIcon);
+        statusText = container.querySelector(Selectors.connect.statusText);
+    } else {
+        // Fallback to legacy ID-based selectors
+        connectBtn = document.querySelector(Selectors.connect.legacyButton);
+        btnText = document.querySelector(Selectors.connect.legacyButtonText);
+        btnSpinner = document.querySelector(Selectors.connect.legacyButtonSpinner);
+        statusDiv = document.querySelector(Selectors.connect.legacyStatusDiv);
+        statusIcon = document.querySelector(Selectors.connect.legacyStatusIcon);
+        statusText = document.querySelector(Selectors.connect.legacyStatusText);
+    }
+};
 
 /**
  * Show status message.
@@ -96,36 +131,45 @@ const getElements = () => ({
  * @param {string} message Status message
  */
 const showStatus = (type, message) => {
-    const {statusDiv, statusIcon, statusText} = getElements();
     if (!statusDiv) {
         return;
     }
 
+    // Show the status div
+    statusDiv.classList.remove('d-none');
     statusDiv.style.display = 'block';
 
+    // Remove previous alert classes
+    statusDiv.classList.remove('alert-warning', 'alert-success', 'alert-danger');
+
     if (type === 'waiting') {
-        statusDiv.style.background = '#fff3cd';
-        statusDiv.style.color = '#856404';
-        statusIcon.innerHTML = '<span class="spinner-border spinner-border-sm" style="margin-right: 8px;"></span>';
+        statusDiv.classList.add('alert-warning');
+        if (statusIcon) {
+            statusIcon.innerHTML = '<span class="spinner-border spinner-border-sm mr-2"></span>';
+        }
     } else if (type === 'success') {
-        statusDiv.style.background = '#d4edda';
-        statusDiv.style.color = '#155724';
-        statusIcon.innerHTML = '✓ ';
+        statusDiv.classList.add('alert-success');
+        if (statusIcon) {
+            statusIcon.innerHTML = '✓ ';
+        }
     } else if (type === 'error') {
-        statusDiv.style.background = '#f8d7da';
-        statusDiv.style.color = '#721c24';
-        statusIcon.innerHTML = '✗ ';
+        statusDiv.classList.add('alert-danger');
+        if (statusIcon) {
+            statusIcon.innerHTML = '✗ ';
+        }
     }
 
-    statusText.textContent = message;
+    if (statusText) {
+        statusText.textContent = message;
+    }
 };
 
 /**
  * Hide status message.
  */
 const hideStatus = () => {
-    const {statusDiv} = getElements();
     if (statusDiv) {
+        statusDiv.classList.add('d-none');
         statusDiv.style.display = 'none';
     }
 };
@@ -136,12 +180,15 @@ const hideStatus = () => {
  * @param {boolean} loading Whether loading
  */
 const setLoading = (loading) => {
-    const {connectBtn, btnSpinner} = getElements();
     if (connectBtn) {
         connectBtn.disabled = loading;
     }
     if (btnSpinner) {
-        btnSpinner.style.display = loading ? 'inline-block' : 'none';
+        if (loading) {
+            btnSpinner.classList.remove('d-none');
+        } else {
+            btnSpinner.classList.add('d-none');
+        }
     }
 };
 
@@ -151,7 +198,6 @@ const setLoading = (loading) => {
  * @param {string} text Button text
  */
 const setBtnText = (text) => {
-    const {btnText} = getElements();
     if (btnText) {
         btnText.textContent = text;
     }
@@ -185,7 +231,6 @@ const saveCredentials = async(siteKey, siteSecret) => {
             showStatus('success', strings.success);
             setBtnText(strings.reconnectBtn);
 
-            const {connectBtn} = getElements();
             if (connectBtn) {
                 connectBtn.classList.remove('btn-primary');
                 connectBtn.classList.add('btn-outline-primary');
@@ -288,22 +333,40 @@ const startConnection = async() => {
 /**
  * Initialize the connect module.
  *
- * @param {Object} cfg Configuration object
- * @param {string} cfg.connectUrl URL to connect.php
- * @param {string} cfg.saveUrl URL to ajax_save.php
- * @param {string} cfg.apiUrl MoodleConnect API URL
- * @param {string} cfg.frontendUrl MoodleConnect frontend URL
- * @param {string} cfg.sesskey Moodle session key
- * @param {boolean} cfg.isConnected Whether already connected
+ * Reads configuration from data attributes on the connect button,
+ * or accepts a configuration object for backward compatibility.
+ *
+ * @param {Object} [cfg] Optional configuration object
+ * @param {string} [cfg.connectUrl] URL to connect.php
+ * @param {string} [cfg.saveUrl] URL to ajax_save.php
+ * @param {string} [cfg.apiUrl] MoodleConnect API URL
+ * @param {string} [cfg.frontendUrl] MoodleConnect frontend URL
+ * @param {string} [cfg.sesskey] Moodle session key
+ * @param {boolean} [cfg.isConnected] Whether already connected
  */
-export const init = async(cfg) => {
-    config = cfg;
-    isConnected = cfg.isConnected || false;
-
+export const init = async(cfg = null) => {
     await loadStrings();
 
-    const {connectBtn} = getElements();
+    // Find DOM elements
+    findElements();
+
     if (connectBtn) {
+        // Read config from data attributes on the button
+        config = {
+            connectUrl: connectBtn.dataset.connecturl || (cfg && cfg.connectUrl) || '',
+            saveUrl: connectBtn.dataset.saveurl || (cfg && cfg.saveUrl) || '',
+            apiUrl: connectBtn.dataset.apiurl || (cfg && cfg.apiUrl) || '',
+            frontendUrl: connectBtn.dataset.frontendurl || (cfg && cfg.frontendUrl) || '',
+            sesskey: connectBtn.dataset.sesskey || (cfg && cfg.sesskey) || '',
+        };
+
+        // Determine initial connection state from button class
+        isConnected = connectBtn.classList.contains('btn-outline-primary') || (cfg && cfg.isConnected) || false;
+
         connectBtn.addEventListener('click', startConnection);
+    } else if (cfg) {
+        // Fallback to passed config (backward compatibility)
+        config = cfg;
+        isConnected = cfg.isConnected || false;
     }
 };

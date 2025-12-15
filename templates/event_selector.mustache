@@ -1,0 +1,97 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_mc_plugin/event_selector
+
+    Event selector component for MoodleConnect admin settings.
+
+    Classes required for JS:
+    * mc-controls - Control bar container
+    * mc-event-list - Event list container
+
+    Data attributes required for JS:
+    * data-region="event-selector" - Main container
+    * data-region="search-input" - Search input field
+    * data-region="selected-count" - Selected count display
+    * data-action="select-visible" - Select visible button
+    * data-action="deselect-visible" - Deselect visible button
+
+    Context variables required for this template:
+    * inputid (string) - Hidden input element ID
+    * inputname (string) - Hidden input element name
+    * currentvalue (string) - Comma-separated selected event classes
+    * hascategories (bool) - Whether there are categories to display
+    * categories (array) - Array of category objects for event_category partial
+
+    Example context (json):
+    {
+        "inputid": "id_s_local_mc_plugin_monitored_events",
+        "inputname": "s_local_mc_plugin_monitored_events",
+        "currentvalue": "\\core\\event\\user_created,\\core\\event\\course_created",
+        "hascategories": true,
+        "categories": [
+            {
+                "name": "Core",
+                "count": 42,
+                "events": []
+            }
+        ]
+    }
+}}
+<div class="local_mc_plugin_event_selector" data-region="event-selector">
+    {{! Hidden input for form submission }}
+    <input type="hidden"
+           id="{{inputid}}"
+           name="{{inputname}}"
+           value="{{currentvalue}}"
+           data-region="events-input">
+
+    {{! Control bar with search and bulk actions }}
+    <div class="mc-controls mb-3 d-flex flex-wrap align-items-center gap-2">
+        <div class="flex-grow-1 mr-2" style="min-width: 200px; max-width: 300px;">
+            <input type="text"
+                   class="form-control form-control-sm"
+                   data-region="search-input"
+                   placeholder="{{#str}} event_search_placeholder, local_mc_plugin {{/str}}">
+        </div>
+        <div class="btn-group btn-group-sm mr-2">
+            <button type="button" class="btn btn-outline-secondary" data-action="select-visible">
+                {{#str}} event_select_visible, local_mc_plugin {{/str}}
+            </button>
+            <button type="button" class="btn btn-outline-secondary" data-action="deselect-visible">
+                {{#str}} event_deselect_visible, local_mc_plugin {{/str}}
+            </button>
+        </div>
+        <span class="text-muted small" data-region="selected-count">
+            {{#str}} event_selected_count, local_mc_plugin, 0 {{/str}}
+        </span>
+    </div>
+
+    {{! Event list grouped by category }}
+    <div class="mc-event-list border rounded p-3" style="max-height: 400px; overflow-y: auto;">
+        {{#hascategories}}
+            {{#categories}}
+                {{> local_mc_plugin/event_category }}
+            {{/categories}}
+        {{/hascategories}}
+        {{^hascategories}}
+            <p class="text-muted mb-0">
+                {{#str}} error_loading_events, local_mc_plugin, No events available {{/str}}
+            </p>
+        {{/hascategories}}
+    </div>
+</div>

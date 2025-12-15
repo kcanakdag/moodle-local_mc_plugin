@@ -30,6 +30,8 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->libdir . '/adminlib.php');
 require_once($CFG->dirroot . '/local/mc_plugin/lib.php');
 
+use local_mc_plugin\output\connect_button;
+
 /**
  * Custom admin setting that renders the "Connect to MoodleConnect" button
  * and handles the OAuth-style connection flow with polling.
@@ -38,21 +40,6 @@ class setting_connect_button extends \admin_setting {
     /** @var bool Whether the site is currently connected */
     private $isconnected;
 
-    /** @var string URL to the connect.php endpoint */
-    private $connecturl;
-
-    /** @var string URL to the ajax_save.php endpoint */
-    private $ajaxsaveurl;
-
-    /** @var string MoodleConnect API base URL */
-    private $apiurl;
-
-    /** @var string MoodleConnect frontend URL */
-    private $frontendurl;
-
-    /** @var string Session key for CSRF protection */
-    private $sesskey;
-
     /**
      * Constructor.
      *
@@ -60,15 +47,7 @@ class setting_connect_button extends \admin_setting {
      * @param bool $isconnected Whether the site is currently connected
      */
     public function __construct($name, $isconnected) {
-        global $CFG;
-
         $this->isconnected = $isconnected;
-        $this->connecturl = (new \moodle_url('/local/mc_plugin/connect.php'))->out(false);
-        $this->ajaxsaveurl = (new \moodle_url('/local/mc_plugin/ajax_save.php'))->out(false);
-        $this->apiurl = local_mc_plugin_get_api_url();
-        $this->frontendurl = local_mc_plugin_get_frontend_url();
-        $this->sesskey = sesskey();
-
         parent::__construct($name, '', '', '');
     }
 
@@ -101,48 +80,31 @@ class setting_connect_button extends \admin_setting {
     public function output_html($data, $query = '') {
         global $PAGE;
 
-        $connectlabel = get_string('connect_button', 'local_mc_plugin');
-        $reconnectlabel = get_string('reconnect_button', 'local_mc_plugin');
-        $btnlabel = $this->isconnected ? $reconnectlabel : $connectlabel;
+        // Get the plugin renderer.
+        $renderer = $PAGE->get_renderer('local_mc_plugin');
 
-        $html = '
-        <div class="form-item row" id="moodleconnect-connect-section">
-            <div class="form-label col-sm-3">
-                <label>' . get_string('connect_heading', 'local_mc_plugin') . '</label>
-            </div>
-            <div class="form-setting col-sm-9">
-                <div id="mc-connect-container">
-                    <div id="mc-connect-status" style="display: none; padding: 12px; border-radius: 6px;
-                        margin-bottom: 15px;">
-                        <span id="mc-connect-status-icon"></span>
-                        <span id="mc-connect-status-text"></span>
-                    </div>
+        // Build URLs and config.
+        $connecturl = (new \moodle_url('/local/mc_plugin/connect.php'))->out(false);
+        $saveurl = (new \moodle_url('/local/mc_plugin/ajax_save.php'))->out(false);
+        $apiurl = local_mc_plugin_get_api_url();
+        $frontendurl = local_mc_plugin_get_frontend_url();
+        $sesskey = sesskey();
 
-                    <button type="button" id="mc-connect-btn" class="btn ' .
-                        ($this->isconnected ? 'btn-outline-primary' : 'btn-primary') .
-                        '" style="padding: 10px 24px; font-size: 15px;">
-                        <span id="mc-connect-btn-text">' . s($btnlabel) . '</span>
-                        <span id="mc-connect-btn-spinner" style="display: none; margin-left: 8px;">
-                            <span class="spinner-border spinner-border-sm" role="status"></span>
-                        </span>
-                    </button>
+        // Create the renderable.
+        $button = new connect_button(
+            $this->isconnected,
+            $connecturl,
+            $saveurl,
+            $apiurl,
+            $frontendurl,
+            $sesskey
+        );
 
-                    <p class="form-text text-muted" style="margin-top: 8px;">
-                        ' . get_string('connect_button_desc', 'local_mc_plugin') . '
-                    </p>
-                </div>
-            </div>
-        </div>';
+        // Render using the Output API.
+        $html = $renderer->render($button);
 
-        // Initialize the AMD module.
-        $PAGE->requires->js_call_amd('local_mc_plugin/admin', 'initConnect', [[
-            'connectUrl' => $this->connecturl,
-            'saveUrl' => $this->ajaxsaveurl,
-            'apiUrl' => $this->apiurl,
-            'frontendUrl' => $this->frontendurl,
-            'sesskey' => $this->sesskey,
-            'isConnected' => $this->isconnected,
-        ]]);
+        // Initialize the AMD module with config from renderable.
+        $PAGE->requires->js_call_amd('local_mc_plugin/admin', 'initConnect', [$button->get_js_config()]);
 
         return $html;
     }

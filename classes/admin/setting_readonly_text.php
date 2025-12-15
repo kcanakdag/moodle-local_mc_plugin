@@ -92,10 +92,8 @@ class setting_readonly_text extends \admin_setting {
             }
         }
 
-        $html = '<div class="form-text defaultsnext">';
-        $html .= '<code style="padding: 4px 8px; background: #f5f5f5; border-radius: 4px; font-family: monospace;">';
-        $html .= s($displayvalue);
-        $html .= '</code>';
+        $html = '<div class="form-text defaultsnext local_mc_plugin_readonly_text">';
+        $html .= '<code>' . s($displayvalue) . '</code>';
         $html .= '</div>';
 
         return format_admin_setting($this, $this->visiblename, $html, $this->description, true, '', null, $query);
