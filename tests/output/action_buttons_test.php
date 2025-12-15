@@ -129,9 +129,8 @@ final class action_buttons_test extends \advanced_testcase {
         $requiredkeys = ['syncurl', 'ajaxsaveurl', 'sesskey'];
 
         foreach ($requiredkeys as $key) {
-            $this->assertObjectHasProperty(
-                $key,
-                $data,
+            $this->assertTrue(
+                property_exists($data, $key),
                 "Context must contain key '{$key}'"
             );
         }

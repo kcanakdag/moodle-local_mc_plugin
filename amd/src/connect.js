@@ -288,6 +288,48 @@ const pollStatus = async() => {
 };
 
 /**
+ * Get the appropriate button text based on connection state.
+ *
+ * @returns {string} Button text
+ */
+const getButtonText = () => {
+    return isConnected ? strings.reconnectBtn : strings.connectBtn;
+};
+
+/**
+ * Reset button state after connection attempt.
+ */
+const resetButtonState = () => {
+    setLoading(false);
+    setBtnText(getButtonText());
+};
+
+/**
+ * Handle successful token retrieval and open connection window.
+ *
+ * @param {Object} data Response data with token
+ */
+const handleTokenSuccess = (data) => {
+    currentToken = data.token;
+
+    // Open MoodleConnect in a new tab.
+    const connectPageUrl = `${config.frontendUrl}/connect?token=${encodeURIComponent(data.token)}`;
+    const connectWindow = window.open(connectPageUrl, '_blank');
+
+    if (!connectWindow) {
+        resetButtonState();
+        showStatus('error', strings.popupBlocked);
+        return;
+    }
+
+    setBtnText(strings.waitingBtn);
+    showStatus('waiting', strings.waiting);
+
+    // Start polling.
+    pollTimer = setInterval(pollStatus, POLL_INTERVAL);
+};
+
+/**
  * Start the connection flow.
  */
 const startConnection = async() => {
@@ -300,34 +342,49 @@ const startConnection = async() => {
         const data = await Repository.initConnection(config.connectUrl, config.sesskey);
 
         if (data.success && data.token) {
-            currentToken = data.token;
-
-            // Open MoodleConnect in a new tab
-            const connectPageUrl = `${config.frontendUrl}/connect?token=${encodeURIComponent(data.token)}`;
-            const connectWindow = window.open(connectPageUrl, '_blank');
-
-            if (!connectWindow) {
-                setLoading(false);
-                setBtnText(isConnected ? strings.reconnectBtn : strings.connectBtn);
-                showStatus('error', strings.popupBlocked);
-                return;
-            }
-
-            setBtnText(strings.waitingBtn);
-            showStatus('waiting', strings.waiting);
-
-            // Start polling
-            pollTimer = setInterval(pollStatus, POLL_INTERVAL);
+            handleTokenSuccess(data);
         } else {
-            setLoading(false);
-            setBtnText(isConnected ? strings.reconnectBtn : strings.connectBtn);
+            resetButtonState();
             showStatus('error', data.message || strings.initFailed);
         }
     } catch (err) {
-        setLoading(false);
-        setBtnText(isConnected ? strings.reconnectBtn : strings.connectBtn);
+        resetButtonState();
         showStatus('error', `${strings.initFailed}: ${err.message}`);
     }
+};
+
+/**
+ * Get config value from button data attribute or fallback config.
+ *
+ * @param {string} dataAttr Data attribute name (lowercase)
+ * @param {string} cfgKey Config key name
+ * @param {Object|null} cfg Fallback config object
+ * @returns {string} Config value
+ */
+const getConfigValue = (dataAttr, cfgKey, cfg) => {
+    if (connectBtn && connectBtn.dataset[dataAttr]) {
+        return connectBtn.dataset[dataAttr];
+    }
+    if (cfg && cfg[cfgKey]) {
+        return cfg[cfgKey];
+    }
+    return '';
+};
+
+/**
+ * Build configuration from button data attributes or fallback config.
+ *
+ * @param {Object|null} cfg Fallback config object
+ * @returns {Object} Configuration object
+ */
+const buildConfig = (cfg) => {
+    return {
+        connectUrl: getConfigValue('connecturl', 'connectUrl', cfg),
+        saveUrl: getConfigValue('saveurl', 'saveUrl', cfg),
+        apiUrl: getConfigValue('apiurl', 'apiUrl', cfg),
+        frontendUrl: getConfigValue('frontendurl', 'frontendUrl', cfg),
+        sesskey: getConfigValue('sesskey', 'sesskey', cfg),
+    };
 };
 
 /**
@@ -346,27 +403,14 @@ const startConnection = async() => {
  */
 export const init = async(cfg = null) => {
     await loadStrings();
-
-    // Find DOM elements
     findElements();
 
+    config = buildConfig(cfg);
+
     if (connectBtn) {
-        // Read config from data attributes on the button
-        config = {
-            connectUrl: connectBtn.dataset.connecturl || (cfg && cfg.connectUrl) || '',
-            saveUrl: connectBtn.dataset.saveurl || (cfg && cfg.saveUrl) || '',
-            apiUrl: connectBtn.dataset.apiurl || (cfg && cfg.apiUrl) || '',
-            frontendUrl: connectBtn.dataset.frontendurl || (cfg && cfg.frontendUrl) || '',
-            sesskey: connectBtn.dataset.sesskey || (cfg && cfg.sesskey) || '',
-        };
-
-        // Determine initial connection state from button class
-        isConnected = connectBtn.classList.contains('btn-outline-primary') || (cfg && cfg.isConnected) || false;
-
+        isConnected = connectBtn.classList.contains('btn-outline-primary') || Boolean(cfg && cfg.isConnected);
         connectBtn.addEventListener('click', startConnection);
     } else if (cfg) {
-        // Fallback to passed config (backward compatibility)
-        config = cfg;
-        isConnected = cfg.isConnected || false;
+        isConnected = Boolean(cfg.isConnected);
     }
 };

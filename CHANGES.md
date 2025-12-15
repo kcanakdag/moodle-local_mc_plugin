@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.0.3] - 2025-12-15
+
+### Fixed
+- **ESLint Complexity**: Further refactored `connect.js` init function by extracting `getConfigValue()` and `buildConfig()` helpers.
+- **PHPCS Lang Ordering**: Fixed alphabetical ordering of language strings in `lang/en/local_mc_plugin.php`.
+
+## [4.0.2] - 2025-12-15
+
+### Fixed
+- **ESLint Complexity**: Refactored `connect.js` to reduce cyclomatic complexity below threshold.
+- **Stylelint**: Removed all `!important` declarations from `styles.css`.
+- **PHPUnit Compatibility**: Replaced `assertObjectHasProperty` with `assertTrue(property_exists(...))` for Moodle 4.0/PHPUnit 9 compatibility.
+
+## [4.0.1] - 2025-12-15
+
+### Fixed
+- **Linting Issues**: Resolved ESLint warnings in AMD modules (camelCase variables).
+- **PHPCS**: Fixed language string ordering in `lang/en/local_mc_plugin.php`.
+
 ## [4.0.0] - 2025-12-15
 
 ### Added

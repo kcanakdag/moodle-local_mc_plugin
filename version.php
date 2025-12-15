@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_mc_plugin';
-$plugin->version   = 2025121500;      // Major release: Output API refactor.
+$plugin->version   = 2025121600;      // Version 4.1.0 - CI fixes, auto-sync, native save button.
 $plugin->requires  = 2022041900;      // Moodle 4.0+.
 $plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = 'v4.0.0';
+$plugin->release   = 'v4.1.0';

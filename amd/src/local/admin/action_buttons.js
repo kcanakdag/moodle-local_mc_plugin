@@ -100,22 +100,22 @@ const getFormValues = () => {
 
     const siteKeyInput = document.querySelector(Selectors.inputs.siteKey);
     if (siteKeyInput && siteKeyInput.value) {
-        values.site_key = siteKeyInput.value;
+        values.siteKey = siteKeyInput.value;
     }
 
     const siteSecretInput = document.querySelector(Selectors.inputs.siteSecret);
     if (siteSecretInput && siteSecretInput.value) {
-        values.site_secret = siteSecretInput.value;
+        values.siteSecret = siteSecretInput.value;
     }
 
     const eventsInput = document.querySelector(Selectors.inputs.monitoredEvents);
     if (eventsInput) {
-        values.monitored_events = eventsInput.value;
+        values.monitoredEvents = eventsInput.value;
     }
 
     const debugInput = document.querySelector(Selectors.inputs.debugMode);
     if (debugInput) {
-        values.debug_mode = debugInput.checked ? 1 : 0;
+        values.debugMode = debugInput.checked ? 1 : 0;
     }
 
     return values;

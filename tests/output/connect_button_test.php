@@ -153,9 +153,8 @@ final class connect_button_test extends \advanced_testcase {
         $requiredkeys = ['connecturl', 'saveurl', 'apiurl', 'frontendurl', 'sesskey', 'isconnected', 'buttonclass'];
 
         foreach ($requiredkeys as $key) {
-            $this->assertObjectHasProperty(
-                $key,
-                $data,
+            $this->assertTrue(
+                property_exists($data, $key),
                 "Context must contain key '{$key}' for connection state: " . ($isconnected ? 'connected' : 'disconnected')
             );
         }

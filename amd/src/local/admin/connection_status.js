@@ -126,8 +126,10 @@ const updateStatus = async(connected, siteName, syncedCount, syncedEvents, messa
 
 /**
  * Test the connection and update status.
+ *
+ * @param {boolean} autoSync Whether to automatically sync events after connection check
  */
-export const testConnection = async() => {
+export const testConnection = async(autoSync = false) => {
     if (!statusContent) {
         return;
     }
@@ -149,6 +151,11 @@ export const testConnection = async() => {
 
         if (data.connected) {
             await updateStatus(true, data.site_name, data.synced_event_count || 0, data.synced_events || []);
+
+            // Auto-sync events if requested and connected
+            if (autoSync) {
+                await syncEventsInBackground();
+            }
         } else if (data.error) {
             await updateStatus(false, null, 0, [], data.error);
         } else if (data.configured) {
@@ -160,6 +167,26 @@ export const testConnection = async() => {
         }
     } catch (err) {
         await updateStatus(false, null, 0, [], err.message);
+    }
+};
+
+/**
+ * Sync events in the background and update status.
+ */
+const syncEventsInBackground = async() => {
+    try {
+        const syncResult = await Repository.syncEvents(config.syncUrl, config.sesskey);
+
+        if (syncResult.success) {
+            // Refresh connection status to show updated sync count
+            const data = await Repository.getConnectionStatus(config.syncUrl, config.sesskey);
+            if (data.connected) {
+                await updateStatus(true, data.site_name, data.synced_event_count || 0, data.synced_events || []);
+            }
+        }
+        // Silently ignore sync failures - user can manually sync if needed
+    } catch (err) {
+        // Silently ignore errors - connection status already shows current state
     }
 };
 
@@ -191,6 +218,7 @@ export const updateStatusWithError = async(errorMessage) => {
  * Initialize the connection status module.
  *
  * Reads configuration from data attributes on the container element.
+ * Automatically syncs events on page load when connected.
  *
  * @param {Object} [cfg] Optional configuration object (for backward compatibility)
  * @param {string} [cfg.syncUrl] URL to sync_schema.php
@@ -217,6 +245,7 @@ export const init = (cfg = null) => {
         eventInputId = cfg.eventInputId || '';
     }
 
-    // Initial status check
-    testConnection();
+    // Initial status check with auto-sync enabled
+    // This syncs events automatically when the page loads
+    testConnection(true);
 };

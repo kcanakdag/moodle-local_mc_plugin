@@ -139,9 +139,8 @@ final class connection_status_test extends \advanced_testcase {
         $requiredkeys = ['syncurl', 'sesskey', 'eventinputid'];
 
         foreach ($requiredkeys as $key) {
-            $this->assertObjectHasProperty(
-                $key,
-                $data,
+            $this->assertTrue(
+                property_exists($data, $key),
                 "Context must contain key '{$key}'"
             );
         }
@@ -195,7 +194,7 @@ final class connection_status_test extends \advanced_testcase {
 
         $data = $status->export_for_template($renderer);
 
-        $this->assertObjectHasProperty('eventinputid', $data);
+        $this->assertTrue(property_exists($data, 'eventinputid'));
         $this->assertEquals('', $data->eventinputid);
     }
 }

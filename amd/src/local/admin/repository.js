@@ -64,8 +64,8 @@ export const saveCredentials = async(saveUrl, sesskey, siteKey, siteSecret) => {
     return postForm(saveUrl, {
         action: 'save',
         sesskey,
-        site_key: siteKey,
-        site_secret: siteSecret,
+        siteKey: siteKey,
+        siteSecret: siteSecret,
     });
 };
 

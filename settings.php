@@ -80,13 +80,5 @@ if ($hassiteconfig) {
         0
     ));
 
-    // Primary Action Button (Save and Sync).
-    $syncurl = (new moodle_url('/local/mc_plugin/sync_schema.php'))->out(false);
-
-    $settings->add(new \local_mc_plugin\admin\setting_action_buttons(
-        'local_mc_plugin/action_buttons',
-        $syncurl
-    ));
-
     $ADMIN->add('localplugins', $settings);
 }
