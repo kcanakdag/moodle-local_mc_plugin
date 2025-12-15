@@ -34,8 +34,7 @@ use local_mc_plugin\local\dynamic_inspector;
  * @copyright  2025 Kerem Can Akdag
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class observer
-{
+class observer {
     /**
      * Generic handler for ALL events.
      *

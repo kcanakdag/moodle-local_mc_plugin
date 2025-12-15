@@ -26,7 +26,15 @@ defined('MOODLE_INTERNAL') || die();
 
 $string['advanced_heading'] = 'Advanced';
 $string['btn_save_sync'] = 'Save and Sync Events';
+$string['cachedef_active_syncs'] = 'Active sync operations cache';
+$string['cachedef_concurrency'] = 'Concurrency control cache';
+$string['cachedef_entity_registry'] = 'Entity registry cache';
+$string['cachedef_mc_metadata'] = 'MoodleConnect metadata cache (bases, tables, schemas, events)';
+$string['cachedef_rate_limits'] = 'Rate limiting cache';
 $string['btn_saving'] = 'Saving...';
+$string['mc_plugin:manage'] = 'Manage MoodleConnect settings';
+$string['mc_plugin:managecourse'] = 'Manage course-level MoodleConnect mappings';
+$string['mc_plugin:viewlogs'] = 'View MoodleConnect logs';
 $string['btn_syncing'] = 'Syncing...';
 $string['config_heading'] = 'Configuration';
 $string['connect_button'] = 'Connect to MoodleConnect';

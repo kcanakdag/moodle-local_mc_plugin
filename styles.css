@@ -25,10 +25,6 @@
    Connect Button Component
    ========================================================================== */
 
-.local_mc_plugin_connect_button {
-    /* Component wrapper - no additional styles needed, uses Bootstrap */
-}
-
 .local_mc_plugin_connect_button [data-region="connect-status"] {
     padding: 12px;
     border-radius: 6px;
@@ -43,10 +39,6 @@
    Connection Status Component
    ========================================================================== */
 
-.local_mc_plugin_connection_status {
-    /* Component wrapper */
-}
-
 .local_mc_plugin_connection_status [data-region="status-dot"] {
     margin-right: 6px;
 }
@@ -58,10 +50,6 @@
 /* ==========================================================================
    Event Selector Component
    ========================================================================== */
-
-.local_mc_plugin_event_selector {
-    /* Component wrapper */
-}
 
 /* Control bar */
 .local_mc_plugin_event_selector .mc-controls {

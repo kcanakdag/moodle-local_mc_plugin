@@ -24,23 +24,4 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$functions = [
-    'local_mc_plugin_fetch_schema' => [
-        'classname' => 'local_mc_plugin\external\fetch_schema',
-        'methodname' => 'execute',
-        'classpath' => '',
-        'description' => 'Fetch Airtable base schema',
-        'type' => 'read',
-        'ajax' => true,
-        'loginrequired' => true,
-    ],
-    'local_mc_plugin_fetch_table_schema' => [
-        'classname' => 'local_mc_plugin\external\fetch_table_schema',
-        'methodname' => 'execute',
-        'classpath' => '',
-        'description' => 'Fetch Airtable table schema',
-        'type' => 'read',
-        'ajax' => true,
-        'loginrequired' => true,
-    ],
-];
+$functions = [];

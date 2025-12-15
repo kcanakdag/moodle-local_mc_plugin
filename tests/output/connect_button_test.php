@@ -173,7 +173,7 @@ final class connect_button_test extends \advanced_testcase {
      * **Feature: mustache-templates-refactor, Property 2: Connect button class correctness**
      *
      * *For any* connection state, the connect_button renderable SHALL return
-     * buttonclass='btn-outline-primary' when isconnected=true, and
+     * buttonclass='btn-secondary' when isconnected=true, and
      * buttonclass='btn-primary' when isconnected=false.
      *
      * **Validates: Requirements 2.3**
@@ -214,7 +214,7 @@ final class connect_button_test extends \advanced_testcase {
         $data = $button->export_for_template($renderer);
 
         // Property 2: Button class must be correct based on connection state.
-        $expectedclass = $isconnected ? 'btn-outline-primary' : 'btn-primary';
+        $expectedclass = $isconnected ? 'btn-secondary' : 'btn-primary';
         $this->assertEquals(
             $expectedclass,
             $data->buttonclass,

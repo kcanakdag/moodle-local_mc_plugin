@@ -35,8 +35,7 @@ require_once(__DIR__ . '/../../lib.php');
  * @copyright  2025 Kerem Can Akdag
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class moodleconnect_client
-{
+class moodleconnect_client {
     /**
      * Recursively sort array keys for consistent JSON encoding.
      *
