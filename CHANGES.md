@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.1.0] - 2025-12-15
+
+### Changed
+- **Native Save Button**: Removed custom "Save and Sync Events" button in favor of Moodle's native "Save changes" button.
+- **Auto-Sync on Page Load**: Events are now automatically synced when the settings page loads (if connected).
+- **Simplified UI**: Cleaner admin interface with fewer custom buttons.
+
+### Fixed
+- **CI Grunt Check**: Fixed Grunt stale file detection with NVM support for correct Node.js version.
+- **Moodle 5.x Support**: Added support for Moodle 5.x public directory structure in CI.
+- **PHPUnit Compatibility**: Replaced `assertObjectHasProperty()` with `property_exists()` for older PHPUnit versions.
+- **AMD Module Builds**: Rebuilt all AMD modules with correct Node.js/npm versions to match CI environment.
+
 ## [4.0.3] - 2025-12-15
 
 ### Fixed
