@@ -87,38 +87,6 @@ class dynamic_inspector {
     }
 
     /**
-     * Get sample data from recent events of the specified class.
-     *
-     * Attempts to find a recent event of the specified type in the log store
-     * and extract its data. Falls back to mock data if no recent events are found.
-     *
-     * @param string $eventclass Fully qualified event class name
-     * @return array Structured array of sample data organized by category
-     */
-    public function get_sample_data(string $eventclass): array {
-        global $DB;
-
-        try {
-            $logevent = $DB->get_record_sql(
-                "SELECT * FROM {logstore_standard_log}
-                 WHERE eventname = :eventname
-                 ORDER BY timecreated DESC",
-                ['eventname' => $eventclass],
-                IGNORE_MULTIPLE
-            );
-
-            if ($logevent) {
-                return $this->extract_fields_from_log($logevent, $eventclass);
-            }
-        } catch (\Exception $e) {
-            // Log table might not exist or query failed - ignore.
-            unset($e);
-        }
-
-        return $this->get_mock_fields($eventclass);
-    }
-
-    /**
      * Extract fields from a live event instance.
      *
      * @param \core\event\base $event The event instance
@@ -141,12 +109,18 @@ class dynamic_inspector {
                 $user = \core_user::get_user($useridtoload);
                 if ($user) {
                     $fields['user'] = [
-                        'id' => ['value' => $user->id, 'type' => 'int', 'label' => 'User ID'],
-                        'email' => ['value' => $user->email, 'type' => 'string', 'label' => 'Email'],
-                        'firstname' => ['value' => $user->firstname, 'type' => 'string', 'label' => 'First Name'],
-                        'lastname' => ['value' => $user->lastname, 'type' => 'string', 'label' => 'Last Name'],
-                        'username' => ['value' => $user->username, 'type' => 'string', 'label' => 'Username'],
-                        'idnumber' => ['value' => $user->idnumber ?? '', 'type' => 'string', 'label' => 'ID Number'],
+                        'id' => ['value' => $user->id, 'type' => 'int',
+                            'label' => get_string('field_user_id', 'local_mc_plugin')],
+                        'email' => ['value' => $user->email, 'type' => 'string',
+                            'label' => get_string('field_email', 'local_mc_plugin')],
+                        'firstname' => ['value' => $user->firstname, 'type' => 'string',
+                            'label' => get_string('field_firstname', 'local_mc_plugin')],
+                        'lastname' => ['value' => $user->lastname, 'type' => 'string',
+                            'label' => get_string('field_lastname', 'local_mc_plugin')],
+                        'username' => ['value' => $user->username, 'type' => 'string',
+                            'label' => get_string('field_username', 'local_mc_plugin')],
+                        'idnumber' => ['value' => $user->idnumber ?? '', 'type' => 'string',
+                            'label' => get_string('field_idnumber', 'local_mc_plugin')],
                     ];
                 }
             } catch (\Exception $e) {
@@ -160,11 +134,16 @@ class dynamic_inspector {
                 $course = get_course($event->courseid);
                 if ($course) {
                     $fields['course'] = [
-                        'id' => ['value' => $course->id, 'type' => 'int', 'label' => 'Course ID'],
-                        'fullname' => ['value' => $course->fullname, 'type' => 'string', 'label' => 'Course Name'],
-                        'shortname' => ['value' => $course->shortname, 'type' => 'string', 'label' => 'Short Name'],
-                        'idnumber' => ['value' => $course->idnumber ?? '', 'type' => 'string', 'label' => 'Course ID Number'],
-                        'startdate' => ['value' => $course->startdate, 'type' => 'datetime', 'label' => 'Start Date'],
+                        'id' => ['value' => $course->id, 'type' => 'int',
+                            'label' => get_string('field_course_id', 'local_mc_plugin')],
+                        'fullname' => ['value' => $course->fullname, 'type' => 'string',
+                            'label' => get_string('field_course_name', 'local_mc_plugin')],
+                        'shortname' => ['value' => $course->shortname, 'type' => 'string',
+                            'label' => get_string('field_course_shortname', 'local_mc_plugin')],
+                        'idnumber' => ['value' => $course->idnumber ?? '', 'type' => 'string',
+                            'label' => get_string('field_course_idnumber', 'local_mc_plugin')],
+                        'startdate' => ['value' => $course->startdate, 'type' => 'datetime',
+                            'label' => get_string('field_course_startdate', 'local_mc_plugin')],
                     ];
                 }
             } catch (\Exception $e) {
@@ -197,93 +176,12 @@ class dynamic_inspector {
         }
 
         $fields['event'] = [
-            'type' => ['value' => $event->eventname, 'type' => 'string', 'label' => 'Event Type'],
-            'timecreated' => ['value' => $event->timecreated, 'type' => 'datetime', 'label' => 'Event Time'],
-            'component' => ['value' => $event->component, 'type' => 'string', 'label' => 'Component'],
-        ];
-
-        return $fields;
-    }
-
-    /**
-     * Extract fields from a log entry.
-     *
-     * @param \stdClass $logevent Log entry from logstore_standard_log table
-     * @param string $eventclass Fully qualified event class name
-     * @return array Structured array of extracted fields
-     */
-    private function extract_fields_from_log(\stdClass $logevent, string $eventclass): array {
-        global $DB;
-
-        $fields = [
-            'user' => [],
-            'course' => [],
-            'object' => [],
-            'event' => [],
-        ];
-
-        if (!empty($logevent->userid)) {
-            try {
-                $user = \core_user::get_user($logevent->userid);
-                if ($user) {
-                    $fields['user'] = [
-                        'id' => ['value' => $user->id, 'type' => 'int', 'label' => 'User ID'],
-                        'email' => ['value' => $user->email, 'type' => 'string', 'label' => 'Email'],
-                        'firstname' => ['value' => $user->firstname, 'type' => 'string', 'label' => 'First Name'],
-                        'lastname' => ['value' => $user->lastname, 'type' => 'string', 'label' => 'Last Name'],
-                        'username' => ['value' => $user->username, 'type' => 'string', 'label' => 'Username'],
-                        'idnumber' => ['value' => $user->idnumber ?? '', 'type' => 'string', 'label' => 'ID Number'],
-                    ];
-                }
-            } catch (\Exception $e) {
-                // User not found - ignore.
-                unset($e);
-            }
-        }
-
-        if (!empty($logevent->courseid) && $logevent->courseid != SITEID) {
-            try {
-                $course = get_course($logevent->courseid);
-                if ($course) {
-                    $fields['course'] = [
-                        'id' => ['value' => $course->id, 'type' => 'int', 'label' => 'Course ID'],
-                        'fullname' => ['value' => $course->fullname, 'type' => 'string', 'label' => 'Course Name'],
-                        'shortname' => ['value' => $course->shortname, 'type' => 'string', 'label' => 'Short Name'],
-                        'idnumber' => ['value' => $course->idnumber ?? '', 'type' => 'string', 'label' => 'Course ID Number'],
-                        'startdate' => ['value' => $course->startdate, 'type' => 'datetime', 'label' => 'Start Date'],
-                    ];
-                }
-            } catch (\Exception $e) {
-                // Course not found - ignore.
-                unset($e);
-            }
-        }
-
-        if (!empty($logevent->objecttable) && !empty($logevent->objectid)) {
-            try {
-                $object = $DB->get_record($logevent->objecttable, ['id' => $logevent->objectid]);
-                if ($object) {
-                    foreach ($object as $key => $value) {
-                        $fields['object'][$key] = [
-                            'value' => $value,
-                            'type' => $this->detect_type($value),
-                            'label' => $this->format_label($key),
-                        ];
-                    }
-                } else {
-                    $fields['object'] = $this->get_fields_from_table_schema($logevent->objecttable);
-                }
-            } catch (\Exception $e) {
-                $fields['object'] = $this->get_fields_from_table_schema($logevent->objecttable);
-            }
-        } else if (!empty($logevent->objecttable)) {
-            $fields['object'] = $this->get_fields_from_table_schema($logevent->objecttable);
-        }
-
-        $fields['event'] = [
-            'type' => ['value' => $eventclass, 'type' => 'string', 'label' => 'Event Type'],
-            'timecreated' => ['value' => $logevent->timecreated, 'type' => 'datetime', 'label' => 'Event Time'],
-            'component' => ['value' => $this->extract_component($eventclass), 'type' => 'string', 'label' => 'Component'],
+            'type' => ['value' => $event->eventname, 'type' => 'string',
+                'label' => get_string('field_event_type', 'local_mc_plugin')],
+            'timecreated' => ['value' => $event->timecreated, 'type' => 'datetime',
+                'label' => get_string('field_event_time', 'local_mc_plugin')],
+            'component' => ['value' => $event->component, 'type' => 'string',
+                'label' => get_string('field_component', 'local_mc_plugin')],
         ];
 
         return $fields;
@@ -303,25 +201,39 @@ class dynamic_inspector {
 
         return [
             'user' => [
-                'id' => ['value' => null, 'type' => 'int', 'label' => 'User ID'],
-                'email' => ['value' => null, 'type' => 'string', 'label' => 'Email'],
-                'firstname' => ['value' => null, 'type' => 'string', 'label' => 'First Name'],
-                'lastname' => ['value' => null, 'type' => 'string', 'label' => 'Last Name'],
-                'username' => ['value' => null, 'type' => 'string', 'label' => 'Username'],
-                'idnumber' => ['value' => null, 'type' => 'string', 'label' => 'ID Number'],
+                'id' => ['value' => null, 'type' => 'int',
+                    'label' => get_string('field_user_id', 'local_mc_plugin')],
+                'email' => ['value' => null, 'type' => 'string',
+                    'label' => get_string('field_email', 'local_mc_plugin')],
+                'firstname' => ['value' => null, 'type' => 'string',
+                    'label' => get_string('field_firstname', 'local_mc_plugin')],
+                'lastname' => ['value' => null, 'type' => 'string',
+                    'label' => get_string('field_lastname', 'local_mc_plugin')],
+                'username' => ['value' => null, 'type' => 'string',
+                    'label' => get_string('field_username', 'local_mc_plugin')],
+                'idnumber' => ['value' => null, 'type' => 'string',
+                    'label' => get_string('field_idnumber', 'local_mc_plugin')],
             ],
             'course' => [
-                'id' => ['value' => null, 'type' => 'int', 'label' => 'Course ID'],
-                'fullname' => ['value' => null, 'type' => 'string', 'label' => 'Course Name'],
-                'shortname' => ['value' => null, 'type' => 'string', 'label' => 'Short Name'],
-                'idnumber' => ['value' => null, 'type' => 'string', 'label' => 'Course ID Number'],
-                'startdate' => ['value' => null, 'type' => 'datetime', 'label' => 'Start Date'],
+                'id' => ['value' => null, 'type' => 'int',
+                    'label' => get_string('field_course_id', 'local_mc_plugin')],
+                'fullname' => ['value' => null, 'type' => 'string',
+                    'label' => get_string('field_course_name', 'local_mc_plugin')],
+                'shortname' => ['value' => null, 'type' => 'string',
+                    'label' => get_string('field_course_shortname', 'local_mc_plugin')],
+                'idnumber' => ['value' => null, 'type' => 'string',
+                    'label' => get_string('field_course_idnumber', 'local_mc_plugin')],
+                'startdate' => ['value' => null, 'type' => 'datetime',
+                    'label' => get_string('field_course_startdate', 'local_mc_plugin')],
             ],
             'object' => $objectfields,
             'event' => [
-                'type' => ['value' => $eventclass, 'type' => 'string', 'label' => 'Event Type'],
-                'timecreated' => ['value' => null, 'type' => 'datetime', 'label' => 'Event Time'],
-                'component' => ['value' => $this->extract_component($eventclass), 'type' => 'string', 'label' => 'Component'],
+                'type' => ['value' => $eventclass, 'type' => 'string',
+                    'label' => get_string('field_event_type', 'local_mc_plugin')],
+                'timecreated' => ['value' => null, 'type' => 'datetime',
+                    'label' => get_string('field_event_time', 'local_mc_plugin')],
+                'component' => ['value' => $this->extract_component($eventclass), 'type' => 'string',
+                    'label' => get_string('field_component', 'local_mc_plugin')],
             ],
         ];
     }

@@ -130,7 +130,7 @@ class event_selector implements renderable, templatable {
      */
     private function format_category_name(string $component): string {
         if ($component === 'core') {
-            return 'Core';
+            return get_string('category_core_simple', 'local_mc_plugin');
         }
         return ucwords(str_replace('_', ' ', $component));
     }

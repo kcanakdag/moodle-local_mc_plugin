@@ -131,22 +131,6 @@ final class dynamic_inspector_test extends \advanced_testcase {
     }
 
     /**
-     * Test get_sample_data returns mock data when no events exist.
-     */
-    public function test_get_sample_data_mock(): void {
-        $this->resetAfterTest(true);
-
-        $inspector = new dynamic_inspector();
-        $data = $inspector->get_sample_data('\core\event\user_created');
-
-        $this->assertIsArray($data);
-        $this->assertArrayHasKey('user', $data);
-        $this->assertArrayHasKey('course', $data);
-        $this->assertArrayHasKey('object', $data);
-        $this->assertArrayHasKey('event', $data);
-    }
-
-    /**
      * Test extract_data with course event.
      */
     public function test_extract_data_with_course(): void {

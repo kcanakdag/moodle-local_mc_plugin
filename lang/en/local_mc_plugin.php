@@ -146,4 +146,32 @@ $string['sync_schema_desc'] = 'Sync event schemas to MoodleConnect for trigger c
 $string['sync_schema_heading'] = 'Event Schema Sync';
 $string['sync_site_key_label'] = 'Site Key: {$a}';
 $string['sync_success'] = 'Settings saved. Synced {$a} event(s) to MoodleConnect';
-$string['test_event_button'] = 'Send Test Event';
+
+// Event category names.
+$string['category_core'] = 'Core System Events';
+$string['category_activity'] = '{$a} Activity Events';
+$string['category_block'] = '{$a} Block Events';
+$string['category_local'] = '{$a} Local Plugin Events';
+$string['category_tool'] = '{$a} Admin Tool Events';
+$string['category_report'] = '{$a} Report Events';
+$string['category_enrol'] = '{$a} Enrollment Events';
+$string['category_auth'] = '{$a} Authentication Events';
+$string['category_theme'] = '{$a} Theme Events';
+$string['category_other'] = '{$a} Events';
+$string['category_core_simple'] = 'Core';
+
+// Field labels for dynamic inspector.
+$string['field_user_id'] = 'User ID';
+$string['field_email'] = 'Email';
+$string['field_firstname'] = 'First Name';
+$string['field_lastname'] = 'Last Name';
+$string['field_username'] = 'Username';
+$string['field_idnumber'] = 'ID Number';
+$string['field_course_id'] = 'Course ID';
+$string['field_course_name'] = 'Course Name';
+$string['field_course_shortname'] = 'Short Name';
+$string['field_course_idnumber'] = 'Course ID Number';
+$string['field_course_startdate'] = 'Start Date';
+$string['field_event_type'] = 'Event Type';
+$string['field_event_time'] = 'Event Time';
+$string['field_component'] = 'Component';

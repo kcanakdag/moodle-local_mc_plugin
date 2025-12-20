@@ -231,32 +231,32 @@ class event_discovery {
         $component = $this->get_component($eventclass);
 
         if ($component === 'core') {
-            return 'Core System Events';
+            return get_string('category_core', 'local_mc_plugin');
         }
 
         $parts = explode('_', $component, 2);
         $type = $parts[0];
-        $name = isset($parts[1]) ? $parts[1] : '';
+        $name = isset($parts[1]) ? ucfirst($parts[1]) : '';
 
         switch ($type) {
             case 'mod':
-                return ucfirst($name) . ' Activity Events';
+                return get_string('category_activity', 'local_mc_plugin', $name);
             case 'block':
-                return ucfirst($name) . ' Block Events';
+                return get_string('category_block', 'local_mc_plugin', $name);
             case 'local':
-                return ucfirst($name) . ' Local Plugin Events';
+                return get_string('category_local', 'local_mc_plugin', $name);
             case 'tool':
-                return ucfirst($name) . ' Admin Tool Events';
+                return get_string('category_tool', 'local_mc_plugin', $name);
             case 'report':
-                return ucfirst($name) . ' Report Events';
+                return get_string('category_report', 'local_mc_plugin', $name);
             case 'enrol':
-                return ucfirst($name) . ' Enrollment Events';
+                return get_string('category_enrol', 'local_mc_plugin', $name);
             case 'auth':
-                return ucfirst($name) . ' Authentication Events';
+                return get_string('category_auth', 'local_mc_plugin', $name);
             case 'theme':
-                return ucfirst($name) . ' Theme Events';
+                return get_string('category_theme', 'local_mc_plugin', $name);
             default:
-                return ucfirst($component) . ' Events';
+                return get_string('category_other', 'local_mc_plugin', ucfirst($component));
         }
     }
 

@@ -165,6 +165,8 @@ class moodleconnect_client {
     /**
      * Helper to POST JSON data (blocking, waits for response).
      *
+     * Uses Moodle's curl wrapper which handles proxy configurations.
+     *
      * @param string $url URL to post to
      * @param array $payload Payload data
      * @param int $timeout Timeout in seconds
@@ -175,23 +177,23 @@ class moodleconnect_client {
         $sortedpayload = self::sort_keys_recursive($payload);
         $json = json_encode($sortedpayload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 
-        $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        $curl = new \curl(['proxy' => true]);
+        $curl->setopt([
+            'timeout' => $timeout,
+            'connecttimeout' => 5,
+        ]);
+        $curl->setHeader([
             'Content-Type: application/json',
             'Content-Length: ' . strlen($json),
         ]);
 
-        $result = curl_exec($ch);
-        $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        $curlerror = curl_error($ch);
-        curl_close($ch);
+        $result = $curl->post($url, $json);
 
-        if ($result === false) {
+        $info = $curl->get_info();
+        $httpcode = $info['http_code'] ?? 0;
+        $curlerror = $curl->get_errno() ? $curl->error : '';
+
+        if ($curl->get_errno()) {
             return ['success' => false, 'message' => get_string('error_connection_failed', 'local_mc_plugin', $curlerror)];
         }
 
@@ -203,7 +205,9 @@ class moodleconnect_client {
     }
 
     /**
-     * Fire-and-forget POST - sends request without waiting for response.
+     * Fire-and-forget POST - sends request with short timeout.
+     *
+     * Uses Moodle's curl wrapper which handles proxy configurations.
      * Uses very short timeout to minimize blocking.
      *
      * @param string $url URL to post to
@@ -215,26 +219,27 @@ class moodleconnect_client {
         $sortedpayload = self::sort_keys_recursive($payload);
         $json = json_encode($sortedpayload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 
-        $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_TIMEOUT_MS, 500);
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT_MS, 300);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        $curl = new \curl(['proxy' => true]);
+        // Use 1 second timeout - Moodle's curl doesn't support millisecond timeouts.
+        $curl->setopt([
+            'timeout' => 1,
+            'connecttimeout' => 1,
+            'fresh_connect' => true,
+        ]);
+        $curl->setHeader([
             'Content-Type: application/json',
             'Content-Length: ' . strlen($json),
         ]);
-        curl_setopt($ch, CURLOPT_NOBODY, false);
-        curl_setopt($ch, CURLOPT_FRESH_CONNECT, true);
 
-        curl_exec($ch);
-        $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
+        $curl->post($url, $json);
+
+        $info = $curl->get_info();
+        $httpcode = $info['http_code'] ?? 0;
 
         if ($httpcode >= 200 && $httpcode < 300) {
             return ['success' => true, 'message' => get_string('sent', 'local_mc_plugin')];
         } else if ($httpcode == 0) {
+            // Timeout is expected for async - request was likely sent.
             return ['success' => true, 'message' => get_string('sent_async', 'local_mc_plugin')];
         } else {
             return ['success' => false, 'message' => "HTTP $httpcode"];
