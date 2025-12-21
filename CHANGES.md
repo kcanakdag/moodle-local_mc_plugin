@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.2.1-rc1] - 2025-12-21
+
+First official release candidate for Moodle Plugin Directory submission.
+
+### Fixed
+- **Moodle curl wrapper**: Replaced direct `curl_init()` calls with Moodle's `\curl` class in `connect.php` and `moodleconnect_client.php`. This ensures proper proxy configuration support for organizations behind web proxies. (Fixes #1)
+- **Language strings**: Moved hard-coded rate limit error message to language file using `get_string()`. (Fixes #2)
+- **Private IP detection**: Added automatic detection of private IPs for local development, only bypassing URL security checks when necessary.
+
+### Changed
+- **Code consistency**: Unified curl wrapper usage pattern across all API client files (`connect.php`, `sync_schema.php`, `moodleconnect_client.php`).
+
 ## [4.1.0] - 2025-12-15
 
 ### Changed
