@@ -27,6 +27,7 @@
 
 require_once('../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
+require_once($CFG->libdir . '/filelib.php');
 require_once(__DIR__ . '/lib.php');
 
 require_login();
@@ -57,13 +58,24 @@ if ($action === 'status') {
 
     // Check connection by calling the site status endpoint (with activate=true to auto-activate).
     $statusurl = $baseurl . '/sites/status?site_key=' . urlencode($sitekey) . '&activate=true';
-    $ch = curl_init($statusurl);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_TIMEOUT, 5);
-    $result = curl_exec($ch);
-    $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    $curlerror = curl_error($ch);
-    curl_close($ch);
+
+    // Bypass Moodle's URL security for private IPs (local development only).
+    // Production URLs use public IPs and standard ports, so security checks pass normally.
+    $curloptions = ['proxy' => true];
+    $parsedurl = parse_url($baseurl);
+    $host = $parsedurl['host'] ?? '';
+    $isprivateip = filter_var($host, FILTER_VALIDATE_IP) !== false
+        && filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) === false;
+    if ($isprivateip) {
+        $curloptions['ignoresecurity'] = true;
+    }
+
+    $curl = new \curl($curloptions);
+    $curl->setopt(['timeout' => 5]);
+    $result = $curl->get($statusurl);
+    $info = $curl->get_info();
+    $httpcode = $info['http_code'] ?? 0;
+    $curlerror = $curl->get_errno() ? $curl->error : '';
 
     if ($httpcode === 200 && $result) {
         $data = json_decode($result, true);

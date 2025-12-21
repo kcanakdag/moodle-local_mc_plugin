@@ -26,6 +26,8 @@ namespace local_mc_plugin\local;
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
+require_once($CFG->libdir . '/filelib.php');
 require_once(__DIR__ . '/../../lib.php');
 
 /**
