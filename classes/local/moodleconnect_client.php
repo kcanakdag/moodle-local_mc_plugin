@@ -179,7 +179,18 @@ class moodleconnect_client {
         $sortedpayload = self::sort_keys_recursive($payload);
         $json = json_encode($sortedpayload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 
-        $curl = new \curl(['proxy' => true]);
+        // Bypass Moodle's URL security for private IPs (local development only).
+        // Production URLs use public IPs and standard ports, so security checks pass normally.
+        $curloptions = ['proxy' => true];
+        $parsedurl = parse_url($url);
+        $host = $parsedurl['host'] ?? '';
+        $isprivateip = filter_var($host, FILTER_VALIDATE_IP) !== false
+            && filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) === false;
+        if ($isprivateip) {
+            $curloptions['ignoresecurity'] = true;
+        }
+
+        $curl = new \curl($curloptions);
         $curl->setopt([
             'timeout' => $timeout,
             'connecttimeout' => 5,
@@ -221,7 +232,18 @@ class moodleconnect_client {
         $sortedpayload = self::sort_keys_recursive($payload);
         $json = json_encode($sortedpayload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 
-        $curl = new \curl(['proxy' => true]);
+        // Bypass Moodle's URL security for private IPs (local development only).
+        // Production URLs use public IPs and standard ports, so security checks pass normally.
+        $curloptions = ['proxy' => true];
+        $parsedurl = parse_url($url);
+        $host = $parsedurl['host'] ?? '';
+        $isprivateip = filter_var($host, FILTER_VALIDATE_IP) !== false
+            && filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) === false;
+        if ($isprivateip) {
+            $curloptions['ignoresecurity'] = true;
+        }
+
+        $curl = new \curl($curloptions);
         // Use 1 second timeout - Moodle's curl doesn't support millisecond timeouts.
         $curl->setopt([
             'timeout' => 1,

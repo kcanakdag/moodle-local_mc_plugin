@@ -89,6 +89,7 @@ $string['error_loading_events'] = 'Error loading events: {$a}';
 $string['error_missing_site_key'] = 'Missing Site Key';
 $string['error_missing_site_secret'] = 'Missing Site Secret';
 $string['error_no_site_key'] = 'No site key configured';
+$string['error_rate_limit'] = 'Too many connection attempts. Please wait a minute and try again.';
 $string['error_unknown_action'] = 'Unknown action: {$a}';
 $string['event_all_synced'] = 'all synced';
 $string['event_deselect_visible'] = 'Deselect Visible';
