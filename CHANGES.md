@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.2.2] - 2025-12-22
+
+### Changed
+- **Build System**: Removed local Gruntfile in favor of Moodle's grunt for AMD builds
+- **CI Compatibility**: AMD build output now matches CI expectations exactly
+
+### Removed
+- Local `Gruntfile.js`, `package.json`, `node_modules/`, husky pre-commit hooks
+- These caused "uncommitted changes detected" errors in CI due to different minification output
+
 ## [4.2.1] - 2025-12-22
 
 ### Added
