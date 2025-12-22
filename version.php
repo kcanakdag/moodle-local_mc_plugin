@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_mc_plugin';
-$plugin->version   = 2025122100;      // Version 4.2.1-rc1 - First official release candidate.
+$plugin->version   = 2025122200;      // Version 4.2.1 - Local Grunt build system.
 $plugin->requires  = 2022041900;      // Moodle 4.0+.
-$plugin->maturity  = MATURITY_RC;
-$plugin->release   = 'v4.2.1-rc1';
+$plugin->maturity  = MATURITY_STABLE;
+$plugin->release   = 'v4.2.1';

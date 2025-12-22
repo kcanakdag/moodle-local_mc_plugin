@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.2.1] - 2025-12-22
+
+### Added
+- **Local Grunt Build System**: Added Gruntfile.js with grunt-terser for AMD module minification
+- **Pre-commit Hook**: Added husky + lint-staged to auto-rebuild AMD modules on commit
+- **No-op Stylelint Task**: Added compatibility task for Moodle CI grunt checks
+
+### Changed
+- **Build Process**: AMD modules can now be built locally without requiring Moodle container
+- **Maturity**: Promoted from RC to STABLE
+
 ## [4.2.1-rc1] - 2025-12-21
 
 First official release candidate for Moodle Plugin Directory submission.
