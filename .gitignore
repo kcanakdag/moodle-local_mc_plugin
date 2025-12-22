@@ -3,6 +3,7 @@ phpcs.phar
 phpcbf.phar
 moodle-cs/
 CodeSniffer.conf
+node_modules
 
 # IDE files
 .vscode/
