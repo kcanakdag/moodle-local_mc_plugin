@@ -7,6 +7,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.0.0] - 2025-12-28
+
+### ⚠️ BREAKING CHANGE
+
+**This version is required for continued event processing.** The MoodleConnect backend now requires plugin version 5.0.0 or higher. Sites running older plugin versions will have events rejected with an "upgrade required" message.
+
+### Added
+- **Event Limit Blocking**: Plugin now respects monthly event limits pushed from MoodleConnect
+  - Events are automatically blocked when limit is exceeded
+  - Admin warning banner displays in plugin settings when blocked
+  - Events resume automatically when the new month begins
+- **Health Check Endpoint**: New `/api.php?action=health` endpoint for connectivity verification
+  - Returns Moodle version, plugin version, and monitored event count
+  - Used by MoodleConnect to verify plugin compatibility
+- **Course-Level Filtering**: Events can now be filtered by course at the Moodle level
+  - MoodleConnect pushes course filters when triggers are configured
+  - Reduces unnecessary event transmission for course-specific triggers
+- **Reverse Event Sync**: MoodleConnect automatically updates monitored events when triggers change
+  - No manual "Sync Events" needed after creating triggers
+  - Plugin receives event list updates via API
+- **Automatic Course Sync**: Courses are synced to MoodleConnect automatically
+  - Initial sync on plugin connection
+  - Incremental sync when courses are created, updated, or deleted
+
+### Changed
+- **Minimum Backend Compatibility**: Requires MoodleConnect backend with health check support
+- **Event Processing**: Events from unverified plugin versions are now rejected
+
+### Fixed
+- Various code quality improvements and language string reorganization
+
+## [4.5.0] - 2025-12-24
+
+### Added
+- **Course Filter Sync**: Course filters configured in MoodleConnect triggers are now pushed to Moodle
+- Plugin filters events at source based on course include/exclude rules
+
 ## [4.2.2] - 2025-12-22
 
 ### Changed

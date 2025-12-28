@@ -133,10 +133,87 @@ if ($action === 'sync') {
 
     $result = \local_mc_plugin\local\moodleconnect_client::sync_schema($schemas);
 
+    // Also sync courses in the background (non-blocking).
+    $courseresult = null;
+    try {
+        $courseresult = \local_mc_plugin\local\moodleconnect_client::sync_all_courses();
+    } catch (\Exception $e) {
+        // Don't fail if course sync fails.
+        $courseresult = ['success' => false, 'message' => $e->getMessage()];
+    }
+
     echo json_encode([
         'success' => $result['success'],
         'message' => $result['message'],
         'event_count' => count($schemas),
+        'course_sync' => $courseresult,
+    ]);
+    exit;
+}
+
+// AJAX: Sync ALL event schemas (for initial connection or resync).
+if ($action === 'syncall') {
+    // Use POST for sesskey protection.
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        header('Content-Type: application/json');
+        echo json_encode(['success' => false, 'message' => 'Invalid request method']);
+        exit;
+    }
+    require_sesskey();
+    header('Content-Type: application/json');
+
+    $sitekey = get_config('local_mc_plugin', 'site_key');
+
+    if (empty($sitekey)) {
+        echo json_encode(['success' => false, 'message' => get_string('error_no_site_key', 'local_mc_plugin')]);
+        exit;
+    }
+
+    // Sync ALL available events (not just monitored ones).
+    $result = \local_mc_plugin\local\moodleconnect_client::sync_all_events();
+
+    // Also sync courses.
+    $courseresult = null;
+    try {
+        $courseresult = \local_mc_plugin\local\moodleconnect_client::sync_all_courses();
+    } catch (\Exception $e) {
+        // Don't fail if course sync fails.
+        $courseresult = ['success' => false, 'message' => $e->getMessage()];
+    }
+
+    echo json_encode([
+        'success' => $result['success'],
+        'message' => $result['message'],
+        'event_count' => $result['event_count'] ?? 0,
+        'course_sync' => $courseresult,
+    ]);
+    exit;
+}
+
+// AJAX: Sync courses only.
+if ($action === 'synccourses') {
+    // Use POST for sesskey protection.
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        header('Content-Type: application/json');
+        echo json_encode(['success' => false, 'message' => 'Invalid request method']);
+        exit;
+    }
+    require_sesskey();
+    header('Content-Type: application/json');
+
+    $sitekey = get_config('local_mc_plugin', 'site_key');
+
+    if (empty($sitekey)) {
+        echo json_encode(['success' => false, 'message' => get_string('error_no_site_key', 'local_mc_plugin')]);
+        exit;
+    }
+
+    $result = \local_mc_plugin\local\moodleconnect_client::sync_all_courses();
+
+    echo json_encode([
+        'success' => $result['success'],
+        'message' => $result['message'],
+        'course_count' => $result['count'] ?? 0,
     ]);
     exit;
 }

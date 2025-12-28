@@ -70,6 +70,7 @@ $debugmode = optional_param('debug_mode', null, PARAM_INT);
 
 if ($action === 'save') {
     $saved = [];
+    $credentialssaved = false;
 
     if ($sitekey !== null) {
         set_config('site_key', $sitekey, 'local_mc_plugin');
@@ -79,6 +80,11 @@ if ($action === 'save') {
     if ($sitesecret !== null) {
         set_config('site_secret', $sitesecret, 'local_mc_plugin');
         $saved[] = 'site_secret';
+    }
+
+    // Check if both credentials were saved (new connection).
+    if ($sitekey !== null && $sitesecret !== null) {
+        $credentialssaved = true;
     }
 
     if ($monitoredevents !== null) {
@@ -110,11 +116,28 @@ if ($action === 'save') {
         $saved[] = 'debug_mode';
     }
 
-    echo json_encode([
+    // If credentials were saved, trigger initial course sync.
+    $coursesyncresult = null;
+    if ($credentialssaved) {
+        try {
+            $coursesyncresult = \local_mc_plugin\local\moodleconnect_client::sync_all_courses();
+        } catch (\Exception $e) {
+            // Don't fail the save if course sync fails - it's not critical.
+            $coursesyncresult = ['success' => false, 'message' => $e->getMessage()];
+        }
+    }
+
+    $response = [
         'success' => true,
         'message' => get_string('success_settings_saved', 'local_mc_plugin'),
         'saved' => $saved,
-    ]);
+    ];
+
+    if ($coursesyncresult !== null) {
+        $response['course_sync'] = $coursesyncresult;
+    }
+
+    echo json_encode($response);
 } else {
     echo json_encode([
         'success' => false,

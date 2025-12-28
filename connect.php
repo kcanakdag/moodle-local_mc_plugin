@@ -78,9 +78,13 @@ if ($action === 'init') {
     $moodleurl = $CFG->wwwroot;
     $moodlesitename = $SITE->fullname;
 
+    // Get plugin version for compatibility check.
+    $pluginversion = get_config('local_mc_plugin', 'version');
+
     $payload = [
         'moodle_url' => $moodleurl,
         'moodle_site_name' => $moodlesitename,
+        'plugin_version' => $pluginversion,
     ];
 
     $json = json_encode($payload);

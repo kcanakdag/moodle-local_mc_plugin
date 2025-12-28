@@ -68,3 +68,53 @@ function local_mc_plugin_get_frontend_url() {
     $apiurl = local_mc_plugin_get_api_url();
     return preg_replace('/\/api\/?$/', '', $apiurl);
 }
+
+/**
+ * Recursively sort array keys for consistent JSON encoding.
+ *
+ * Used for HMAC signature computation to ensure consistent ordering.
+ *
+ * @param mixed $data The data to sort
+ * @return mixed The sorted data
+ */
+function local_mc_plugin_sort_keys_recursive($data) {
+    if (!is_array($data)) {
+        return $data;
+    }
+
+    // Check if it's an associative array (object in JSON terms).
+    $isassoc = array_keys($data) !== range(0, count($data) - 1);
+
+    if ($isassoc) {
+        ksort($data);
+    }
+
+    foreach ($data as $key => $value) {
+        $data[$key] = local_mc_plugin_sort_keys_recursive($value);
+    }
+
+    return $data;
+}
+
+/**
+ * Check if events are currently blocked due to limit exceeded.
+ *
+ * @return bool True if events are blocked
+ */
+function local_mc_plugin_is_events_blocked() {
+    $blockeduntil = (int) get_config('local_mc_plugin', 'events_blocked_until');
+    return $blockeduntil > 0 && time() < $blockeduntil;
+}
+
+/**
+ * Get the event limit notification message if events are blocked.
+ *
+ * @return string|null The notification message or null if not blocked
+ */
+function local_mc_plugin_get_limit_notification() {
+    if (!local_mc_plugin_is_events_blocked()) {
+        return null;
+    }
+
+    return get_config('local_mc_plugin', 'events_limit_notification');
+}

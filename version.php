@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_mc_plugin';
-$plugin->version   = 2025122201;      // Version 4.2.2 - Use Moodle's grunt for AMD builds.
+$plugin->version   = 2025122800;      // Version 5.0.0 - Required update for event limit sync.
 $plugin->requires  = 2022041900;      // Moodle 4.0+.
 $plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = 'v4.2.2';
+$plugin->release   = 'v5.0.0';
