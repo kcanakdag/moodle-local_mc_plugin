@@ -34,4 +34,21 @@ $observers = [
         'eventname' => '*',
         'callback'  => '\local_mc_plugin\observer::handle_event',
     ],
+    // Course sync observers - always active when connected.
+    // These sync the course list to MoodleConnect automatically.
+    [
+        'eventname' => '\core\event\course_created',
+        'callback'  => '\local_mc_plugin\course_observer::course_created',
+        'priority'  => 100,
+    ],
+    [
+        'eventname' => '\core\event\course_updated',
+        'callback'  => '\local_mc_plugin\course_observer::course_updated',
+        'priority'  => 100,
+    ],
+    [
+        'eventname' => '\core\event\course_deleted',
+        'callback'  => '\local_mc_plugin\course_observer::course_deleted',
+        'priority'  => 100,
+    ],
 ];

@@ -30,57 +30,17 @@ define([
     let statusContent = null;
 
     /**
-     * Get the count of selected events from the form.
-     *
-     * @returns {number}
-     */
-    const getSelectedEventCount = () => {
-        const eventsInput = document.querySelector(Selectors.inputs.monitoredEvents);
-        if (!eventsInput || !eventsInput.value) {
-            return 0;
-        }
-        return eventsInput.value.split(',').filter((e) => e.trim() !== '').length;
-    };
-
-    /**
-     * Get the list of selected events from the form.
-     *
-     * @returns {Array<string>}
-     */
-    const getSelectedEvents = () => {
-        const eventsInput = document.querySelector(Selectors.inputs.monitoredEvents);
-        if (!eventsInput || !eventsInput.value) {
-            return [];
-        }
-        return eventsInput.value.split(',').map((e) => e.trim()).filter((e) => e !== '');
-    };
-
-
-    /**
-     * Build sync status text based on selected and synced events.
+     * Build sync status text based on synced events count.
      *
      * @param {number} syncedCount Number of synced events
-     * @param {Array} syncedEvents Array of synced event names
      * @returns {Promise<string|null>} Sync status text or null
      */
-    const buildSyncStatusText = async(syncedCount, syncedEvents) => {
-        const selectedCount = getSelectedEventCount();
-        const selectedEvents = getSelectedEvents();
-
+    const buildSyncStatusText = async(syncedCount) => {
         if (syncedCount === 0) {
             return await Str.get_string('status_events_not_synced', 'local_mc_plugin');
         }
 
-        if (syncedCount === selectedCount && syncedEvents) {
-            const allMatch = selectedEvents.every((e) => syncedEvents.includes(e));
-            if (allMatch) {
-                const str = await Str.get_string('status_events_synced', 'local_mc_plugin', syncedCount);
-                return str;
-            }
-        }
-
-        // Events changed
-        return await Str.get_string('status_events_changed', 'local_mc_plugin');
+        return await Str.get_string('status_events_synced', 'local_mc_plugin', syncedCount);
     };
 
     /**
@@ -105,7 +65,7 @@ define([
 
         if (connected) {
             statusText = await Str.get_string('status_connected', 'local_mc_plugin');
-            syncStatus = await buildSyncStatusText(syncedCount, syncedEvents);
+            syncStatus = await buildSyncStatusText(syncedCount);
 
             // Refresh event selector counter
             if (eventInputId) {
@@ -127,11 +87,13 @@ define([
     };
 
     /**
-     * Sync events in the background and update status.
+     * Sync ALL events in the background and update status.
+     * This syncs all available Moodle events to MoodleConnect,
+     * allowing users to create triggers for any event.
      */
-    const syncEventsInBackground = async() => {
+    const syncAllEventsInBackground = async() => {
         try {
-            const syncResult = await Repository.syncEvents(config.syncUrl, config.sesskey);
+            const syncResult = await Repository.syncAllEvents(config.syncUrl, config.sesskey);
 
             if (syncResult.success) {
                 // Refresh connection status to show updated sync count
@@ -176,9 +138,9 @@ define([
                 if (data.connected) {
                     await updateStatus(true, data.site_name, data.synced_event_count || 0, data.synced_events || []);
 
-                    // Auto-sync events if requested and connected
+                    // Auto-sync ALL events if requested and connected
                     if (autoSync) {
-                        await syncEventsInBackground();
+                        await syncAllEventsInBackground();
                     }
                 } else if (data.error) {
                     await updateStatus(false, null, 0, [], data.error);

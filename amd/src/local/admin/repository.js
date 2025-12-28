@@ -104,6 +104,17 @@ define([], function() {
          */
         syncEvents: async function(syncUrl, sesskey) {
             return postForm(syncUrl, {action: 'sync', sesskey});
+        },
+
+        /**
+         * Sync ALL events to MoodleConnect (for initial connection or resync).
+         *
+         * @param {string} syncUrl URL to sync_schema.php
+         * @param {string} sesskey Moodle session key
+         * @returns {Promise<Object>} Response with success status and event count
+         */
+        syncAllEvents: async function(syncUrl, sesskey) {
+            return postForm(syncUrl, {action: 'syncall', sesskey});
         }
     };
 });

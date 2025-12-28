@@ -101,7 +101,12 @@
         </button>
 
         <p class="form-text text-muted mt-2">
-            {{#str}} connect_button_desc, local_mc_plugin {{/str}}
+            {{#isconnected}}
+                {{#str}} reconnect_button_desc, local_mc_plugin {{/str}}
+            {{/isconnected}}
+            {{^isconnected}}
+                {{#str}} connect_button_desc, local_mc_plugin {{/str}}
+            {{/isconnected}}
         </p>
     </div>
 </div>

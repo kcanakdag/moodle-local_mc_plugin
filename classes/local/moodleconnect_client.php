@@ -127,6 +127,30 @@ class moodleconnect_client {
     }
 
     /**
+     * Sync ALL available event schemas to MoodleConnect.
+     *
+     * Called on initial connection to sync all available events.
+     * This allows users to create triggers for any event without
+     * pre-selecting them in Moodle.
+     *
+     * @return array ['success' => bool, 'message' => string, 'event_count' => int]
+     */
+    public static function sync_all_events() {
+        $discovery = new event_discovery();
+        $allevents = $discovery->get_all_events();
+
+        // Get schemas for all events.
+        $eventclasses = array_column($allevents, 'class');
+        $inspector = new dynamic_inspector();
+        $schemas = $inspector->get_event_schemas($eventclasses);
+
+        $result = self::sync_schema($schemas);
+        $result['event_count'] = count($schemas);
+
+        return $result;
+    }
+
+    /**
      * Sync event schemas to MoodleConnect.
      * Called when user changes monitored events in settings.
      *
@@ -162,6 +186,127 @@ class moodleconnect_client {
         $payload['timestamp'] = $timestamp;
 
         return self::post_json($url, $payload);
+    }
+
+    /**
+     * Sync courses to MoodleConnect.
+     *
+     * @param array $courses Array of course data
+     * @param string $mode 'full' to replace all courses, 'incremental' to upsert
+     * @return array ['success' => bool, 'message' => string]
+     */
+    public static function sync_courses($courses, $mode = 'incremental') {
+        $baseurl = local_mc_plugin_get_api_url();
+        $sitekey = get_config('local_mc_plugin', 'site_key');
+        $sitesecret = get_config('local_mc_plugin', 'site_secret');
+
+        if (empty($sitekey)) {
+            return ['success' => false, 'message' => get_string('error_missing_site_key', 'local_mc_plugin')];
+        }
+
+        if (empty($sitesecret)) {
+            return ['success' => false, 'message' => get_string('error_missing_site_secret', 'local_mc_plugin')];
+        }
+
+        $url = $baseurl . '/courses/sync';
+        $timestamp = time();
+
+        $payload = [
+            'site_key' => $sitekey,
+            'courses' => $courses,
+            'mode' => $mode,
+        ];
+
+        // Compute HMAC signature.
+        $signature = self::compute_signature($timestamp, $payload, $sitesecret);
+
+        // Add signature and timestamp to payload.
+        $payload['signature'] = $signature;
+        $payload['timestamp'] = $timestamp;
+
+        return self::post_json($url, $payload);
+    }
+
+    /**
+     * Delete a course from MoodleConnect.
+     *
+     * @param int $courseid The Moodle course ID
+     * @return array ['success' => bool, 'message' => string]
+     */
+    public static function delete_course($courseid) {
+        $baseurl = local_mc_plugin_get_api_url();
+        $sitekey = get_config('local_mc_plugin', 'site_key');
+        $sitesecret = get_config('local_mc_plugin', 'site_secret');
+
+        if (empty($sitekey)) {
+            return ['success' => false, 'message' => get_string('error_missing_site_key', 'local_mc_plugin')];
+        }
+
+        if (empty($sitesecret)) {
+            return ['success' => false, 'message' => get_string('error_missing_site_secret', 'local_mc_plugin')];
+        }
+
+        $url = $baseurl . '/courses/delete';
+        $timestamp = time();
+
+        $payload = [
+            'site_key' => $sitekey,
+            'course_id' => $courseid,
+        ];
+
+        // Compute HMAC signature.
+        $signature = self::compute_signature($timestamp, $payload, $sitesecret);
+
+        // Add signature and timestamp to payload.
+        $payload['signature'] = $signature;
+        $payload['timestamp'] = $timestamp;
+
+        return self::post_json($url, $payload);
+    }
+
+    /**
+     * Sync all courses from Moodle to MoodleConnect (bulk sync).
+     *
+     * Called on initial connection or manual resync.
+     *
+     * @return array ['success' => bool, 'message' => string, 'count' => int]
+     */
+    public static function sync_all_courses() {
+        global $DB;
+
+        // Get all visible courses (excluding site course).
+        $courses = get_courses();
+        $coursedata = [];
+
+        foreach ($courses as $course) {
+            // Skip the site course (id = 1).
+            if ($course->id == SITEID) {
+                continue;
+            }
+
+            $categoryname = '';
+            if (!empty($course->category)) {
+                $category = $DB->get_record('course_categories', ['id' => $course->category]);
+                if ($category) {
+                    $categoryname = $category->name;
+                }
+            }
+
+            $coursedata[] = [
+                'id' => $course->id,
+                'fullname' => $course->fullname,
+                'shortname' => $course->shortname,
+                'idnumber' => $course->idnumber ?? '',
+                'category_id' => $course->category ?? null,
+                'category_name' => $categoryname,
+                'visible' => (bool) $course->visible,
+            ];
+        }
+
+        $result = self::sync_courses($coursedata, 'full');
+        $result['count'] = count($coursedata);
+
+        return $result;
     }
 
     /**

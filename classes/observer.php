@@ -36,17 +36,195 @@ use local_mc_plugin\local\dynamic_inspector;
  */
 class observer {
     /**
+     * Get the course filter configuration for a specific event type.
+     *
+     * @param string $eventname The event name (e.g., \core\event\user_created)
+     * @return array|null The course filter config or null if no filter
+     */
+    private static function get_course_filter_for_event(string $eventname): ?array {
+        $configjson = get_config('local_mc_plugin', 'monitored_events_config');
+
+        if (empty($configjson)) {
+            return null;
+        }
+
+        $eventsconfig = json_decode($configjson, true);
+        if (!is_array($eventsconfig)) {
+            return null;
+        }
+
+        // Normalize event name for comparison.
+        $eventnamenormalized = ltrim($eventname, '\\');
+
+        foreach ($eventsconfig as $eventconfig) {
+            if (!isset($eventconfig['event_type'])) {
+                continue;
+            }
+
+            $configeventnormalized = ltrim($eventconfig['event_type'], '\\');
+
+            if ($configeventnormalized === $eventnamenormalized) {
+                return $eventconfig['course_filter'] ?? null;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Safely extract the course ID from an event.
+     *
+     * This method tries multiple approaches to get the course ID:
+     * 1. Direct courseid property on the event
+     * 2. Context-based course ID
+     *
+     * Returns null if no course context can be determined (event should be sent).
+     *
+     * @param \core\event\base $event The Moodle event
+     * @return int|null The course ID or null if not determinable
+     */
+    private static function get_event_course_id(\core\event\base $event): ?int {
+        // Try direct courseid property first.
+        try {
+            $courseid = $event->courseid;
+            if (!empty($courseid) && is_numeric($courseid) && (int)$courseid > 0) {
+                return (int)$courseid;
+            }
+        } catch (\Exception $e) {
+            // Property may not exist or be accessible.
+            unset($e);
+        }
+
+        // Try getting course ID from context.
+        try {
+            $context = $event->get_context();
+            if ($context) {
+                // For course context, get the instance ID directly.
+                if ($context->contextlevel === CONTEXT_COURSE) {
+                    return (int)$context->instanceid;
+                }
+
+                // For module context, get the course from the context path.
+                if ($context->contextlevel === CONTEXT_MODULE) {
+                    $coursecontext = $context->get_course_context(false);
+                    if ($coursecontext) {
+                        return (int)$coursecontext->instanceid;
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            // Context may not be available.
+            unset($e);
+        }
+
+        // Could not determine course ID - return null (event will be sent).
+        return null;
+    }
+
+    /**
+     * Check if an event passes the course filter.
+     *
+     * Philosophy: When in doubt, send the event. Backend will filter again.
+     * - If no filter configured: send
+     * - If can't determine course ID: send
+     * - If course ID is site-level (0 or 1): send
+     * - Otherwise: apply filter logic
+     *
+     * @param \core\event\base $event The Moodle event
+     * @param array|null $coursefilter The course filter config
+     * @return bool True if event should be sent
+     */
+    private static function passes_course_filter(\core\event\base $event, ?array $coursefilter): bool {
+        // No filter = send all.
+        if ($coursefilter === null) {
+            return true;
+        }
+
+        // Invalid filter structure = send (fail open).
+        if (!isset($coursefilter['mode']) || !isset($coursefilter['course_ids'])) {
+            return true;
+        }
+
+        $mode = $coursefilter['mode'];
+        $filterids = $coursefilter['course_ids'];
+
+        // Empty filter IDs = send all.
+        if (empty($filterids) || !is_array($filterids)) {
+            return true;
+        }
+
+        // Get course ID from event.
+        $courseid = self::get_event_course_id($event);
+
+        // Can't determine course ID = send (fail open).
+        // This handles events without course context (user_created, etc.).
+        if ($courseid === null) {
+            return true;
+        }
+
+        // Site-level events (courseid 0 or 1) = send.
+        // SITEID constant is typically 1.
+        if ($courseid <= 1) {
+            return true;
+        }
+
+        // Apply filter logic.
+        if ($mode === 'include') {
+            return in_array($courseid, $filterids, true);
+        } else if ($mode === 'exclude') {
+            return !in_array($courseid, $filterids, true);
+        }
+
+        // Unknown mode = send (fail open).
+        return true;
+    }
+
+    /**
+     * Check if events are currently blocked due to limit exceeded.
+     *
+     * MoodleConnect pushes a blocked_until timestamp when the user exceeds
+     * their monthly event quota. Events are blocked until that timestamp passes.
+     *
+     * @return bool True if events are blocked, false if they can be sent
+     */
+    private static function is_events_blocked(): bool {
+        $blockeduntil = (int) get_config('local_mc_plugin', 'events_blocked_until');
+
+        // No block set or timestamp is 0.
+        if ($blockeduntil <= 0) {
+            return false;
+        }
+
+        // Check if we're still within the blocked period.
+        return time() < $blockeduntil;
+    }
+
+    /**
      * Generic handler for ALL events.
      *
      * This method is called for every event that occurs in Moodle. It checks if the event
-     * is in the monitored events list, extracts the event data, and sends it to MoodleConnect.
-     * In debug mode, it also logs events to a file and displays notifications.
+     * is in the monitored events list, applies course filtering, extracts the event data,
+     * and sends it to MoodleConnect. In debug mode, it also logs events to a file and
+     * displays notifications.
      *
      * @param \core\event\base $event The Moodle event object
      * @return void
      */
     public static function handle_event(\core\event\base $event) {
         global $CFG;
+
+        // Check if events are blocked due to limit exceeded.
+        if (self::is_events_blocked()) {
+            // Log blocked event in debug mode.
+            if (get_config('local_mc_plugin', 'debug_mode')) {
+                $logfile = $CFG->dataroot . '/moodleconnect_debug.log';
+                $blockeduntil = (int) get_config('local_mc_plugin', 'events_blocked_until');
+                $msg = date('Y-m-d H:i:s') . " | Event blocked (limit exceeded): {$event->eventname}";
+                $msg .= " (blocked until " . date('Y-m-d H:i:s', $blockeduntil) . ")\n";
+                @file_put_contents($logfile, $msg, FILE_APPEND);
+            }
+            return;
+        }
 
         // Debug: log ALL events to file if debug mode is on.
         if (get_config('local_mc_plugin', 'debug_mode')) {
@@ -68,6 +246,20 @@ class observer {
 
         // Allow wildcard (for debugging) or check exact match.
         if ($monitoredeventsstr !== '*' && !in_array($eventnamenormalized, $monitorednormalized)) {
+            return;
+        }
+
+        // Check course filter before sending.
+        $coursefilter = self::get_course_filter_for_event($event->eventname);
+        if (!self::passes_course_filter($event, $coursefilter)) {
+            // Event filtered out by course filter.
+            if (get_config('local_mc_plugin', 'debug_mode')) {
+                $logfile = $CFG->dataroot . '/moodleconnect_debug.log';
+                $courseid = self::get_event_course_id($event);
+                $msg = date('Y-m-d H:i:s') . " | Event filtered by course filter: {$event->eventname}";
+                $msg .= " (courseid={$courseid}, filter=" . json_encode($coursefilter) . ")\n";
+                @file_put_contents($logfile, $msg, FILE_APPEND);
+            }
             return;
         }
 

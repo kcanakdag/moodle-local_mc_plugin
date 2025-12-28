@@ -238,9 +238,9 @@ define([
 
                 isConnected = true;
 
-                // Refresh connection status
+                // Refresh connection status and sync all events
                 setTimeout(() => {
-                    ConnectionStatus.testConnection();
+                    ConnectionStatus.testConnection(true);
                 }, 500);
             } else {
                 showStatus('error', data.message || strings.saveFailed);

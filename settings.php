@@ -17,6 +17,10 @@
 /**
  * Plugin settings and configuration page.
  *
+ * Events are now managed automatically via reverse sync from MoodleConnect.
+ * When triggers are created/updated in MoodleConnect, the monitored events
+ * are automatically synced to this plugin.
+ *
  * @package    local_mc_plugin
  * @copyright  2025 Kerem Can Akdag
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -27,11 +31,16 @@ defined('MOODLE_INTERNAL') || die();
 if ($hassiteconfig) {
     $settings = new admin_settingpage('local_mc_plugin', get_string('pluginname', 'local_mc_plugin'));
 
+    // Event Limit Warning (shown at top if events are blocked).
+    $settings->add(new \local_mc_plugin\admin\setting_limit_warning(
+        'local_mc_plugin/limit_warning'
+    ));
+
     // Section: Connection.
     $settings->add(new admin_setting_heading(
         'local_mc_plugin/connection_heading',
         get_string('connection_heading', 'local_mc_plugin'),
-        ''
+        get_string('connection_heading_desc', 'local_mc_plugin')
     ));
 
     // Check connection status.
@@ -39,30 +48,23 @@ if ($hassiteconfig) {
     $sitesecret = get_config('local_mc_plugin', 'site_secret');
     $isconnected = !empty($sitekey) && !empty($sitesecret);
 
-    // Connection Status Display with integrated Connect/Reconnect Button.
-    // The event input ID follows Moodle's pattern: id_s_<plugin>_<setting>.
-    $eventinputid = 'id_s_local_mc_plugin_monitored_events';
+    // Connection Status Display with Connect Button.
     $settings->add(new \local_mc_plugin\admin\setting_connection_status(
         'local_mc_plugin/connection_status',
-        $eventinputid,
+        '', // No event input ID needed anymore.
         $isconnected
     ));
 
-    // Site Key and Secret are stored internally but not displayed to users.
-
-    // Section: Monitored Events.
+    // Section: Synced Events (read-only display).
     $settings->add(new admin_setting_heading(
-        'local_mc_plugin/events_heading',
-        get_string('events_heading', 'local_mc_plugin'),
-        get_string('events_heading_desc', 'local_mc_plugin')
+        'local_mc_plugin/synced_events_heading',
+        get_string('synced_events_heading', 'local_mc_plugin'),
+        get_string('synced_events_heading_desc', 'local_mc_plugin')
     ));
 
-    // Dynamic Event Selection.
-    $settings->add(new \local_mc_plugin\admin\setting_event_selection(
-        'local_mc_plugin/monitored_events',
-        get_string('monitored_events', 'local_mc_plugin'),
-        get_string('monitored_events_desc', 'local_mc_plugin'),
-        '\core\event\user_created, \core\event\course_created'
+    // Synced Events Display (read-only).
+    $settings->add(new \local_mc_plugin\admin\setting_synced_events(
+        'local_mc_plugin/synced_events_display'
     ));
 
     // Section: Advanced.
