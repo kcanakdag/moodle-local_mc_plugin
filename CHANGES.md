@@ -5,7 +5,17 @@ All notable changes to the MoodleConnect plugin will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+
+## [5.0.1] - 2025-12-28
+
+### Added
+- **Health Check Sync**: The health check endpoint now supports optional `sync_events` and `sync_courses` parameters
+  - MoodleConnect can request event/course sync during health checks
+  - Enables automatic data sync when users first connect their site
+  - Eliminates the need for users to manually refresh after initial connection
+
+### Changed
+- Improved initial connection experience - events and courses sync automatically
 
 ## [5.0.0] - 2025-12-28
 

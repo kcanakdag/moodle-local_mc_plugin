@@ -225,13 +225,40 @@ switch ($action) {
     case 'health':
         // Comprehensive health check for MoodleConnect to verify connectivity.
         // Returns detailed info about the Moodle instance and plugin status.
+        // Optionally triggers sync of events and/or courses if requested.
         $sitename = $CFG->fullname ?? '';
         $siteurl = $CFG->wwwroot ?? '';
         $pluginversion = get_config('local_mc_plugin', 'version');
         $monitoredevents = get_config('local_mc_plugin', 'monitored_events');
         $eventcount = empty($monitoredevents) ? 0 : count(array_filter(explode(',', $monitoredevents)));
 
-        echo json_encode([
+        // Check if sync is requested (optional parameters).
+        $syncevents = !empty($data['sync_events']);
+        $synccourses = !empty($data['sync_courses']);
+
+        $syncresults = null;
+        if ($syncevents || $synccourses) {
+            require_once(__DIR__ . '/classes/local/moodleconnect_client.php');
+            $syncresults = [];
+
+            if ($syncevents) {
+                $eventresult = \local_mc_plugin\local\moodleconnect_client::sync_all_events();
+                $syncresults['events'] = [
+                    'success' => $eventresult['success'],
+                    'count' => $eventresult['event_count'] ?? 0,
+                ];
+            }
+
+            if ($synccourses) {
+                $courseresult = \local_mc_plugin\local\moodleconnect_client::sync_all_courses();
+                $syncresults['courses'] = [
+                    'success' => $courseresult['success'],
+                    'count' => $courseresult['count'] ?? 0,
+                ];
+            }
+        }
+
+        $response = [
             'success' => true,
             'status' => 'healthy',
             'site' => [
@@ -246,7 +273,13 @@ switch ($action) {
                 'monitored_event_count' => $eventcount,
             ],
             'timestamp' => time(),
-        ]);
+        ];
+
+        if ($syncresults !== null) {
+            $response['sync'] = $syncresults;
+        }
+
+        echo json_encode($response);
         break;
 
     case 'update_limit_status':
