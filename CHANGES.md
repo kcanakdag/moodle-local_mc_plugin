@@ -6,6 +6,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [5.1.0] - 2026-01-26
+
+### Added
+- **Analytics Dashboard**: New analytics page showing Moodle event activity
+  - Summary KPIs: total events, unique users, active courses
+  - Event type distribution (donut chart)
+  - Top courses by activity (progress bars)
+  - Top users by activity (with avatars)
+  - Activity timeline (bar chart)
+  - Date range filtering (7d, 30d, 90d)
+  - Accessible from plugin settings page
+
+### Changed
+- **Documentation**: Updated README with destinations terminology and event processing details
+
 ## [5.0.1] - 2025-12-28
 
 ### Added

@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_mc_plugin';
-$plugin->version   = 2025122801;      // Version 5.0.1 - Health check sync support.
+$plugin->version   = 2026012600;      // Version 5.1.0 - Analytics dashboard.
 $plugin->requires  = 2022041900;      // Moodle 4.0+.
 $plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = 'v5.0.1';
+$plugin->release   = 'v5.1.0';

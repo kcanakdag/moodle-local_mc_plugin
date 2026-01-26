@@ -1,0 +1,215 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_mc_plugin/analytics_content
+
+    Analytics dashboard content - rendered via AJAX.
+
+    Context variables required for this template:
+    * totalevents - Total event count (formatted)
+    * uniqueusers - Unique user count (formatted)
+    * activecourses - Active course count (formatted)
+    * events - Array of event types with label, count, percent, color
+    * courses - Array of courses with name, count, percent, color
+    * users - Array of users with name, initials, count, bgcolor
+    * timeline - Array of timeline data with label, count, height
+    * timelinestart - First date label
+    * timelineend - Last date label
+    * hasevents - Boolean for events data
+    * hascourses - Boolean for courses data
+    * hasusers - Boolean for users data
+    * hastimeline - Boolean for timeline data
+
+    Example context (json):
+    {
+        "totalevents": "1,234",
+        "uniqueusers": "456",
+        "activecourses": "12",
+        "hasevents": true,
+        "events": [
+            {"label": "Course Viewed", "count": "500", "percent": 40, "color": "#fd7e14", "dasharray": "40 60", "dashoffset": 0}
+        ],
+        "hascourses": true,
+        "courses": [
+            {"name": "Introduction to Moodle", "count": "200", "percent": 100, "color": "#0d6efd"}
+        ],
+        "hasusers": true,
+        "users": [
+            {"name": "John Smith", "initials": "JS", "count": "150", "bgcolor": "#fd7e14"}
+        ],
+        "hastimeline": true,
+        "timeline": [
+            {"label": "Jan 1", "count": "50", "height": 50}
+        ],
+        "timelinestart": "Jan 1",
+        "timelineend": "Jan 7"
+    }
+}}
+
+{{! KPI Cards Row }}
+<div class="row mb-4">
+    <div class="col-md-4 mb-3">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body text-center py-4">
+                <div class="display-4 fw-bold text-primary mb-2">{{totalevents}}</div>
+                <div class="text-muted text-uppercase small fw-semibold">
+                    {{#str}}analytics_total_events, local_mc_plugin{{/str}}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body text-center py-4">
+                <div class="display-4 fw-bold text-success mb-2">{{uniqueusers}}</div>
+                <div class="text-muted text-uppercase small fw-semibold">
+                    {{#str}}analytics_unique_users, local_mc_plugin{{/str}}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body text-center py-4">
+                <div class="display-4 fw-bold text-info mb-2">{{activecourses}}</div>
+                <div class="text-muted text-uppercase small fw-semibold">
+                    {{#str}}analytics_active_courses, local_mc_plugin{{/str}}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{! Activity Timeline - Full Width }}
+{{#hastimeline}}
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-header bg-transparent border-0 pb-0">
+        <h6 class="mb-0 text-muted">{{#str}}analytics_activity_timeline, local_mc_plugin{{/str}}</h6>
+    </div>
+    <div class="card-body pt-2">
+        <div class="d-flex align-items-end" style="height:120px;gap:3px;">
+            {{#timeline}}
+            <div class="flex-fill bg-primary rounded-top mc-timeline-bar"
+                 style="height:{{height}}%;min-width:8px;opacity:0.8;"
+                 data-label="{{label}}" data-count="{{count}}"
+                 title="{{label}}: {{count}} events"></div>
+            {{/timeline}}
+        </div>
+        <div class="d-flex justify-content-between mt-2 small text-muted">
+            <span>{{timelinestart}}</span>
+            <span>{{timelineend}}</span>
+        </div>
+    </div>
+</div>
+{{/hastimeline}}
+
+{{! Three Column Layout }}
+<div class="row">
+    {{! Event Types - Donut with Legend }}
+    <div class="col-lg-4 mb-4">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-header bg-transparent border-0 pb-0">
+                <h6 class="mb-0 text-muted">{{#str}}analytics_event_types, local_mc_plugin{{/str}}</h6>
+            </div>
+            <div class="card-body">
+                {{#hasevents}}
+                <div class="d-flex align-items-center mb-3">
+                    {{! CSS Donut Chart }}
+                    <div class="mc-donut-chart" style="width:100px;height:100px;flex-shrink:0;">
+                        <svg viewBox="0 0 36 36" style="width:100%;height:100%;">
+                            {{#events}}
+                            <circle cx="18" cy="18" r="15.9" fill="none" stroke="{{color}}"
+                                    stroke-width="3" stroke-dasharray="{{dasharray}}"
+                                    stroke-dashoffset="{{dashoffset}}"
+                                    transform="rotate(-90 18 18)"></circle>
+                            {{/events}}
+                        </svg>
+                    </div>
+                    {{! Legend }}
+                    <div class="ms-3 flex-grow-1">
+                        {{#events}}
+                        <div class="d-flex align-items-center mb-1" style="font-size:0.8rem;">
+                            <div style="width:10px;height:10px;border-radius:2px;background:{{color}};flex-shrink:0;"></div>
+                            <div class="text-truncate mx-2 flex-grow-1" title="{{label}}">{{label}}</div>
+                            <div class="text-muted">{{percent}}%</div>
+                        </div>
+                        {{/events}}
+                    </div>
+                </div>
+                {{/hasevents}}
+                {{^hasevents}}
+                <p class="text-muted text-center py-4">{{#str}}analytics_no_data, local_mc_plugin{{/str}}</p>
+                {{/hasevents}}
+            </div>
+        </div>
+    </div>
+
+    {{! Top Courses - Progress Bars }}
+    <div class="col-lg-4 mb-4">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-header bg-transparent border-0 pb-0">
+                <h6 class="mb-0 text-muted">{{#str}}analytics_top_courses, local_mc_plugin{{/str}}</h6>
+            </div>
+            <div class="card-body">
+                {{#hascourses}}
+                {{#courses}}
+                <div class="mb-2">
+                    <div class="d-flex justify-content-between small mb-1">
+                        <span class="text-truncate" style="max-width:70%;" title="{{name}}">{{name}}</span>
+                        <span class="text-muted">{{count}}</span>
+                    </div>
+                    <div class="progress" style="height:8px;background:#e9ecef;">
+                        <div class="progress-bar" style="width:{{percent}}%;background:{{color}};"></div>
+                    </div>
+                </div>
+                {{/courses}}
+                {{/hascourses}}
+                {{^hascourses}}
+                <p class="text-muted text-center py-4">{{#str}}analytics_no_data, local_mc_plugin{{/str}}</p>
+                {{/hascourses}}
+            </div>
+        </div>
+    </div>
+
+    {{! Top Users - Table with Avatars }}
+    <div class="col-lg-4 mb-4">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-header bg-transparent border-0 pb-0">
+                <h6 class="mb-0 text-muted">{{#str}}analytics_top_users, local_mc_plugin{{/str}}</h6>
+            </div>
+            <div class="card-body p-0">
+                {{#hasusers}}
+                <div class="list-group list-group-flush">
+                    {{#users}}
+                    <div class="list-group-item d-flex align-items-center px-3 py-2 border-0">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center me-2"
+                             style="width:32px;height:32px;background:{{bgcolor}};color:#fff;font-size:0.75rem;font-weight:600;">
+                            {{initials}}
+                        </div>
+                        <div class="flex-grow-1 text-truncate small">{{name}}</div>
+                        <div class="badge bg-light text-dark">{{count}}</div>
+                    </div>
+                    {{/users}}
+                </div>
+                {{/hasusers}}
+                {{^hasusers}}
+                <p class="text-muted text-center py-4">{{#str}}analytics_no_data, local_mc_plugin{{/str}}</p>
+                {{/hasusers}}
+            </div>
+        </div>
+    </div>
+</div>

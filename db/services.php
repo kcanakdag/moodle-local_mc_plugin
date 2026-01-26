@@ -24,4 +24,12 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$functions = [];
+$functions = [
+    'local_mc_plugin_get_analytics' => [
+        'classname' => 'local_mc_plugin\external\get_analytics',
+        'description' => 'Get analytics data for the dashboard',
+        'type' => 'read',
+        'ajax' => true,
+        'loginrequired' => true,
+    ],
+];

@@ -64,4 +64,12 @@ $definitions = [
         'staticacceleration' => true,
         'staticaccelerationsize' => 1,
     ],
+    'analytics' => [
+        'mode' => cache_store::MODE_APPLICATION,
+        'simplekeys' => true,
+        'simpledata' => false,
+        'ttl' => 900, // 15 minutes - analytics data cache (longer TTL for expensive queries)
+        'staticacceleration' => true,
+        'staticaccelerationsize' => 20,
+    ],
 ];
