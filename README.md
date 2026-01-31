@@ -4,7 +4,7 @@
 [![PHP Version](https://img.shields.io/badge/PHP-7.4%2B-blue.svg)](https://php.net)
 [![License](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](LICENSE)
 
-The official Moodle plugin for [MoodleConnect](https://moodleconnect.com) — a platform that bridges Moodle LMS events to external tools like Airtable, webhooks, and more.
+The official Moodle plugin for [MoodleConnect](https://moodleconnect.com) — a platform that bridges Moodle LMS events to external tools like Airtable, Google Sheets, webhooks, and more.
 
 ## Overview
 
@@ -15,12 +15,18 @@ MoodleConnect enables Moodle administrators to automatically sync events (user c
 ## Features
 
 - **One-Click Connection**: Secure OAuth-style flow connects your site instantly
-- **Automatic Event Sync**: Events flow based on your dashboard triggers — no manual selection
+- **Automatic Event Sync**: Events flow based on your dashboard automations — no manual selection
 - **Reverse Sync**: MoodleConnect tells the plugin which events to capture
 - **Course Filtering**: Filter events by course at the source
 - **Secure Communication**: HMAC-SHA256 authentication for all requests
 - **Debug Mode**: Built-in logging for troubleshooting
 - **Zero Performance Impact**: Asynchronous event handling
+
+## Supported Destinations
+
+- **Airtable** — Create and upsert records with field behaviors
+- **Google Sheets** — Append or update rows in spreadsheets
+- **Webhooks** — Send data to any HTTP endpoint (Zapier, Make, custom APIs)
 
 ## Requirements
 
@@ -58,30 +64,43 @@ git clone https://github.com/kcanakdag/moodle-local_mc_plugin.git mc_plugin
 3. Log in and authorize the connection
 4. Done! Your site is connected.
 
-### 2. Create Triggers (in MoodleConnect Dashboard)
+### 2. Create Automations (in MoodleConnect Dashboard)
 
 1. Log in to [moodleconnect.com](https://moodleconnect.com)
-2. Go to **Connections** tab — add your Airtable or webhook credentials
-3. Go to **Triggers** tab — create automations:
+2. Select your site and go to the **Automations** tab
+3. Add a **Destination** (Airtable, Google Sheets, or Webhook)
+4. Create an **Automation**:
    - Select an event (e.g., "User Created")
-   - Choose a destination tool
+   - Choose a destination
    - Map fields (e.g., `{{user.email}}` → `Email`)
-4. Save — events automatically start flowing!
+5. Save — events automatically start flowing!
 
-That's it! The plugin automatically knows which events to send based on your triggers.
+That's it! The plugin automatically knows which events to send based on your automations.
 
 ## How It Works
 
 ```
 ┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐
-│   Moodle LMS    │◀───▶│  MoodleConnect   │────▶│  External Tools │
+│   Moodle LMS    │◀───▶│  MoodleConnect   │────▶│  Destinations   │
+│                 │     │     Service      │     │                 │
+│ Events fire     │     │ Routes events    │     │ • Airtable      │
+│ Plugin captures │     │ Processes data   │     │ • Google Sheets │
+│ Sends to API    │     │ Retries failures │     │ • Webhooks      │
 └─────────────────┘     └──────────────────┘     └─────────────────┘
         ▲                       │
         │    Reverse Sync       │
         └───────────────────────┘
 ```
 
-**Reverse Sync**: When you create a trigger in MoodleConnect, it tells your Moodle plugin which events to capture. No manual configuration needed!
+**Reverse Sync**: When you create an automation in MoodleConnect, it tells your Moodle plugin which events to capture. No manual configuration needed!
+
+## Event Processing
+
+MoodleConnect handles event processing reliably:
+
+- **Automatic Retries**: Failed events retry with exponential backoff (30s, 2m, 10m, 30m, 1h)
+- **Rate Limiting**: Respects API limits for each destination
+- **Status Tracking**: Monitor event status in the Logs tab (received → queued → completed)
 
 ## Troubleshooting
 
@@ -95,19 +114,21 @@ That's it! The plugin automatically knows which events to send based on your tri
 
 | Issue | Solution |
 |-------|----------|
-| Events not sending | Check connection status, verify triggers exist |
+| Events not sending | Check connection status, verify automations exist |
 | "Plugin update required" | Update to v5.0.0 or higher |
 | Connection failed | Check firewall allows outbound HTTPS |
+| Events stuck in "retrying" | Check destination credentials are valid |
 
 See the [Troubleshooting Guide](https://github.com/kcanakdag/moodle-local_mc_plugin/wiki/Troubleshooting) for more.
 
 ## Privacy
 
-This plugin transmits event data to MoodleConnect based on your trigger configuration. Only events with active triggers are sent.
+This plugin transmits event data to MoodleConnect based on your automation configuration. Only events with active automations are sent.
 
 - All communication uses HTTPS
 - HMAC signatures verify authenticity
 - You control what data is transmitted
+- Self-service data export and deletion available
 
 See [Privacy & GDPR](https://github.com/kcanakdag/moodle-local_mc_plugin/wiki/Privacy) for details.
 
@@ -116,7 +137,7 @@ See [Privacy & GDPR](https://github.com/kcanakdag/moodle-local_mc_plugin/wiki/Pr
 - **[Installation](https://github.com/kcanakdag/moodle-local_mc_plugin/wiki/Installation)**
 - **[Configuration](https://github.com/kcanakdag/moodle-local_mc_plugin/wiki/Configuration)**
 - **[Events](https://github.com/kcanakdag/moodle-local_mc_plugin/wiki/Events)**
-- **[Triggers](https://github.com/kcanakdag/moodle-local_mc_plugin/wiki/Triggers)**
+- **[Automations](https://github.com/kcanakdag/moodle-local_mc_plugin/wiki/Automations)**
 - **[FAQ](https://github.com/kcanakdag/moodle-local_mc_plugin/wiki/FAQ)**
 
 ## Support

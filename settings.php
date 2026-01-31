@@ -82,5 +82,17 @@ if ($hassiteconfig) {
         0
     ));
 
+    // Section: Analytics.
+    $settings->add(new admin_setting_heading(
+        'local_mc_plugin/analytics_heading',
+        get_string('analytics_title', 'local_mc_plugin'),
+        ''
+    ));
+
+    // Inline Analytics Dashboard.
+    $settings->add(new \local_mc_plugin\admin\setting_analytics(
+        'local_mc_plugin/analytics_display'
+    ));
+
     $ADMIN->add('localplugins', $settings);
 }
