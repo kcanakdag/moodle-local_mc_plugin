@@ -36,19 +36,19 @@ MoodleConnect enables Moodle administrators to automatically sync events (user c
 
 ## Installation
 
-### Via Moodle Plugin Installer (Recommended)
+### Via Moodle Plugin Directory (Recommended)
 
-1. Download the latest release from [GitHub Releases](https://github.com/kcanakdag/moodle-local_mc_plugin/releases)
+1. Download from [moodle.org/plugins/local_mc_plugin](https://moodle.org/plugins/local_mc_plugin)
 2. In Moodle: **Site administration → Plugins → Install plugins**
 3. Upload the ZIP file and follow the prompts
 
 ### Manual Installation
 
-1. Download and extract the release ZIP
-2. Upload to `moodle/local/mc_plugin/`
+1. Download from the [Moodle Plugin Directory](https://moodle.org/plugins/local_mc_plugin)
+2. Extract and upload to `moodle/local/mc_plugin/`
 3. Visit **Site administration → Notifications** to complete installation
 
-### Via Git
+### Via Git (Development)
 
 ```bash
 cd /path/to/moodle/local
