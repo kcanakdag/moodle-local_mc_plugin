@@ -72,7 +72,8 @@ define([
             {key: 'connect_waiting_btn', component: 'local_mc_plugin'},
             {key: 'connect_saving', component: 'local_mc_plugin'},
             {key: 'connect_success', component: 'local_mc_plugin'},
-            {key: 'connect_popup_blocked', component: 'local_mc_plugin'},
+            {key: 'connect_popup_fallback', component: 'local_mc_plugin'},
+            {key: 'connect_popup_open_link', component: 'local_mc_plugin'},
             {key: 'connect_init_failed', component: 'local_mc_plugin'},
             {key: 'connect_timeout', component: 'local_mc_plugin'},
             {key: 'connect_token_expired', component: 'local_mc_plugin'},
@@ -88,14 +89,15 @@ define([
             waitingBtn: results[2],
             saving: results[3],
             success: results[4],
-            popupBlocked: results[5],
-            initFailed: results[6],
-            timeout: results[7],
-            tokenExpired: results[8],
-            credentialsRetrieved: results[9],
-            saveFailed: results[10],
-            connectBtn: results[11],
-            reconnectBtn: results[12],
+            popupFallback: results[5],
+            popupOpenLink: results[6],
+            initFailed: results[7],
+            timeout: results[8],
+            tokenExpired: results[9],
+            credentialsRetrieved: results[10],
+            saveFailed: results[11],
+            connectBtn: results[12],
+            reconnectBtn: results[13],
         };
     };
 
@@ -312,18 +314,30 @@ define([
     const handleTokenSuccess = (data) => {
         currentToken = data.token;
 
-        // Open MoodleConnect in a new tab.
+        // Build the connect URL and attempt to open in a new tab.
         const connectPageUrl = `${config.frontendUrl}/connect?token=${encodeURIComponent(data.token)}`;
-        const connectWindow = window.open(connectPageUrl, '_blank');
-
-        if (!connectWindow) {
-            resetButtonState();
-            showStatus('error', strings.popupBlocked);
-            return;
-        }
+        window.open(connectPageUrl, '_blank');
 
         setBtnText(strings.waitingBtn);
         showStatus('waiting', strings.waiting);
+
+        // Always append a fallback link in case the new tab didn't open (popup blockers, etc).
+        if (statusText) {
+            const fallback = document.createElement('span');
+            fallback.style.display = 'block';
+            fallback.style.marginTop = '0.5rem';
+            fallback.textContent = strings.popupFallback + ' ';
+
+            const link = document.createElement('a');
+            link.href = connectPageUrl;
+            link.target = '_blank';
+            link.rel = 'noopener';
+            link.textContent = strings.popupOpenLink;
+            link.style.fontWeight = 'bold';
+
+            fallback.appendChild(link);
+            statusText.appendChild(fallback);
+        }
 
         // Start polling.
         pollTimer = setInterval(pollStatus, POLL_INTERVAL);

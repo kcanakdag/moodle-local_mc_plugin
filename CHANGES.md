@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [5.1.1] - 2026-02-13
+
+### Fixed
+- **Connection Flow**: Always show a fallback link when connecting to MoodleConnect
+  - Previously relied on popup blocker detection which is unreliable across browsers
+  - Now always displays "If a new tab didn't open, click here to open MoodleConnect" below the waiting status
+  - Polling starts immediately regardless, so the connection completes automatically once authorized
+
 ## [5.1.0] - 2026-01-26
 
 ### Added
