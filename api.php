@@ -225,6 +225,7 @@ switch ($action) {
     case 'health':
         // Comprehensive health check for MoodleConnect to verify connectivity.
         // Returns detailed info about the Moodle instance and plugin status.
+        // Includes detected capabilities for local actions.
         // Optionally triggers sync of events and/or courses if requested.
         $sitename = $CFG->fullname ?? '';
         $siteurl = $CFG->wwwroot ?? '';
@@ -258,6 +259,9 @@ switch ($action) {
             }
         }
 
+        // Detect local action capabilities.
+        $capabilities = \local_mc_plugin\local\actions\action_handler_factory::get_available_actions();
+
         $response = [
             'success' => true,
             'status' => 'healthy',
@@ -271,6 +275,9 @@ switch ($action) {
                 'version' => $pluginversion,
                 'release' => get_config('local_mc_plugin', 'release') ?: null,
                 'monitored_event_count' => $eventcount,
+            ],
+            'capabilities' => [
+                'local_actions' => $capabilities,
             ],
             'timestamp' => time(),
         ];
@@ -310,6 +317,48 @@ switch ($action) {
             'blocked_until' => $blockeduntil,
             'message' => $blocked ? 'Events blocked until limit resets' : 'Events unblocked',
         ]);
+        break;
+
+    case 'get_metadata':
+        // Return metadata for UI dropdowns (courses, roles, groups, cohorts, badges, certificates).
+        $type = $data['type'] ?? '';
+
+        if (empty($type)) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'error' => 'Missing metadata type']);
+            exit;
+        }
+
+        $supportedtypes = \local_mc_plugin\local\metadata\metadata_provider_factory::get_supported_types();
+        if (!in_array($type, $supportedtypes)) {
+            http_response_code(400);
+            echo json_encode([
+                'success' => false,
+                'error' => 'Unsupported metadata type: ' . $type,
+                'supported_types' => $supportedtypes,
+            ]);
+            exit;
+        }
+
+        $provider = \local_mc_plugin\local\metadata\metadata_provider_factory::get_provider($type);
+        $metadataitems = $provider->get_all();
+
+        echo json_encode([
+            'success' => true,
+            'type' => $type,
+            'data' => $metadataitems,
+            'count' => count($metadataitems),
+        ]);
+        break;
+
+    case 'execute_local_action':
+        // Execute a local action inline and return the result.
+        // The action_executor handles idempotency, handler dispatch, and execution recording.
+        $result = \local_mc_plugin\local\actions\action_executor::execute($data);
+        if (!$result['success']) {
+            http_response_code(422);
+        }
+        echo json_encode($result);
         break;
 
     default:

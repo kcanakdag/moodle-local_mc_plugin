@@ -55,5 +55,72 @@ function xmldb_local_mc_plugin_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2025112801, 'local', 'mc_plugin');
     }
 
+    if ($oldversion < 2026021000) {
+        // Add executions table for local action idempotency tracking.
+        $table = new xmldb_table('local_mc_plugin_executions');
+
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('action_type', XMLDB_TYPE_CHAR, '50', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('event_fingerprint', XMLDB_TYPE_CHAR, '64', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('target_id', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('user_id', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('result', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('executed_at', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+
+        $table->add_index('idx_action_fingerprint', XMLDB_INDEX_UNIQUE, ['action_type', 'event_fingerprint']);
+        $table->add_index('idx_executed_at', XMLDB_INDEX_NOTUNIQUE, ['executed_at']);
+
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        upgrade_plugin_savepoint(true, 2026021000, 'local', 'mc_plugin');
+    }
+
+    if ($oldversion < 2026022100) {
+        // Backfill executions schema for upgrade paths that may have skipped 2026021000.
+        $table = new xmldb_table('local_mc_plugin_executions');
+
+        if (!$dbman->table_exists($table)) {
+            $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+            $table->add_field('action_type', XMLDB_TYPE_CHAR, '50', null, XMLDB_NOTNULL, null, null);
+            $table->add_field('event_fingerprint', XMLDB_TYPE_CHAR, '64', null, XMLDB_NOTNULL, null, null);
+            $table->add_field('target_id', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+            $table->add_field('user_id', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+            $table->add_field('result', XMLDB_TYPE_TEXT, null, null, null, null, null);
+            $table->add_field('executed_at', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+
+            $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+
+            $table->add_index('idx_action_fingerprint', XMLDB_INDEX_UNIQUE, ['action_type', 'event_fingerprint']);
+            $table->add_index('idx_executed_at', XMLDB_INDEX_NOTUNIQUE, ['executed_at']);
+
+            $dbman->create_table($table);
+        } else {
+            $actionfingerprintindex = new xmldb_index(
+                'idx_action_fingerprint',
+                XMLDB_INDEX_UNIQUE,
+                ['action_type', 'event_fingerprint']
+            );
+            if (!$dbman->index_exists($table, $actionfingerprintindex)) {
+                $dbman->add_index($table, $actionfingerprintindex);
+            }
+
+            $executedatindex = new xmldb_index('idx_executed_at', XMLDB_INDEX_NOTUNIQUE, ['executed_at']);
+            if (!$dbman->index_exists($table, $executedatindex)) {
+                $dbman->add_index($table, $executedatindex);
+            }
+        }
+
+        upgrade_plugin_savepoint(true, 2026022100, 'local', 'mc_plugin');
+    }
+
+    if ($oldversion < 2026022101) {
+        // No schema changes in 5.2.0; advance plugin savepoint for code-only fixes.
+        upgrade_plugin_savepoint(true, 2026022101, 'local', 'mc_plugin');
+    }
+
     return true;
 }

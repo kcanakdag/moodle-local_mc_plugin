@@ -35,11 +35,15 @@ use core_privacy\local\request\userlist;
 use core_privacy\local\request\writer;
 
 /**
- * Privacy Subsystem for local_mc_plugin implementing null_provider.
+ * Privacy Subsystem for local_mc_plugin.
  *
- * This plugin does not store any personal data locally in the Moodle database.
- * However, it transmits event data (which may contain personal information) to
- * an external service (MoodleConnect API).
+ * This plugin stores local action execution records (local_mc_plugin_executions)
+ * which contain user IDs. It also transmits event data to the external
+ * MoodleConnect API.
+ *
+ * @package    local_mc_plugin
+ * @copyright  2025 Kerem Can Akdag
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class provider implements
     core_userlist_provider,
@@ -52,9 +56,7 @@ class provider implements
      * @return collection A listing of user data stored through this system.
      */
     public static function get_metadata(collection $collection): collection {
-        // This plugin does not store any data locally in Moodle tables.
-        // However, it transmits event data to an external service.
-
+        // External data transmission.
         $collection->add_external_location_link(
             'moodleconnect_api',
             [
@@ -73,43 +75,89 @@ class provider implements
             'privacy:metadata:moodleconnect_api'
         );
 
+        // Local action execution records.
+        $collection->add_database_table(
+            'local_mc_plugin_executions',
+            [
+                'user_id' => 'privacy:metadata:executions:user_id',
+                'action_type' => 'privacy:metadata:executions:action_type',
+                'result' => 'privacy:metadata:executions:result',
+                'executed_at' => 'privacy:metadata:executions:executed_at',
+            ],
+            'privacy:metadata:executions'
+        );
+
         return $collection;
     }
 
     /**
      * Get the list of contexts that contain user information for the specified user.
      *
-     * Since this plugin does not store any data locally, this returns an empty contextlist.
-     *
      * @param int $userid The user to search.
      * @return contextlist The contextlist containing the list of contexts used in this plugin.
      */
     public static function get_contexts_for_userid(int $userid): contextlist {
-        // This plugin does not store any personal data locally in Moodle.
-        // All data is transmitted to an external service and not retained.
         $contextlist = new contextlist();
+
+        // Execution records are stored at system context level.
+        $sql = "SELECT ctx.id
+                  FROM {local_mc_plugin_executions} e
+                  JOIN {context} ctx ON ctx.contextlevel = :contextlevel AND ctx.instanceid = 0
+                 WHERE e.user_id = :userid";
+
+        $contextlist->add_from_sql($sql, [
+            'contextlevel' => CONTEXT_SYSTEM,
+            'userid' => $userid,
+        ]);
+
         return $contextlist;
     }
 
     /**
      * Export all user data for the specified user, in the specified contexts.
      *
-     * Since this plugin does not store any data locally, there is nothing to export.
-     *
      * @param approved_contextlist $contextlist The approved contexts to export information for.
      */
     public static function export_user_data(approved_contextlist $contextlist) {
-        // This plugin does not store any personal data locally in Moodle.
-        // Data is only transmitted to the external MoodleConnect service.
-        // Users should contact the MoodleConnect service directly for data export.
+        global $DB;
 
-        // Write a note explaining this to the user.
+        // Only export if system context is in the approved list.
+        $hassystemcontext = false;
+        foreach ($contextlist->get_contexts() as $ctx) {
+            if ($ctx->contextlevel == CONTEXT_SYSTEM) {
+                $hassystemcontext = true;
+                break;
+            }
+        }
+        if (!$hassystemcontext) {
+            return;
+        }
+
+        $userid = $contextlist->get_user()->id;
         $context = \context_system::instance();
         $subcontext = [get_string('pluginname', 'local_mc_plugin')];
 
+        // Export execution records.
+        $records = $DB->get_records('local_mc_plugin_executions', ['user_id' => $userid], 'executed_at ASC');
+        if ($records) {
+            $exportdata = [];
+            foreach ($records as $record) {
+                $exportdata[] = (object) [
+                    'action_type' => $record->action_type,
+                    'result' => $record->result,
+                    'executed_at' => \core_privacy\local\request\transform::datetime($record->executed_at),
+                ];
+            }
+            writer::with_context($context)->export_data(
+                array_merge($subcontext, ['executions']),
+                (object) ['executions' => $exportdata]
+            );
+        }
+
+        // Note about external data.
         writer::with_context($context)->export_data(
             $subcontext,
-            (object)[
+            (object) [
                 'note' => get_string('privacy:export:note', 'local_mc_plugin'),
             ]
         );
@@ -118,48 +166,67 @@ class provider implements
     /**
      * Delete all data for all users in the specified context.
      *
-     * Since this plugin does not store any data locally, there is nothing to delete.
-     *
      * @param \context $context The specific context to delete data for.
      */
     public static function delete_data_for_all_users_in_context(\context $context) {
-        // This plugin does not store any personal data locally in Moodle.
-        // No action required.
+        global $DB;
+
+        if ($context->contextlevel == CONTEXT_SYSTEM) {
+            $DB->delete_records('local_mc_plugin_executions');
+        }
     }
 
     /**
      * Delete all user data for the specified user, in the specified contexts.
      *
-     * Since this plugin does not store any data locally, there is nothing to delete.
-     *
      * @param approved_contextlist $contextlist The approved contexts and user information to delete information for.
      */
     public static function delete_data_for_user(approved_contextlist $contextlist) {
-        // This plugin does not store any personal data locally in Moodle.
-        // No action required.
+        global $DB;
+
+        $userid = $contextlist->get_user()->id;
+        foreach ($contextlist->get_contexts() as $context) {
+            if ($context->contextlevel == CONTEXT_SYSTEM) {
+                $DB->delete_records('local_mc_plugin_executions', ['user_id' => $userid]);
+            }
+        }
     }
 
     /**
      * Get the list of users who have data within a context.
      *
-     * Since this plugin does not store any data locally, this returns an empty userlist.
-     *
      * @param userlist $userlist The userlist containing the list of users who have data in this context/plugin combination.
      */
     public static function get_users_in_context(userlist $userlist) {
-        // This plugin does not store any personal data locally in Moodle.
-        // No users to add to the list.
+        $context = $userlist->get_context();
+
+        if ($context->contextlevel == CONTEXT_SYSTEM) {
+            $sql = "SELECT DISTINCT user_id AS userid
+                      FROM {local_mc_plugin_executions}
+                     WHERE user_id IS NOT NULL";
+            $userlist->add_from_sql('userid', $sql, []);
+        }
     }
 
     /**
      * Delete multiple users within a single context.
      *
-     * Since this plugin does not store any data locally, there is nothing to delete.
-     *
      * @param approved_userlist $userlist The approved context and user information to delete information for.
      */
     public static function delete_data_for_users(approved_userlist $userlist) {
-        // This plugin does not store any personal data locally in Moodle.
-        // No action required.
+        global $DB;
+
+        $context = $userlist->get_context();
+        if ($context->contextlevel != CONTEXT_SYSTEM) {
+            return;
+        }
+
+        $userids = $userlist->get_userids();
+        if (empty($userids)) {
+            return;
+        }
+
+        [$insql, $inparams] = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED);
+        $DB->delete_records_select('local_mc_plugin_executions', "user_id {$insql}", $inparams);
     }
 }

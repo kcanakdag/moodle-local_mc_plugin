@@ -27,10 +27,11 @@ MoodleConnect enables Moodle administrators to automatically sync events (user c
 - **Airtable** — Create and upsert records with field behaviors
 - **Google Sheets** — Append or update rows in spreadsheets
 - **Webhooks** — Send data to any HTTP endpoint (Zapier, Make, custom APIs)
+- **Local Moodle Actions** — Trigger actions within the same Moodle instance (see below)
 
 ## Requirements
 
-- **Moodle**: 4.0 or higher
+- **Moodle**: 4.0 – 5.1 (4.0, 4.1, 4.2, 4.3, 4.4, 4.5 LTS, 5.0, 5.1)
 - **PHP**: 7.4 or higher
 - **MoodleConnect Account**: Free at [moodleconnect.com](https://moodleconnect.com)
 
@@ -77,6 +78,43 @@ git clone https://github.com/kcanakdag/moodle-local_mc_plugin.git mc_plugin
 
 That's it! The plugin automatically knows which events to send based on your automations.
 
+## Local Moodle Actions
+
+Local actions let you trigger operations inside the same Moodle instance when events occur — no external service required. Configure them in the MoodleConnect dashboard just like any other destination.
+
+### Available Actions
+
+| Action | Description | Dependency |
+|--------|-------------|------------|
+| Issue Certificate | Issue a custom certificate to a user | [mod_customcert](https://moodle.org/plugins/mod_customcert) |
+| Award Badge | Award a site or course badge | Badges enabled in site config |
+| Send Message | Send a Moodle notification to a user | Core (always available) |
+| Enroll User | Enroll a user in a course with a role | Manual enrolment plugin enabled |
+| Suspend/Unsuspend Enrolment | Temporarily suspend or restore access | Core (always available) |
+| Add to Group | Add a user to a course group | Core (always available) |
+| Add to Cohort | Add a user to a site or category cohort | Core (always available) |
+
+### How Local Actions Work
+
+1. A Moodle event fires and the plugin sends it to MoodleConnect
+2. MoodleConnect matches the event to your automation triggers
+3. For local action destinations, MoodleConnect dispatches the action back to the plugin
+4. The plugin executes the action inline and returns the result
+5. MoodleConnect logs the result — same audit trail as external destinations
+
+Actions are idempotent: duplicate events or retries won't cause duplicate operations.
+
+### Combining Actions
+
+You can mix local actions with external destinations in a single automation. For example:
+
+- `course_completed → issue_certificate → webhook_to_CRM`
+- `user_created → add_to_cohort → send_welcome_message`
+
+### Capability Detection
+
+The plugin automatically detects which actions are available on your site and reports this to MoodleConnect. Actions that require missing plugins or disabled features are hidden from the configuration UI with guidance on how to enable them.
+
 ## How It Works
 
 ```
@@ -118,6 +156,20 @@ MoodleConnect handles event processing reliably:
 | "Plugin update required" | Update to v5.0.0 or higher |
 | Connection failed | Check firewall allows outbound HTTPS |
 | Events stuck in "retrying" | Check destination credentials are valid |
+
+### Local Action Pending Claims Cleanup
+
+If a local action request is interrupted mid-execution, the idempotency claim can remain in a `__pending__` state.
+Use the CLI cleanup command to inspect and manually recover old orphaned claims:
+
+```bash
+php local/mc_plugin/cli/cleanup_pending_claims.php --list --olderthan=86400
+php local/mc_plugin/cli/cleanup_pending_claims.php --delete --yes --olderthan=86400
+```
+
+Notes:
+- `--olderthan` defaults to `86400` (24h) to reduce risk of touching active in-flight executions.
+- Use `--actiontype=...` or `--fingerprint=...` to target specific claims.
 
 See the [Troubleshooting Guide](https://github.com/kcanakdag/moodle-local_mc_plugin/wiki/Troubleshooting) for more.
 

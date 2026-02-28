@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Plugin version and other metadata.
+ * Message provider definitions for local_mc_plugin.
  *
  * @package    local_mc_plugin
  * @copyright  2025 Kerem Can Akdag
@@ -24,8 +24,11 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'local_mc_plugin';
-$plugin->version   = 2026022101;      // Version 5.2.0 - Local Moodle Actions.
-$plugin->requires  = 2022041900;      // Moodle 4.0+.
-$plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = 'v5.2.0';
+$messageproviders = [
+    'automation' => [
+        'defaults' => [
+            'popup' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_ENABLED,
+            'email' => MESSAGE_PERMITTED,
+        ],
+    ],
+];

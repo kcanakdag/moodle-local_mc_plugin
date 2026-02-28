@@ -310,6 +310,21 @@ class moodleconnect_client {
     }
 
     /**
+     * Get detected local action capabilities for this Moodle site.
+     *
+     * Uses the action handler factory to check availability of each
+     * registered action type. Returns a structured array suitable for
+     * inclusion in health check or sync payloads.
+     *
+     * @return array Capabilities keyed by action type.
+     */
+    public static function get_capabilities(): array {
+        return [
+            'local_actions' => \local_mc_plugin\local\actions\action_handler_factory::get_available_actions(),
+        ];
+    }
+
+    /**
      * Helper to POST JSON data (blocking, waits for response).
      *
      * Uses Moodle's curl wrapper which handles proxy configurations.

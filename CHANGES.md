@@ -5,6 +5,26 @@ All notable changes to the MoodleConnect plugin will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.2.0] - 2026-02-21
+
+### Added
+- **Local Moodle Actions**: MoodleConnect can now dispatch actions back to Moodle for inline execution
+  - Supported actions: issue certificate, award badge, send message, enroll user, suspend enrolment, add to group, add to cohort
+  - Claim-based idempotency prevents duplicate side effects
+  - Structured error codes with retryable vs permanent classification
+- **Metadata Providers**: Moodle site metadata (courses, roles, groups, cohorts, badges, certificates) exposed via API for UI dropdowns
+- **Manual Pending Claim Recovery CLI**: `local/mc_plugin/cli/cleanup_pending_claims.php`
+  - Lists orphaned pending claims with age and filters
+  - Deletes matched claims only with explicit `--delete --yes` confirmation
+
+### Fixed
+- **Local Action Idempotency**: Removed automatic stale-claim reclaim in inline action executor
+  - Pending `__pending__` claims are no longer auto-deleted by elapsed time
+  - Prevents duplicate side effects when the original request is still executing
+- **Issue Certificate Config Fidelity**: `send_email` action config is now honored
+  - Uses customcert `issue_certificate` email argument when supported
+  - Keeps compatibility with older customcert signatures
+
 
 ## [5.1.1] - 2026-02-13
 
