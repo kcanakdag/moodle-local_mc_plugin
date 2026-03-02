@@ -167,6 +167,7 @@ $string['field_event_type'] = 'Event Type';
 $string['field_firstname'] = 'First Name';
 $string['field_idnumber'] = 'ID Number';
 $string['field_lastname'] = 'Last Name';
+$string['field_profileimageurl'] = 'Profile Image URL';
 $string['field_user_id'] = 'User ID';
 $string['field_username'] = 'Username';
 $string['mc_plugin:manage'] = 'Manage MoodleConnect settings';

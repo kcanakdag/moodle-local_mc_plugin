@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_mc_plugin';
-$plugin->version   = 2026022101;      // Version 5.2.0 - Local Moodle Actions.
+$plugin->version   = 2026030200;      // Version 5.2.1 - Add profile image URL to events.
 $plugin->requires  = 2022041900;      // Moodle 4.0+.
 $plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = 'v5.2.0';
+$plugin->release   = 'v5.2.1';

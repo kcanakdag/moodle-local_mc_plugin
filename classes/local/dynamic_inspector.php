@@ -122,6 +122,22 @@ class dynamic_inspector {
                         'idnumber' => ['value' => $user->idnumber ?? '', 'type' => 'string',
                             'label' => get_string('field_idnumber', 'local_mc_plugin')],
                     ];
+
+                    // Add profile image URL.
+                    try {
+                        $userpicture = new \user_picture($user);
+                        $userpicture->size = 1; // F1 = 100px.
+                        global $PAGE;
+                        $profileimageurl = $userpicture->get_url($PAGE)->out(false);
+                        $fields['user']['profileimageurl'] = [
+                            'value' => $profileimageurl,
+                            'type' => 'string',
+                            'label' => get_string('field_profileimageurl', 'local_mc_plugin'),
+                        ];
+                    } catch (\Exception $e) {
+                        // Profile image URL not available - ignore.
+                        unset($e);
+                    }
                 }
             } catch (\Exception $e) {
                 // User not found - ignore.
@@ -213,6 +229,8 @@ class dynamic_inspector {
                     'label' => get_string('field_username', 'local_mc_plugin')],
                 'idnumber' => ['value' => null, 'type' => 'string',
                     'label' => get_string('field_idnumber', 'local_mc_plugin')],
+                'profileimageurl' => ['value' => null, 'type' => 'string',
+                    'label' => get_string('field_profileimageurl', 'local_mc_plugin')],
             ],
             'course' => [
                 'id' => ['value' => null, 'type' => 'int',
