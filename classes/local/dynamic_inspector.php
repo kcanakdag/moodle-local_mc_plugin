@@ -123,29 +123,43 @@ class dynamic_inspector {
                             'label' => get_string('field_idnumber', 'local_mc_plugin')],
                     ];
 
-                    // Add profile image URL (built directly to avoid $PAGE dependency in event context).
-                    $profileimageurl = null;
+                    // Add profile image URLs for all sizes (built directly to avoid $PAGE dependency).
+                    // Moodle stores: f3 = 512x512, f1 = 100x100, f2 = 35x35 (no original retained).
+                    $profileimages = [
+                        'profileimageurl_512x512' => ['file' => 'f3',
+                            'label' => get_string('field_profileimageurl_512x512', 'local_mc_plugin')],
+                        'profileimageurl_100x100' => ['file' => 'f1',
+                            'label' => get_string('field_profileimageurl_100x100', 'local_mc_plugin')],
+                        'profileimageurl_35x35' => ['file' => 'f2',
+                            'label' => get_string('field_profileimageurl_35x35', 'local_mc_plugin')],
+                    ];
+                    $usercontext = null;
                     if (!empty($user->picture)) {
                         try {
                             $usercontext = \context_user::instance($user->id);
-                            $profileimageurl = \moodle_url::make_pluginfile_url(
+                        } catch (\Exception $e) {
+                            // Context not available - URLs will remain null.
+                            unset($e);
+                        }
+                    }
+                    foreach ($profileimages as $fieldname => $info) {
+                        $url = null;
+                        if ($usercontext) {
+                            $url = \moodle_url::make_pluginfile_url(
                                 $usercontext->id,
                                 'user',
                                 'icon',
                                 null,
                                 '/',
-                                'f1'
+                                $info['file']
                             )->out(false) . '?rev=' . $user->picture;
-                        } catch (\Exception $e) {
-                            // Context not available - ignore.
-                            unset($e);
                         }
+                        $fields['user'][$fieldname] = [
+                            'value' => $url,
+                            'type' => 'string',
+                            'label' => $info['label'],
+                        ];
                     }
-                    $fields['user']['profileimageurl'] = [
-                        'value' => $profileimageurl,
-                        'type' => 'string',
-                        'label' => get_string('field_profileimageurl', 'local_mc_plugin'),
-                    ];
                 }
             } catch (\Exception $e) {
                 // User not found - ignore.
@@ -237,8 +251,12 @@ class dynamic_inspector {
                     'label' => get_string('field_username', 'local_mc_plugin')],
                 'idnumber' => ['value' => null, 'type' => 'string',
                     'label' => get_string('field_idnumber', 'local_mc_plugin')],
-                'profileimageurl' => ['value' => null, 'type' => 'string',
-                    'label' => get_string('field_profileimageurl', 'local_mc_plugin')],
+                'profileimageurl_512x512' => ['value' => null, 'type' => 'string',
+                    'label' => get_string('field_profileimageurl_512x512', 'local_mc_plugin')],
+                'profileimageurl_100x100' => ['value' => null, 'type' => 'string',
+                    'label' => get_string('field_profileimageurl_100x100', 'local_mc_plugin')],
+                'profileimageurl_35x35' => ['value' => null, 'type' => 'string',
+                    'label' => get_string('field_profileimageurl_35x35', 'local_mc_plugin')],
             ],
             'course' => [
                 'id' => ['value' => null, 'type' => 'int',

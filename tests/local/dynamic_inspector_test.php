@@ -105,9 +105,13 @@ final class dynamic_inspector_test extends \advanced_testcase {
         $this->assertEquals('Test', $data['user']['firstname']['value']);
         $this->assertEquals('User', $data['user']['lastname']['value']);
 
-        // Profile image URL field is always present, null when user has no custom picture.
-        $this->assertArrayHasKey('profileimageurl', $data['user']);
-        $this->assertNull($data['user']['profileimageurl']['value']);
+        // Profile image URL fields are always present, null when user has no custom picture.
+        $this->assertArrayHasKey('profileimageurl_512x512', $data['user']);
+        $this->assertNull($data['user']['profileimageurl_512x512']['value']);
+        $this->assertArrayHasKey('profileimageurl_100x100', $data['user']);
+        $this->assertNull($data['user']['profileimageurl_100x100']['value']);
+        $this->assertArrayHasKey('profileimageurl_35x35', $data['user']);
+        $this->assertNull($data['user']['profileimageurl_35x35']['value']);
     }
 
     /**
@@ -135,13 +139,21 @@ final class dynamic_inspector_test extends \advanced_testcase {
         $inspector = new dynamic_inspector();
         $data = $inspector->extract_data($event);
 
-        $this->assertArrayHasKey('profileimageurl', $data['user']);
-        $profileimageurl = $data['user']['profileimageurl']['value'];
-        $this->assertNotNull($profileimageurl);
-        $this->assertStringContainsString('pluginfile.php', $profileimageurl);
-        $this->assertStringContainsString('/user/icon', $profileimageurl);
-        $this->assertStringContainsString('f1', $profileimageurl);
-        $this->assertStringContainsString('rev=1', $profileimageurl);
+        // All three profile image sizes should be present with correct filenames.
+        $sizes = [
+            'profileimageurl_512x512' => 'f3',
+            'profileimageurl_100x100' => 'f1',
+            'profileimageurl_35x35' => 'f2',
+        ];
+        foreach ($sizes as $field => $filename) {
+            $this->assertArrayHasKey($field, $data['user']);
+            $url = $data['user'][$field]['value'];
+            $this->assertNotNull($url);
+            $this->assertStringContainsString('pluginfile.php', $url);
+            $this->assertStringContainsString('/user/icon', $url);
+            $this->assertStringContainsString($filename, $url);
+            $this->assertStringContainsString('rev=1', $url);
+        }
     }
 
     /**
