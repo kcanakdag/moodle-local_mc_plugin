@@ -104,6 +104,44 @@ final class dynamic_inspector_test extends \advanced_testcase {
         $this->assertEquals('test@example.com', $data['user']['email']['value']);
         $this->assertEquals('Test', $data['user']['firstname']['value']);
         $this->assertEquals('User', $data['user']['lastname']['value']);
+
+        // Profile image URL field is always present, null when user has no custom picture.
+        $this->assertArrayHasKey('profileimageurl', $data['user']);
+        $this->assertNull($data['user']['profileimageurl']['value']);
+    }
+
+    /**
+     * Test extract_data includes profile image URL when user has a picture.
+     */
+    public function test_extract_data_profile_image_url(): void {
+        global $DB;
+        $this->resetAfterTest(true);
+
+        $user = $this->getDataGenerator()->create_user([
+            'email' => 'photo@example.com',
+            'firstname' => 'Photo',
+            'lastname' => 'User',
+        ]);
+
+        // Simulate user having uploaded a profile picture.
+        $DB->set_field('user', 'picture', 1, ['id' => $user->id]);
+        $user->picture = 1;
+
+        $event = \core\event\user_created::create([
+            'objectid' => $user->id,
+            'context' => \context_user::instance($user->id),
+        ]);
+
+        $inspector = new dynamic_inspector();
+        $data = $inspector->extract_data($event);
+
+        $this->assertArrayHasKey('profileimageurl', $data['user']);
+        $profileimageurl = $data['user']['profileimageurl']['value'];
+        $this->assertNotNull($profileimageurl);
+        $this->assertStringContainsString('pluginfile.php', $profileimageurl);
+        $this->assertStringContainsString('/user/icon', $profileimageurl);
+        $this->assertStringContainsString('f1', $profileimageurl);
+        $this->assertStringContainsString('rev=1', $profileimageurl);
     }
 
     /**

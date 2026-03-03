@@ -123,21 +123,29 @@ class dynamic_inspector {
                             'label' => get_string('field_idnumber', 'local_mc_plugin')],
                     ];
 
-                    // Add profile image URL.
-                    try {
-                        $userpicture = new \user_picture($user);
-                        $userpicture->size = 1; // F1 = 100px.
-                        global $PAGE;
-                        $profileimageurl = $userpicture->get_url($PAGE)->out(false);
-                        $fields['user']['profileimageurl'] = [
-                            'value' => $profileimageurl,
-                            'type' => 'string',
-                            'label' => get_string('field_profileimageurl', 'local_mc_plugin'),
-                        ];
-                    } catch (\Exception $e) {
-                        // Profile image URL not available - ignore.
-                        unset($e);
+                    // Add profile image URL (built directly to avoid $PAGE dependency in event context).
+                    $profileimageurl = null;
+                    if (!empty($user->picture)) {
+                        try {
+                            $usercontext = \context_user::instance($user->id);
+                            $profileimageurl = \moodle_url::make_pluginfile_url(
+                                $usercontext->id,
+                                'user',
+                                'icon',
+                                null,
+                                '/',
+                                'f1'
+                            )->out(false) . '?rev=' . $user->picture;
+                        } catch (\Exception $e) {
+                            // Context not available - ignore.
+                            unset($e);
+                        }
                     }
+                    $fields['user']['profileimageurl'] = [
+                        'value' => $profileimageurl,
+                        'type' => 'string',
+                        'label' => get_string('field_profileimageurl', 'local_mc_plugin'),
+                    ];
                 }
             } catch (\Exception $e) {
                 // User not found - ignore.

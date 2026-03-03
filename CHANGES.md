@@ -5,6 +5,12 @@ All notable changes to the MoodleConnect plugin will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.2.2] - 2026-03-03
+
+### Fixed
+- **Profile Image URL Compatibility**: Build URL directly via `pluginfile.php` instead of relying on Moodle's page renderer, which is not always initialized during event processing
+
+
 ## [5.2.1] - 2026-03-02
 
 ### Added
