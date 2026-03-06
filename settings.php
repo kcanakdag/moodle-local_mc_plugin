@@ -94,5 +94,16 @@ if ($hassiteconfig) {
         'local_mc_plugin/analytics_display'
     ));
 
+    // Section: Experimental Features.
+    $settings->add(new admin_setting_heading(
+        'local_mc_plugin/experimental_heading',
+        get_string('experimental_heading', 'local_mc_plugin'),
+        ''
+    ));
+
+    $settings->add(new \local_mc_plugin\admin\setting_bulk_sync(
+        'local_mc_plugin/bulk_sync_display'
+    ));
+
     $ADMIN->add('localplugins', $settings);
 }

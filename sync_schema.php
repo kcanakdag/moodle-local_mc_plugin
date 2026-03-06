@@ -218,6 +218,107 @@ if ($action === 'synccourses') {
     exit;
 }
 
+// AJAX: Count active users for bulk sync preflight.
+if ($action === 'bulkcount') {
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        header('Content-Type: application/json');
+        echo json_encode(['success' => false, 'message' => 'Invalid request method']);
+        exit;
+    }
+    require_sesskey();
+    header('Content-Type: application/json');
+
+    $sitekey = get_config('local_mc_plugin', 'site_key');
+    if (empty($sitekey)) {
+        echo json_encode(['success' => false, 'message' => get_string('bulk_sync_no_connection', 'local_mc_plugin')]);
+        exit;
+    }
+
+    // Check if user_updated is in monitored events.
+    $monitoredeventsstr = get_config('local_mc_plugin', 'monitored_events');
+    $monitoredevents = array_map(function ($e) {
+        return ltrim(trim($e), '\\');
+    }, explode(',', $monitoredeventsstr));
+    $monitored = in_array('core\\event\\user_updated', $monitoredevents);
+
+    $count = $DB->count_records_select('user', 'deleted = 0 AND suspended = 0 AND id > 1');
+
+    // Get quota usage data (pushed by backend via update_limit_status).
+    $usagejson = get_config('local_mc_plugin', 'events_limit_usage');
+    $usage = $usagejson ? json_decode($usagejson, true) : null;
+
+    $response = [
+        'success' => true,
+        'count' => (int)$count,
+        'monitored' => $monitored,
+    ];
+
+    if (is_array($usage)) {
+        $response['quota'] = [
+            'used' => (int)($usage['current'] ?? 0),
+            'limit' => (int)($usage['limit'] ?? 0),
+        ];
+    }
+
+    echo json_encode($response);
+    exit;
+}
+
+// AJAX: Bulk fire user_updated events in batches.
+if ($action === 'bulkfire') {
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        header('Content-Type: application/json');
+        echo json_encode(['success' => false, 'message' => 'Invalid request method']);
+        exit;
+    }
+    require_sesskey();
+    header('Content-Type: application/json');
+
+    $sitekey = get_config('local_mc_plugin', 'site_key');
+    if (empty($sitekey)) {
+        echo json_encode(['success' => false, 'message' => get_string('bulk_sync_no_connection', 'local_mc_plugin')]);
+        exit;
+    }
+
+    $offset = max(0, optional_param('offset', 0, PARAM_INT));
+    $batchsize = optional_param('batch_size', 25, PARAM_INT);
+    $batchsize = max(1, min($batchsize, 50)); // Clamp to 1-50.
+
+    set_time_limit(0);
+
+    $users = $DB->get_records_select(
+        'user',
+        'deleted = 0 AND suspended = 0 AND id > 1',
+        null,
+        'id ASC',
+        '*',
+        $offset,
+        $batchsize
+    );
+
+    $processed = 0;
+    foreach ($users as $user) {
+        try {
+            $event = \core\event\user_updated::create([
+                'objectid' => $user->id,
+                'relateduserid' => $user->id,
+                'context' => \context_user::instance($user->id),
+            ]);
+            $event->add_record_snapshot('user', $user);
+            $event->trigger();
+            $processed++;
+        } catch (\Exception $e) {
+            // Skip users that fail (e.g., deleted context) and continue.
+            continue;
+        }
+    }
+
+    $hasmore = count($users) >= $batchsize;
+
+    echo json_encode(['success' => true, 'processed' => $processed, 'has_more' => $hasmore]);
+    exit;
+}
+
 // Standalone Page UI (for direct access).
 $PAGE->set_url(new moodle_url('/local/mc_plugin/sync_schema.php'));
 $PAGE->set_context(context_system::instance());

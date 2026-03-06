@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_mc_plugin';
-$plugin->version   = 2026030301;      // Version 5.2.3 - Multiple profile image sizes.
+$plugin->version   = 2026030600;      // Version 5.2.4 - Bulk user sync (experimental).
 $plugin->requires  = 2022041900;      // Moodle 4.0+.
 $plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = 'v5.2.3';
+$plugin->release   = 'v5.2.4';

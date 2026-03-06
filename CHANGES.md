@@ -5,6 +5,16 @@ All notable changes to the MoodleConnect plugin will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.2.4] - 2026-03-06
+
+### Added
+- **Bulk User Sync (Experimental)**: Fire `user_updated` events for all active users to backfill data after creating a new automation
+  - Preflight check validates connection status, monitored events, and quota usage
+  - Batched processing (25 users per request) with progress bar
+  - Confirmation dialog with quota impact warnings
+  - Located under new "Experimental Features" section in plugin settings
+- **Manual CI Trigger**: Added `workflow_dispatch` to CI workflow for on-demand runs
+
 ## [5.2.3] - 2026-03-03
 
 ### Changed

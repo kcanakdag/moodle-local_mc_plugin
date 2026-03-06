@@ -10,8 +10,9 @@
 define([
     'local_mc_plugin/local/admin/event_selector',
     'local_mc_plugin/local/admin/connection_status',
-    'local_mc_plugin/connect'
-], function(EventSelector, ConnectionStatus, Connect) {
+    'local_mc_plugin/connect',
+    'local_mc_plugin/local/admin/bulk_sync'
+], function(EventSelector, ConnectionStatus, Connect, BulkSync) {
     "use strict";
 
     return {
@@ -50,6 +51,17 @@ define([
          */
         initConnect: function(cfg) {
             Connect.init(cfg);
+        },
+
+        /**
+         * Initialize the bulk sync component.
+         *
+         * @param {Object} cfg Configuration object
+         * @param {string} cfg.syncUrl URL to sync_schema.php
+         * @param {string} cfg.sesskey Moodle session key
+         */
+        initBulkSync: function(cfg) {
+            BulkSync.init(cfg);
         }
     };
 });

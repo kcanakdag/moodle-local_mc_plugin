@@ -115,6 +115,35 @@ define([], function() {
          */
         syncAllEvents: async function(syncUrl, sesskey) {
             return postForm(syncUrl, {action: 'syncall', sesskey});
+        },
+
+        /**
+         * Count active users for bulk sync preflight.
+         *
+         * @param {string} syncUrl URL to sync_schema.php
+         * @param {string} sesskey Moodle session key
+         * @returns {Promise<Object>} Response with count and monitored status
+         */
+        bulkSyncCount: async function(syncUrl, sesskey) {
+            return postForm(syncUrl, {action: 'bulkcount', sesskey});
+        },
+
+        /**
+         * Fire user_updated events for a batch of users.
+         *
+         * @param {string} syncUrl URL to sync_schema.php
+         * @param {string} sesskey Moodle session key
+         * @param {number} offset Start offset
+         * @param {number} batchSize Number of users per batch
+         * @returns {Promise<Object>} Response with processed count and has_more flag
+         */
+        bulkSyncFire: async function(syncUrl, sesskey, offset, batchSize) {
+            return postForm(syncUrl, {
+                action: 'bulkfire',
+                sesskey,
+                offset: offset,
+                batch_size: batchSize, // eslint-disable-line camelcase
+            });
         }
     };
 });
