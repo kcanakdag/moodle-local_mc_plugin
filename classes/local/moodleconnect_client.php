@@ -278,6 +278,9 @@ class moodleconnect_client {
         $courses = get_courses();
         $coursedata = [];
 
+        // Bulk-fetch all categories to avoid N+1 queries in the loop.
+        $categories = $DB->get_records('course_categories', null, '', 'id, name');
+
         foreach ($courses as $course) {
             // Skip the site course (id = 1).
             if ($course->id == SITEID) {
@@ -285,11 +288,8 @@ class moodleconnect_client {
             }
 
             $categoryname = '';
-            if (!empty($course->category)) {
-                $category = $DB->get_record('course_categories', ['id' => $course->category]);
-                if ($category) {
-                    $categoryname = $category->name;
-                }
+            if (!empty($course->category) && isset($categories[$course->category])) {
+                $categoryname = $categories[$course->category]->name;
             }
 
             $coursedata[] = [
@@ -307,21 +307,6 @@ class moodleconnect_client {
         $result['count'] = count($coursedata);
 
         return $result;
-    }
-
-    /**
-     * Get detected local action capabilities for this Moodle site.
-     *
-     * Uses the action handler factory to check availability of each
-     * registered action type. Returns a structured array suitable for
-     * inclusion in health check or sync payloads.
-     *
-     * @return array Capabilities keyed by action type.
-     */
-    public static function get_capabilities(): array {
-        return [
-            'local_actions' => \local_mc_plugin\local\actions\action_handler_factory::get_available_actions(),
-        ];
     }
 
     /**

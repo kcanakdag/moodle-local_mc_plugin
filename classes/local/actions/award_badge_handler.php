@@ -84,7 +84,7 @@ class award_badge_handler implements action_handler {
             return [
                 'success' => false,
                 'error' => $availability['error'],
-                'error_code' => 'badges_disabled',
+                'error_code' => error_codes::BADGES_DISABLED,
                 'retry' => false,
             ];
         }
@@ -96,7 +96,7 @@ class award_badge_handler implements action_handler {
             return [
                 'success' => false,
                 'error' => "Badge ID {$badgeid} not found",
-                'error_code' => 'badge_not_found',
+                'error_code' => error_codes::BADGE_NOT_FOUND,
                 'retry' => false,
             ];
         }
@@ -108,7 +108,7 @@ class award_badge_handler implements action_handler {
             return [
                 'success' => false,
                 'error' => "Badge '{$badge->name}' is not active",
-                'error_code' => 'badge_not_active',
+                'error_code' => error_codes::BADGE_NOT_ACTIVE,
                 'retry' => false,
             ];
         }
@@ -119,26 +119,18 @@ class award_badge_handler implements action_handler {
             return [
                 'success' => false,
                 'error' => 'User ID not found in event payload',
-                'error_code' => 'invalid_payload',
+                'error_code' => error_codes::INVALID_PAYLOAD,
                 'retry' => false,
             ];
         }
 
         // Check if already awarded (Moodle-level idempotency).
-        if ($badge->is_issued($userid)) {
-            $issued = $DB->get_record('badge_issued', [
-                'badgeid' => $badgeid,
-                'userid' => $userid,
-            ]);
-            if (!$issued) {
-                return [
-                    'success' => true,
-                    'result' => [
-                        'status' => 'already_awarded',
-                        'badge_name' => $badge->name,
-                    ],
-                ];
-            }
+        // Query badge_issued directly instead of calling is_issued() + get_record (avoids duplicate query).
+        $issued = $DB->get_record('badge_issued', [
+            'badgeid' => $badgeid,
+            'userid' => $userid,
+        ]);
+        if ($issued) {
             return [
                 'success' => true,
                 'result' => [
@@ -163,7 +155,7 @@ class award_badge_handler implements action_handler {
             return [
                 'success' => false,
                 'error' => "Badge issue() was called but no badge_issued record found for badge {$badgeid}, user {$userid}",
-                'error_code' => 'action_failed',
+                'error_code' => error_codes::ACTION_FAILED,
                 'retry' => true,
             ];
         }

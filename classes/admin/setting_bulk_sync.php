@@ -28,8 +28,14 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir . '/adminlib.php');
 
+use local_mc_plugin\output\bulk_sync;
+
 /**
  * Custom admin setting that renders the bulk user sync button with progress.
+ *
+ * @package    local_mc_plugin
+ * @copyright  2025 Kerem Can Akdag
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class setting_bulk_sync extends \admin_setting {
     /**
@@ -74,42 +80,11 @@ class setting_bulk_sync extends \admin_setting {
         $syncurl = (new \moodle_url('/local/mc_plugin/sync_schema.php'))->out(false);
         $sesskey = sesskey();
 
-        $html = '<div id="mc-bulk-sync">';
+        $renderer = $PAGE->get_renderer('local_mc_plugin');
+        $bulksync = new bulk_sync($syncurl, $sesskey);
+        $html = $renderer->render($bulksync);
 
-        // Description.
-        $html .= '<p class="text-muted small">'
-            . get_string('bulk_sync_desc', 'local_mc_plugin') . '</p>';
-
-        // Status area (populated by JS).
-        $html .= '<div id="mc-bulk-sync-status" class="mb-2 small"></div>';
-
-        // Button.
-        $html .= '<button type="button" id="mc-bulk-sync-btn" class="btn btn-outline-secondary" disabled>';
-        $html .= '<span id="mc-bulk-sync-spinner" class="spinner-border spinner-border-sm d-none mr-1"'
-            . ' role="status" aria-hidden="true"></span>';
-        $html .= '<span id="mc-bulk-sync-btn-text">'
-            . get_string('bulk_sync_button', 'local_mc_plugin') . '</span>';
-        $html .= '</button>';
-
-        // Progress bar (hidden initially).
-        $html .= '<div id="mc-bulk-sync-progress" class="mt-2 d-none" style="max-width: 400px;">';
-        $html .= '<div class="progress" style="height: 20px;">';
-        $html .= '<div id="mc-bulk-sync-bar" class="progress-bar progress-bar-striped progress-bar-animated"'
-            . ' role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>';
-        $html .= '</div>';
-        $html .= '<div id="mc-bulk-sync-progress-text" class="small text-muted mt-1"></div>';
-        $html .= '</div>';
-
-        // Result area.
-        $html .= '<div id="mc-bulk-sync-result" class="mt-2"></div>';
-
-        $html .= '</div>';
-
-        // Initialize the AMD module.
-        $PAGE->requires->js_call_amd('local_mc_plugin/admin', 'initBulkSync', [[
-            'syncUrl' => $syncurl,
-            'sesskey' => $sesskey,
-        ]]);
+        $PAGE->requires->js_call_amd('local_mc_plugin/admin', 'initBulkSync', [$bulksync->get_js_config()]);
 
         return format_admin_setting($this, '', $html, '', false, '', null, $query);
     }

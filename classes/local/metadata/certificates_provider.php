@@ -58,7 +58,7 @@ class certificates_provider implements metadata_provider {
         global $DB;
 
         $plugindir = \core_component::get_component_directory('mod_customcert');
-        if ($plugindir === null || !file_exists($plugindir)) {
+        if ($plugindir === null) {
             return [];
         }
 

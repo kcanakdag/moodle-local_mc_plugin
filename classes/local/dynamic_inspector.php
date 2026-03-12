@@ -24,8 +24,15 @@
 
 namespace local_mc_plugin\local;
 
+// phpcs:ignore moodle.Files.MoodleInternal.MoodleInternalNotNeeded -- direct access fatals before Moodle bootstrap.
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Service class for dynamically inspecting events and extracting available data fields.
+ *
+ * @package    local_mc_plugin
+ * @copyright  2025 Kerem Can Akdag
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class dynamic_inspector {
     /**
@@ -66,7 +73,14 @@ class dynamic_inspector {
         foreach ($eventclasses as $eventclass) {
             $eventclass = trim($eventclass);
             if (!empty($eventclass)) {
-                $schemas[] = $this->get_event_schema($eventclass);
+                try {
+                    $schemas[] = $this->get_event_schema($eventclass);
+                } catch (\Throwable $e) {
+                    // Skip events whose schema generation fails so one
+                    // broken event cannot prevent the entire sync.
+                    debugging('local_mc_plugin: Schema generation failed for ' .
+                        $eventclass . ': ' . $e->getMessage(), DEBUG_DEVELOPER);
+                }
             }
         }
         return $schemas;
@@ -172,7 +186,7 @@ class dynamic_inspector {
                 $course = get_course($event->courseid);
                 if ($course) {
                     $fields['course'] = [
-                        'id' => ['value' => $course->id, 'type' => 'int',
+                        'id' => ['value' => (int) $course->id, 'type' => 'int',
                             'label' => get_string('field_course_id', 'local_mc_plugin')],
                         'fullname' => ['value' => $course->fullname, 'type' => 'string',
                             'label' => get_string('field_course_name', 'local_mc_plugin')],
@@ -191,25 +205,34 @@ class dynamic_inspector {
         }
 
         if (!empty($event->objecttable) && !empty($event->objectid)) {
+            $object = null;
+
+            // Try the record snapshot first (available if added before trigger).
             try {
                 $object = $event->get_record_snapshot($event->objecttable, $event->objectid);
-
-                if (!$object) {
-                    $object = $DB->get_record($event->objecttable, ['id' => $event->objectid]);
-                }
-
-                if ($object) {
-                    foreach ($object as $key => $value) {
-                        $fields['object'][$key] = [
-                            'value' => $value,
-                            'type' => $this->detect_type($value),
-                            'label' => $this->format_label($key),
-                        ];
-                    }
-                }
             } catch (\Exception $e) {
-                // Object not found - ignore.
+                // Snapshot not available after trigger - fall through to DB query.
                 unset($e);
+            }
+
+            // Fall back to direct DB lookup.
+            if (!$object) {
+                try {
+                    $object = $DB->get_record($event->objecttable, ['id' => $event->objectid]);
+                } catch (\Exception $e) {
+                    // Table or record not found - ignore.
+                    unset($e);
+                }
+            }
+
+            if ($object) {
+                foreach ($object as $key => $value) {
+                    $fields['object'][$key] = [
+                        'value' => $value,
+                        'type' => $this->detect_type($value),
+                        'label' => $this->format_label($key),
+                    ];
+                }
             }
         }
 
@@ -221,6 +244,20 @@ class dynamic_inspector {
             'component' => ['value' => $event->component, 'type' => 'string',
                 'label' => get_string('field_component', 'local_mc_plugin')],
         ];
+
+        // Extract 'other' data if present (e.g. reseturl for password reset events).
+        $otherdata = $event->other;
+        if (!empty($otherdata) && is_array($otherdata)) {
+            foreach ($otherdata as $key => $value) {
+                if (is_scalar($value) || is_null($value)) {
+                    $fields['other'][$key] = [
+                        'value' => $value,
+                        'type' => $this->detect_type($value),
+                        'label' => $this->format_label($key),
+                    ];
+                }
+            }
+        }
 
         return $fields;
     }
@@ -279,7 +316,87 @@ class dynamic_inspector {
                 'component' => ['value' => $this->extract_component($eventclass), 'type' => 'string',
                     'label' => get_string('field_component', 'local_mc_plugin')],
             ],
+            'other' => $this->get_other_fields_from_event_class($eventclass),
         ];
+    }
+
+    /**
+     * Get 'other' fields declared by an event class via get_other_mapping().
+     *
+     * Event classes can implement a static get_other_mapping() method to declare
+     * which fields they provide in the 'other' data. This allows schema sync to
+     * advertise these fields without firing a live event.
+     *
+     * @param string $eventclass Fully qualified event class name
+     * @return array Array of field definitions (may be empty)
+     */
+    private function get_other_fields_from_event_class(string $eventclass): array {
+        if (!class_exists($eventclass)) {
+            return [];
+        }
+
+        // Prefer our dedicated schema method (does not conflict with Moodle's
+        // get_other_mapping which has a different return-value contract).
+        if (method_exists($eventclass, 'get_mc_other_fields')) {
+            try {
+                $mcfields = $eventclass::get_mc_other_fields();
+                if (is_array($mcfields) && !empty($mcfields)) {
+                    $fields = [];
+                    foreach ($mcfields as $key => $info) {
+                        $fields[$key] = [
+                            'value' => null,
+                            'type' => $info['type'] ?? 'string',
+                            'label' => $this->format_label($key),
+                        ];
+                    }
+                    return $fields;
+                }
+            } catch (\Throwable $e) {
+                // Fall through to get_other_mapping.
+                unset($e);
+            }
+        }
+
+        // Fallback: try get_other_mapping for events that override it with
+        // our custom format (kept for backward compatibility).
+        if (!method_exists($eventclass, 'get_other_mapping')) {
+            return [];
+        }
+
+        // Skip if get_other_mapping is only inherited from the base class,
+        // as the base implementation calls debugging() which fails in tests.
+        try {
+            $ref = new \ReflectionMethod($eventclass, 'get_other_mapping');
+            if ($ref->getDeclaringClass()->getName() === 'core\\event\\base') {
+                return [];
+            }
+        } catch (\ReflectionException $e) {
+            return [];
+        }
+
+        try {
+            $mapping = $eventclass::get_other_mapping();
+        } catch (\Throwable $e) {
+            return [];
+        }
+
+        if (!is_array($mapping)) {
+            return [];
+        }
+
+        $fields = [];
+        foreach ($mapping as $key => $info) {
+            if (!is_array($info)) {
+                continue;
+            }
+            $fields[$key] = [
+                'value' => null,
+                'type' => $info['type'] ?? 'string',
+                'label' => $this->format_label($key),
+            ];
+        }
+
+        return $fields;
     }
 
     /**

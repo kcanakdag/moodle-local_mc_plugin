@@ -78,7 +78,7 @@ class suspend_enrolment_handler implements action_handler {
             return [
                 'success' => false,
                 'error' => "Course ID {$courseid} not found",
-                'error_code' => 'course_not_found',
+                'error_code' => error_codes::COURSE_NOT_FOUND,
                 'retry' => false,
             ];
         }
@@ -89,7 +89,7 @@ class suspend_enrolment_handler implements action_handler {
             return [
                 'success' => false,
                 'error' => 'User ID not found in event payload',
-                'error_code' => 'invalid_payload',
+                'error_code' => error_codes::INVALID_PAYLOAD,
                 'retry' => false,
             ];
         }
@@ -100,7 +100,7 @@ class suspend_enrolment_handler implements action_handler {
             return [
                 'success' => false,
                 'error' => "User is not enrolled in course '{$course->fullname}'",
-                'error_code' => 'user_not_enrolled',
+                'error_code' => error_codes::USER_NOT_ENROLLED,
                 'retry' => false,
             ];
         }
@@ -116,7 +116,7 @@ class suspend_enrolment_handler implements action_handler {
             return [
                 'success' => false,
                 'error' => 'No enrolment record found',
-                'error_code' => 'enrolment_not_found',
+                'error_code' => error_codes::ENROLMENT_NOT_FOUND,
                 'retry' => false,
             ];
         }
@@ -136,7 +136,7 @@ class suspend_enrolment_handler implements action_handler {
                 return [
                     'success' => false,
                     'error' => "Enrolment plugin '{$enrolment->enrol}' not found",
-                    'error_code' => 'enrolment_plugin_missing',
+                    'error_code' => error_codes::ENROLMENT_PLUGIN_MISSING,
                     'retry' => false,
                 ];
             }
@@ -146,7 +146,7 @@ class suspend_enrolment_handler implements action_handler {
                 return [
                     'success' => false,
                     'error' => "Enrolment instance {$enrolment->enrolid} not found",
-                    'error_code' => 'enrolment_not_found',
+                    'error_code' => error_codes::ENROLMENT_NOT_FOUND,
                     'retry' => false,
                 ];
             }

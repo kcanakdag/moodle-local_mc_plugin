@@ -57,7 +57,7 @@ class issue_certificate_handler implements action_handler {
      */
     public function check_availability(): array {
         $plugindir = \core_component::get_component_directory('mod_customcert');
-        if ($plugindir === null || !file_exists($plugindir)) {
+        if ($plugindir === null) {
             return [
                 'available' => false,
                 'error' => 'mod_customcert plugin is not installed',
@@ -81,7 +81,7 @@ class issue_certificate_handler implements action_handler {
             return [
                 'success' => false,
                 'error' => $availability['error'],
-                'error_code' => 'plugin_not_installed',
+                'error_code' => error_codes::PLUGIN_NOT_INSTALLED,
                 'retry' => false,
             ];
         }
@@ -93,7 +93,7 @@ class issue_certificate_handler implements action_handler {
             return [
                 'success' => false,
                 'error' => "Certificate ID {$certificateid} not found",
-                'error_code' => 'certificate_not_found',
+                'error_code' => error_codes::CERTIFICATE_NOT_FOUND,
                 'retry' => false,
             ];
         }
@@ -104,7 +104,7 @@ class issue_certificate_handler implements action_handler {
             return [
                 'success' => false,
                 'error' => 'User ID not found in event payload',
-                'error_code' => 'invalid_payload',
+                'error_code' => error_codes::INVALID_PAYLOAD,
                 'retry' => false,
             ];
         }
@@ -132,7 +132,7 @@ class issue_certificate_handler implements action_handler {
             return [
                 'success' => false,
                 'error' => 'mod_customcert is installed but missing issue_certificate API',
-                'error_code' => 'plugin_not_installed',
+                'error_code' => error_codes::PLUGIN_NOT_INSTALLED,
                 'retry' => false,
             ];
         }
@@ -150,7 +150,7 @@ class issue_certificate_handler implements action_handler {
             return [
                 'success' => false,
                 'error' => "issue_certificate() returned no issue ID for certificate {$certificateid}, user {$userid}",
-                'error_code' => 'action_failed',
+                'error_code' => error_codes::ACTION_FAILED,
                 'retry' => true,
             ];
         }
@@ -161,7 +161,7 @@ class issue_certificate_handler implements action_handler {
             return [
                 'success' => false,
                 'error' => "Certificate was issued (ID {$issueid}) but the record could not be retrieved",
-                'error_code' => 'action_failed',
+                'error_code' => error_codes::ACTION_FAILED,
                 'retry' => true,
             ];
         }

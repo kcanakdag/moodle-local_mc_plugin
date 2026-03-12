@@ -24,6 +24,9 @@
 
 namespace local_mc_plugin\admin;
 
+// phpcs:ignore moodle.Files.MoodleInternal.MoodleInternalNotNeeded -- direct access fatals before Moodle bootstrap.
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Admin setting to display event limit warning.
  *
@@ -101,18 +104,16 @@ class setting_limit_warning extends \admin_setting {
         $html .= '<p>' . s($message) . '</p>';
 
         if ($usage) {
-            $html .= '<p class="mb-0">';
-            $html .= '<strong>Usage:</strong> ' . (int) $usage['current'] . ' / ' . (int) $usage['limit'];
-            $html .= ' (' . (int) $usage['percent'] . '%)';
-            $html .= '</p>';
+            $usageparams = (object) [
+                'current' => (int) $usage['current'],
+                'limit'   => (int) $usage['limit'],
+                'percent' => (int) $usage['percent'],
+            ];
+            $html .= '<p class="mb-0">' . get_string('events_limit_usage', 'local_mc_plugin', $usageparams) . '</p>';
         }
 
         $html .= '<hr>';
-        $html .= '<p class="mb-0">';
-        $html .= 'Events will resume automatically on <strong>' . $blockeduntilstr . '</strong>, ';
-        $html .= 'or <a href="https://moodleconnect.com/settings" target="_blank">upgrade your plan</a> ';
-        $html .= 'to increase your limit immediately.';
-        $html .= '</p>';
+        $html .= '<p class="mb-0">' . get_string('events_limit_resume', 'local_mc_plugin', $blockeduntilstr) . '</p>';
         $html .= '</div>';
 
         return $html;

@@ -31,6 +31,9 @@
 
 namespace local_mc_plugin;
 
+// phpcs:ignore moodle.Files.MoodleInternal.MoodleInternalNotNeeded -- direct access fatals before Moodle bootstrap.
+defined('MOODLE_INTERNAL') || die();
+
 use local_mc_plugin\local\moodleconnect_client;
 
 /**

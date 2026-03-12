@@ -78,7 +78,7 @@ class add_to_cohort_handler implements action_handler {
             return [
                 'success' => false,
                 'error' => "Cohort ID {$cohortid} not found",
-                'error_code' => 'cohort_not_found',
+                'error_code' => error_codes::COHORT_NOT_FOUND,
                 'retry' => false,
             ];
         }
@@ -89,7 +89,7 @@ class add_to_cohort_handler implements action_handler {
             return [
                 'success' => false,
                 'error' => 'User ID not found in event payload',
-                'error_code' => 'invalid_payload',
+                'error_code' => error_codes::INVALID_PAYLOAD,
                 'retry' => false,
             ];
         }

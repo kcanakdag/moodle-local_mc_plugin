@@ -24,11 +24,18 @@
 
 namespace local_mc_plugin\admin;
 
+// phpcs:ignore moodle.Files.MoodleInternal.MoodleInternalNotNeeded -- direct access fatals before Moodle bootstrap.
+defined('MOODLE_INTERNAL') || die();
+
 use local_mc_plugin\local\analytics_service;
 use local_mc_plugin\local\analytics_renderer;
 
 /**
  * Custom admin setting that displays analytics inline in settings page.
+ *
+ * @package    local_mc_plugin
+ * @copyright  2025 Kerem Can Akdag
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class setting_analytics extends \admin_setting {
     /**

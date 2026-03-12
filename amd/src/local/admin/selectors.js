@@ -96,6 +96,19 @@ define([], function() {
             legacyResultDiv: '#mc-action-result',
         },
 
+        // Bulk sync section (data-* attributes from bulk_sync.mustache)
+        bulkSync: {
+            container: '[data-region="bulk-sync"]',
+            status: '[data-region="bulk-sync-status"]',
+            startBtn: '[data-action="bulk-sync-start"]',
+            spinner: '[data-region="bulk-sync-spinner"]',
+            cancelBtn: '[data-action="bulk-sync-cancel"]',
+            progress: '[data-region="bulk-sync-progress"]',
+            progressBar: '[data-region="bulk-sync-bar"]',
+            progressText: '[data-region="bulk-sync-progress-text"]',
+            result: '[data-region="bulk-sync-result"]',
+        },
+
         // Form inputs (standard Moodle admin setting names)
         inputs: {
             monitoredEvents: 'input[name="s_local_mc_plugin_monitored_events"]',

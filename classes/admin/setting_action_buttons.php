@@ -32,6 +32,10 @@ use local_mc_plugin\output\action_buttons;
 
 /**
  * Custom admin setting that renders the primary action button.
+ *
+ * @package    local_mc_plugin
+ * @copyright  2025 Kerem Can Akdag
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class setting_action_buttons extends \admin_setting {
     /** @var string URL to the sync_schema.php endpoint */

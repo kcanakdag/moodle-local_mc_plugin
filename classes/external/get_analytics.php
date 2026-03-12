@@ -24,6 +24,9 @@
 
 namespace local_mc_plugin\external;
 
+// phpcs:ignore moodle.Files.MoodleInternal.MoodleInternalNotNeeded -- direct access fatals before Moodle bootstrap.
+defined('MOODLE_INTERNAL') || die();
+
 use core_external\external_api;
 use core_external\external_function_parameters;
 use core_external\external_single_structure;
@@ -33,6 +36,10 @@ use local_mc_plugin\local\analytics_renderer;
 
 /**
  * External function to get analytics data via AJAX.
+ *
+ * @package    local_mc_plugin
+ * @copyright  2025 Kerem Can Akdag
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class get_analytics extends external_api {
     /**

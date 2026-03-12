@@ -129,6 +129,7 @@ class error_codes {
         self::EXECUTION_EXCEPTION,
         self::EXECUTION_IN_PROGRESS,
         self::MESSAGE_SEND_FAILED,
+        self::ACTION_FAILED,
     ];
 
     /**
@@ -141,7 +142,6 @@ class error_codes {
     const PERMANENT = [
         self::INVALID_REQUEST,
         self::UNKNOWN_ACTION_TYPE,
-        self::ACTION_FAILED,
         self::PLUGIN_NOT_INSTALLED,
         self::BADGES_DISABLED,
         self::MANUAL_ENROL_NOT_ENABLED,

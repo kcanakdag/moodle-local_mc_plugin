@@ -5,6 +5,27 @@ All notable changes to the MoodleConnect plugin will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.3.0] - 2026-03-12
+
+### Added
+- **Password Reset Requested Event**: Custom event `\local_mc_plugin\event\password_reset_requested` fires when a user submits the forgot-password form
+  - Includes reset token and reset URL in event payload for use in SendGrid or other email automations
+  - Uses Moodle's `post_forgot_password_requests` plugin callback (Moodle 3.8+)
+  - Automatically discovered in the event selector UI under "Local: MoodleConnect"
+  - User data enriched by dynamic inspector (name, email, profile images)
+- **Schema sync `other` fields**: Custom events can now declare `other` payload fields via `get_other_mapping()`, making them available as mappable variables in MoodleConnect automations
+
+### Fixed
+- **Event discovery**: Custom plugin events now bypass stale autoloader classmap, ensuring newly added events are discovered immediately after plugin upgrade
+- **Schema discovery**: Fixed `other` data extraction silently failing for all events when object fields were encountered
+- **Dynamic inspector**: Avoid `debugging()` call in `get_other_mapping` fallback to prevent noise in production logs
+- **Action handlers**: Refactored error handling to use class constants instead of magic strings for error codes
+- **i18n**: Hardcoded English strings in limit warning banner now use `get_string()`
+- **i18n**: Fixed lang string ordering violations for Moodle coding standards compliance
+- **Bulk sync JS**: Module-level container reference prevents duplicate `click` listeners if `init()` is called more than once on the same page
+- **Bulk sync JS**: Progress text now uses `core/str` lang string instead of hardcoded separator
+- **CLI cleanup tool**: Output now reads "Submitted for deletion" instead of "Deleted claims" to accurately reflect batch delete semantics
+
 ## [5.2.4] - 2026-03-06
 
 ### Added

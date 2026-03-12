@@ -35,6 +35,10 @@ use local_mc_plugin\output\connect_button;
 /**
  * Custom admin setting that renders the "Connect to MoodleConnect" button
  * and handles the OAuth-style connection flow with polling.
+ *
+ * @package    local_mc_plugin
+ * @copyright  2025 Kerem Can Akdag
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class setting_connect_button extends \admin_setting {
     /** @var bool Whether the site is currently connected */

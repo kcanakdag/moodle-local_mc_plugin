@@ -25,7 +25,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_mc_plugin';
-$plugin->version   = 2026030600;      // Version 5.2.4 - Bulk user sync (experimental).
+$plugin->version   = 2026031200;      // Version 5.3.0 - Custom password reset requested event.
 $plugin->requires  = 2022041900;      // Moodle 4.0+.
+$plugin->supported = [400, 502];      // Moodle 4.0 to 5.2.
 $plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = 'v5.2.4';
+$plugin->release   = 'v5.3.0';

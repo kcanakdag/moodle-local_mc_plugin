@@ -39,7 +39,7 @@ defined('MOODLE_INTERNAL') || die();
  */
 class execution_claim_cleanup {
     /** @var string Sentinel value used by action_executor while claim is in progress. */
-    private const CLAIM_PENDING_SENTINEL = '__pending__';
+    private const CLAIM_PENDING_SENTINEL = action_executor::CLAIM_PENDING_SENTINEL;
 
     /**
      * Find pending claims older than a threshold.
@@ -88,25 +88,23 @@ class execution_claim_cleanup {
      * Delete execution claims by id.
      *
      * @param int[] $claimids Claim record ids.
-     * @return int Number of deleted records.
+     * @return int Number of valid IDs submitted for deletion.
      */
     public static function delete_claims(array $claimids): int {
         global $DB;
 
-        $deleted = 0;
-        foreach ($claimids as $claimid) {
-            $claimid = (int) $claimid;
-            if ($claimid <= 0) {
-                continue;
-            }
+        $validids = array_filter(array_map('intval', $claimids), function ($id) {
+            return $id > 0;
+        });
 
-            if ($DB->record_exists('local_mc_plugin_executions', ['id' => $claimid])) {
-                $DB->delete_records('local_mc_plugin_executions', ['id' => $claimid]);
-                $deleted++;
-            }
+        if (empty($validids)) {
+            return 0;
         }
 
-        return $deleted;
+        [$insql, $params] = $DB->get_in_or_equal($validids, SQL_PARAMS_NAMED, 'id');
+        $DB->delete_records_select('local_mc_plugin_executions', "id $insql", $params);
+
+        return count($validids);
     }
 
     /**
@@ -120,7 +118,7 @@ class execution_claim_cleanup {
      *   total:int,
      *   deleted:int,
      *   claims:array<int,\stdClass>
-     * }
+     * } 'deleted' is the count of valid IDs submitted for deletion (not confirmed rows affected).
      */
     public static function cleanup_pending_claims(
         int $olderthanseconds = 86400,

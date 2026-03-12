@@ -43,7 +43,7 @@ defined('MOODLE_INTERNAL') || die();
  */
 class action_executor {
     /** @var string Sentinel value stored in result while execution is in progress. */
-    private const CLAIM_PENDING_SENTINEL = '__pending__';
+    public const CLAIM_PENDING_SENTINEL = '__pending__';
 
     /**
      * Execute a local action and return the result.
@@ -74,17 +74,17 @@ class action_executor {
 
         // Validate required fields.
         if (empty($actiontype)) {
-            return self::build_response(false, null, 'Missing action_type', 'invalid_request', false, $starttime);
+            return self::build_response(false, null, 'Missing action_type', error_codes::INVALID_REQUEST, false, $starttime);
         }
         if (empty($eventfingerprint)) {
-            return self::build_response(false, null, 'Missing event_fingerprint', 'invalid_request', false, $starttime);
+            return self::build_response(false, null, 'Missing event_fingerprint', error_codes::INVALID_REQUEST, false, $starttime);
         }
 
         // Get handler.
         try {
             $handler = action_handler_factory::get_handler($actiontype);
         } catch (\Exception $e) {
-            return self::build_response(false, null, $e->getMessage(), 'unknown_action_type', false, $starttime);
+            return self::build_response(false, null, $e->getMessage(), error_codes::UNKNOWN_ACTION_TYPE, false, $starttime);
         }
 
         // Build data object for handler (matches interface expectations).
@@ -107,7 +107,7 @@ class action_executor {
                 false,
                 null,
                 'Execution already in progress',
-                'execution_in_progress',
+                error_codes::EXECUTION_IN_PROGRESS,
                 true,
                 $starttime
             );
@@ -118,13 +118,13 @@ class action_executor {
             $result = $handler->execute($data);
         } catch (\Exception $e) {
             self::release_claim($claim['recordid']);
-            return self::build_response(false, null, $e->getMessage(), 'execution_exception', true, $starttime);
+            return self::build_response(false, null, $e->getMessage(), error_codes::EXECUTION_EXCEPTION, true, $starttime);
         }
 
         if ($result['success']) {
             // Finalize claimed execution record for idempotency/audit trail.
             try {
-                self::finalize_execution($claim['recordid'], $data, $result);
+                self::finalize_execution($claim['recordid'], $data, $result, $claim['user_id'] ?? null);
             } catch (\Exception $e) {
                 // Do not write to stdout in API requests; keep JSON response clean.
                 debugging('MoodleConnect: Failed to finalize execution record: ' . $e->getMessage(), DEBUG_DEVELOPER);
@@ -140,7 +140,7 @@ class action_executor {
             false,
             null,
             $result['error'] ?? 'Unknown error',
-            $result['error_code'] ?? 'action_failed',
+            $result['error_code'] ?? error_codes::ACTION_FAILED,
             $result['retry'] ?? false,
             $starttime
         );
@@ -192,18 +192,19 @@ class action_executor {
     private static function claim_execution(object $data): array {
         global $DB;
 
+        $userid = self::extract_user_id($data);
         $record = (object) [
             'action_type' => $data->action_type,
             'event_fingerprint' => $data->event_fingerprint,
             'target_id' => null,
-            'user_id' => self::extract_user_id($data),
+            'user_id' => $userid,
             'result' => self::CLAIM_PENDING_SENTINEL,
             'executed_at' => time(),
         ];
 
         try {
             $recordid = (int) $DB->insert_record('local_mc_plugin_executions', $record, true);
-            return ['status' => 'claimed', 'recordid' => $recordid];
+            return ['status' => 'claimed', 'recordid' => $recordid, 'user_id' => $userid];
         } catch (\Exception $e) {
             // Duplicate key means this execution was already claimed/processed.
             $existing = $DB->get_record('local_mc_plugin_executions', [
@@ -228,15 +229,16 @@ class action_executor {
      * @param int $recordid Claimed execution record id.
      * @param object $data Action data.
      * @param array $result Handler execution result.
+     * @param int|null $userid Pre-extracted user ID from claim phase.
      * @return void
      */
-    private static function finalize_execution(int $recordid, object $data, array $result): void {
+    private static function finalize_execution(int $recordid, object $data, array $result, ?int $userid = null): void {
         global $DB;
 
         $record = (object) [
             'id' => $recordid,
             'target_id' => self::extract_target_id($data, $result),
-            'user_id' => self::extract_user_id($data),
+            'user_id' => $userid ?? self::extract_user_id($data),
             'result' => json_encode($result['result'] ?? []),
             'executed_at' => time(),
         ];

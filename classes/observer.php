@@ -24,6 +24,9 @@
 
 namespace local_mc_plugin;
 
+// phpcs:ignore moodle.Files.MoodleInternal.MoodleInternalNotNeeded -- direct access fatals before Moodle bootstrap.
+defined('MOODLE_INTERNAL') || die();
+
 use local_mc_plugin\local\moodleconnect_client;
 use local_mc_plugin\local\dynamic_inspector;
 
@@ -221,7 +224,7 @@ class observer {
                 $blockeduntil = (int) get_config('local_mc_plugin', 'events_blocked_until');
                 $msg = date('Y-m-d H:i:s') . " | Event blocked (limit exceeded): {$event->eventname}";
                 $msg .= " (blocked until " . date('Y-m-d H:i:s', $blockeduntil) . ")\n";
-                @file_put_contents($logfile, $msg, FILE_APPEND);
+                @file_put_contents($logfile, $msg, FILE_APPEND | LOCK_EX);
             }
             return;
         }
@@ -230,7 +233,7 @@ class observer {
         if (get_config('local_mc_plugin', 'debug_mode')) {
             $logfile = $CFG->dataroot . '/moodleconnect_debug.log';
             $msg = date('Y-m-d H:i:s') . " | Event received: {$event->eventname}\n";
-            @file_put_contents($logfile, $msg, FILE_APPEND);
+            @file_put_contents($logfile, $msg, FILE_APPEND | LOCK_EX);
         }
 
         // Get monitored events (comma separated string from multiselect).
@@ -258,7 +261,7 @@ class observer {
                 $courseid = self::get_event_course_id($event);
                 $msg = date('Y-m-d H:i:s') . " | Event filtered by course filter: {$event->eventname}";
                 $msg .= " (courseid={$courseid}, filter=" . json_encode($coursefilter) . ")\n";
-                @file_put_contents($logfile, $msg, FILE_APPEND);
+                @file_put_contents($logfile, $msg, FILE_APPEND | LOCK_EX);
             }
             return;
         }

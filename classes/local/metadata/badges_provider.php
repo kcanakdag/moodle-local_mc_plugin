@@ -57,23 +57,26 @@ class badges_provider implements metadata_provider {
      */
     public function get_all(): array {
         global $DB, $CFG;
+        require_once($CFG->libdir . '/badgeslib.php');
 
         if (empty($CFG->enablebadges)) {
             return [];
         }
 
-        // Active badges: status 1 (BADGE_STATUS_ACTIVE) or 3 (BADGE_STATUS_ACTIVE_LOCKED).
         $sql = "SELECT id, name, type, courseid, status
                   FROM {badge}
-                 WHERE status IN (1, 3)
+                 WHERE status IN (:active, :activelocked)
               ORDER BY name ASC";
-        $badges = $DB->get_records_sql($sql);
+        $badges = $DB->get_records_sql($sql, [
+            'active' => BADGE_STATUS_ACTIVE,
+            'activelocked' => BADGE_STATUS_ACTIVE_LOCKED,
+        ]);
 
         return array_values(array_map(function ($b) {
             return [
                 'id' => (int) $b->id,
                 'name' => $b->name,
-                'type' => ((int) $b->type === 1) ? 'site' : 'course',
+                'type' => ((int) $b->type === BADGE_TYPE_SITE) ? 'site' : 'course',
                 'courseid' => $b->courseid ? (int) $b->courseid : null,
             ];
         }, $badges));

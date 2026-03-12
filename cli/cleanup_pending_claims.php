@@ -118,5 +118,5 @@ if ($result['total'] > 0) {
 }
 
 if (!empty($options['delete'])) {
-    cli_writeln('Deleted claims: ' . (int) $result['deleted']);
+    cli_writeln('Submitted for deletion: ' . (int) $result['deleted']);
 }

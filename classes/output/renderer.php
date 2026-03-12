@@ -24,6 +24,9 @@
 
 namespace local_mc_plugin\output;
 
+// phpcs:ignore moodle.Files.MoodleInternal.MoodleInternalNotNeeded -- direct access fatals before Moodle bootstrap.
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Renderer for the MoodleConnect plugin.
  *
@@ -77,5 +80,16 @@ class renderer extends \plugin_renderer_base {
     protected function render_action_buttons(action_buttons $buttons): string {
         $data = $buttons->export_for_template($this);
         return $this->render_from_template('local_mc_plugin/action_buttons', $data);
+    }
+
+    /**
+     * Render the bulk sync component.
+     *
+     * @param bulk_sync $bulksync The renderable
+     * @return string HTML output
+     */
+    protected function render_bulk_sync(bulk_sync $bulksync): string {
+        $data = $bulksync->export_for_template($this);
+        return $this->render_from_template('local_mc_plugin/bulk_sync', $data);
     }
 }

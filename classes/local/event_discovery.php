@@ -24,8 +24,15 @@
 
 namespace local_mc_plugin\local;
 
+// phpcs:ignore moodle.Files.MoodleInternal.MoodleInternalNotNeeded -- direct access fatals before Moodle bootstrap.
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Service class for discovering all available Moodle events dynamically.
+ *
+ * @package    local_mc_plugin
+ * @copyright  2025 Kerem Can Akdag
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class event_discovery {
     /** @var string Cache key for event list */
@@ -168,6 +175,26 @@ class event_discovery {
         $CFG->debugdisplay = false;
 
         $eventclasses = \core_component::get_component_classes_in_namespace(null, 'event');
+
+        // Ensure our own plugin's custom events are always included.
+        // get_component_classes_in_namespace uses a cached classmap that may be
+        // stale after deployment (Moodle 4.x and 5.x both rely on this cache).
+        // Bypass it by scanning our classes/event/ directory directly.
+        $plugineventdir = realpath(__DIR__ . '/../event');
+        if ($plugineventdir && is_dir($plugineventdir)) {
+            foreach (scandir($plugineventdir) as $file) {
+                if (substr($file, -4) !== '.php') {
+                    continue;
+                }
+                $classname = 'local_mc_plugin\\event\\' . basename($file, '.php');
+                if (!isset($eventclasses[$classname])) {
+                    require_once($plugineventdir . '/' . $file);
+                    if (class_exists($classname, false)) {
+                        $eventclasses[$classname] = $plugineventdir . '/' . $file;
+                    }
+                }
+            }
+        }
 
         $CFG->debug = $olddebug;
         $CFG->debugdisplay = $olddisplay;

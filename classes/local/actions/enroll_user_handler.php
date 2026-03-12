@@ -84,7 +84,7 @@ class enroll_user_handler implements action_handler {
             return [
                 'success' => false,
                 'error' => "Course ID {$courseid} not found",
-                'error_code' => 'course_not_found',
+                'error_code' => error_codes::COURSE_NOT_FOUND,
                 'retry' => false,
             ];
         }
@@ -95,7 +95,7 @@ class enroll_user_handler implements action_handler {
             return [
                 'success' => false,
                 'error' => 'User ID not found in event payload',
-                'error_code' => 'invalid_payload',
+                'error_code' => error_codes::INVALID_PAYLOAD,
                 'retry' => false,
             ];
         }
@@ -106,7 +106,7 @@ class enroll_user_handler implements action_handler {
             return [
                 'success' => false,
                 'error' => 'Manual enrolment plugin is not installed or enabled',
-                'error_code' => 'manual_enrol_plugin_missing',
+                'error_code' => error_codes::MANUAL_ENROL_PLUGIN_MISSING,
                 'retry' => false,
             ];
         }
@@ -119,7 +119,7 @@ class enroll_user_handler implements action_handler {
                 'success' => false,
                 'error' => "Manual enrolment is not enabled for course '{$course->fullname}'. "
                     . "Go to Course > Participants > Enrolment methods and enable Manual enrolments.",
-                'error_code' => 'manual_enrol_not_enabled',
+                'error_code' => error_codes::MANUAL_ENROL_NOT_ENABLED,
                 'retry' => false,
             ];
         }
@@ -131,7 +131,7 @@ class enroll_user_handler implements action_handler {
                 return [
                     'success' => false,
                     'error' => 'role_id is required and no default student role was found',
-                    'error_code' => 'role_not_found',
+                    'error_code' => error_codes::ROLE_NOT_FOUND,
                     'retry' => false,
                 ];
             }
@@ -143,7 +143,7 @@ class enroll_user_handler implements action_handler {
             return [
                 'success' => false,
                 'error' => "Role ID {$roleid} not found",
-                'error_code' => 'role_not_found',
+                'error_code' => error_codes::ROLE_NOT_FOUND,
                 'retry' => false,
             ];
         }
@@ -179,7 +179,7 @@ class enroll_user_handler implements action_handler {
             return [
                 'success' => false,
                 'error' => "enrol_user() was called but no enrolment record found for user {$userid} in course {$courseid}",
-                'error_code' => 'action_failed',
+                'error_code' => error_codes::ACTION_FAILED,
                 'retry' => true,
             ];
         }

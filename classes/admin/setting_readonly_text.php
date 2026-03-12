@@ -34,6 +34,10 @@ require_once($CFG->libdir . '/adminlib.php');
  * Read-only text display setting.
  * Displays a value as non-editable text, useful for showing credentials
  * that are managed automatically via the OAuth connection flow.
+ *
+ * @package    local_mc_plugin
+ * @copyright  2025 Kerem Can Akdag
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class setting_readonly_text extends \admin_setting {
     /** @var bool Whether to mask the value (show asterisks) */

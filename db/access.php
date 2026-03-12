@@ -27,6 +27,7 @@ defined('MOODLE_INTERNAL') || die();
 $capabilities = [
     // Manage global MoodleConnect mappings and settings.
     'local/mc_plugin:manage' => [
+        'riskbitmask' => RISK_CONFIG,
         'captype' => 'write',
         'contextlevel' => CONTEXT_SYSTEM,
         'archetypes' => [
@@ -36,6 +37,7 @@ $capabilities = [
 
     // Manage course-level MoodleConnect mappings.
     'local/mc_plugin:managecourse' => [
+        'riskbitmask' => RISK_CONFIG,
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSE,
         'archetypes' => [

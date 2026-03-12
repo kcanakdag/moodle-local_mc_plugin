@@ -78,7 +78,7 @@ class add_to_group_handler implements action_handler {
             return [
                 'success' => false,
                 'error' => "Group ID {$groupid} not found",
-                'error_code' => 'group_not_found',
+                'error_code' => error_codes::GROUP_NOT_FOUND,
                 'retry' => false,
             ];
         }
@@ -89,7 +89,7 @@ class add_to_group_handler implements action_handler {
             return [
                 'success' => false,
                 'error' => 'User ID not found in event payload',
-                'error_code' => 'invalid_payload',
+                'error_code' => error_codes::INVALID_PAYLOAD,
                 'retry' => false,
             ];
         }
@@ -100,7 +100,7 @@ class add_to_group_handler implements action_handler {
             return [
                 'success' => false,
                 'error' => 'User is not enrolled in the course containing this group',
-                'error_code' => 'user_not_enrolled',
+                'error_code' => error_codes::USER_NOT_ENROLLED,
                 'retry' => false,
             ];
         }

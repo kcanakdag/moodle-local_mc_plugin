@@ -35,9 +35,42 @@ require_capability('moodle/site:config', context_system::instance());
 
 $action = optional_param('action', '', PARAM_ALPHA);
 
+/**
+ * Validate an AJAX POST request: check method, sesskey, and set JSON content type.
+ *
+ * @return void Exits with JSON error if validation fails.
+ */
+function local_mc_plugin_require_ajax_post() {
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        header('Content-Type: application/json');
+        echo json_encode(['success' => false, 'message' => 'Invalid request method']);
+        exit;
+    }
+    require_sesskey();
+    header('Content-Type: application/json');
+}
+
+/**
+ * Validate that a site key is configured.
+ *
+ * @param string $errormessage Optional error message override.
+ * @return string The site key.
+ */
+function local_mc_plugin_require_site_key($errormessage = '') {
+    $sitekey = get_config('local_mc_plugin', 'site_key');
+    if (empty($sitekey)) {
+        if (empty($errormessage)) {
+            $errormessage = get_string('error_no_site_key', 'local_mc_plugin');
+        }
+        echo json_encode(['success' => false, 'message' => $errormessage]);
+        exit;
+    }
+    return $sitekey;
+}
+
 // AJAX: Check connection status.
 if ($action === 'status') {
-    // Use POST for sesskey protection (prevent sesskey leakage in logs/history).
+    // Custom POST check: status returns {configured, connected} not {success, message}.
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
         header('Content-Type: application/json');
         echo json_encode(['configured' => false, 'connected' => false, 'error' => 'Invalid request method']);
@@ -104,22 +137,8 @@ if ($action === 'status') {
 
 // AJAX: Sync event schemas.
 if ($action === 'sync') {
-    // Use POST for sesskey protection.
-    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-        header('Content-Type: application/json');
-        echo json_encode(['success' => false, 'message' => 'Invalid request method']);
-        exit;
-    }
-    require_sesskey();
-    header('Content-Type: application/json');
-
-    $sitekey = get_config('local_mc_plugin', 'site_key');
-    $baseurl = local_mc_plugin_get_api_url();
-
-    if (empty($sitekey)) {
-        echo json_encode(['success' => false, 'message' => get_string('error_no_site_key', 'local_mc_plugin')]);
-        exit;
-    }
+    local_mc_plugin_require_ajax_post();
+    local_mc_plugin_require_site_key();
 
     $monitoredevents = get_config('local_mc_plugin', 'monitored_events');
     $eventclasses = array_filter(array_map('trim', explode(',', $monitoredevents)));
@@ -153,21 +172,8 @@ if ($action === 'sync') {
 
 // AJAX: Sync ALL event schemas (for initial connection or resync).
 if ($action === 'syncall') {
-    // Use POST for sesskey protection.
-    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-        header('Content-Type: application/json');
-        echo json_encode(['success' => false, 'message' => 'Invalid request method']);
-        exit;
-    }
-    require_sesskey();
-    header('Content-Type: application/json');
-
-    $sitekey = get_config('local_mc_plugin', 'site_key');
-
-    if (empty($sitekey)) {
-        echo json_encode(['success' => false, 'message' => get_string('error_no_site_key', 'local_mc_plugin')]);
-        exit;
-    }
+    local_mc_plugin_require_ajax_post();
+    local_mc_plugin_require_site_key();
 
     // Sync ALL available events (not just monitored ones).
     $result = \local_mc_plugin\local\moodleconnect_client::sync_all_events();
@@ -192,21 +198,8 @@ if ($action === 'syncall') {
 
 // AJAX: Sync courses only.
 if ($action === 'synccourses') {
-    // Use POST for sesskey protection.
-    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-        header('Content-Type: application/json');
-        echo json_encode(['success' => false, 'message' => 'Invalid request method']);
-        exit;
-    }
-    require_sesskey();
-    header('Content-Type: application/json');
-
-    $sitekey = get_config('local_mc_plugin', 'site_key');
-
-    if (empty($sitekey)) {
-        echo json_encode(['success' => false, 'message' => get_string('error_no_site_key', 'local_mc_plugin')]);
-        exit;
-    }
+    local_mc_plugin_require_ajax_post();
+    local_mc_plugin_require_site_key();
 
     $result = \local_mc_plugin\local\moodleconnect_client::sync_all_courses();
 
@@ -220,26 +213,15 @@ if ($action === 'synccourses') {
 
 // AJAX: Count active users for bulk sync preflight.
 if ($action === 'bulkcount') {
-    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-        header('Content-Type: application/json');
-        echo json_encode(['success' => false, 'message' => 'Invalid request method']);
-        exit;
-    }
-    require_sesskey();
-    header('Content-Type: application/json');
-
-    $sitekey = get_config('local_mc_plugin', 'site_key');
-    if (empty($sitekey)) {
-        echo json_encode(['success' => false, 'message' => get_string('bulk_sync_no_connection', 'local_mc_plugin')]);
-        exit;
-    }
+    local_mc_plugin_require_ajax_post();
+    local_mc_plugin_require_site_key(get_string('bulk_sync_no_connection', 'local_mc_plugin'));
 
     // Check if user_updated is in monitored events.
     $monitoredeventsstr = get_config('local_mc_plugin', 'monitored_events');
     $monitoredevents = array_map(function ($e) {
         return ltrim(trim($e), '\\');
     }, explode(',', $monitoredeventsstr));
-    $monitored = in_array('core\\event\\user_updated', $monitoredevents);
+    $monitored = in_array(\core\event\user_updated::class, $monitoredevents);
 
     $count = $DB->count_records_select('user', 'deleted = 0 AND suspended = 0 AND id > 1');
 
@@ -266,25 +248,14 @@ if ($action === 'bulkcount') {
 
 // AJAX: Bulk fire user_updated events in batches.
 if ($action === 'bulkfire') {
-    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-        header('Content-Type: application/json');
-        echo json_encode(['success' => false, 'message' => 'Invalid request method']);
-        exit;
-    }
-    require_sesskey();
-    header('Content-Type: application/json');
-
-    $sitekey = get_config('local_mc_plugin', 'site_key');
-    if (empty($sitekey)) {
-        echo json_encode(['success' => false, 'message' => get_string('bulk_sync_no_connection', 'local_mc_plugin')]);
-        exit;
-    }
+    local_mc_plugin_require_ajax_post();
+    local_mc_plugin_require_site_key(get_string('bulk_sync_no_connection', 'local_mc_plugin'));
 
     $offset = max(0, optional_param('offset', 0, PARAM_INT));
     $batchsize = optional_param('batch_size', 25, PARAM_INT);
     $batchsize = max(1, min($batchsize, 50)); // Clamp to 1-50.
 
-    set_time_limit(0);
+    set_time_limit(120);
 
     $users = $DB->get_records_select(
         'user',
@@ -296,7 +267,23 @@ if ($action === 'bulkfire') {
         $batchsize
     );
 
+    // Preload user contexts to avoid N+1 queries in the loop.
+    $userids = array_keys($users);
+    if (!empty($userids)) {
+        [$insql, $params] = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED, 'uid');
+        $params['ctxlevel'] = CONTEXT_USER;
+        $ctxrecords = $DB->get_records_select(
+            'context',
+            "contextlevel = :ctxlevel AND instanceid $insql",
+            $params
+        );
+        foreach ($ctxrecords as $ctxrecord) {
+            \context::instance_by_id($ctxrecord->id, IGNORE_MISSING);
+        }
+    }
+
     $processed = 0;
+    $skipped = [];
     foreach ($users as $user) {
         try {
             $event = \core\event\user_updated::create([
@@ -308,14 +295,15 @@ if ($action === 'bulkfire') {
             $event->trigger();
             $processed++;
         } catch (\Exception $e) {
-            // Skip users that fail (e.g., deleted context) and continue.
+            // Track users that fail (e.g., deleted context) and continue.
+            $skipped[] = (int)$user->id;
             continue;
         }
     }
 
     $hasmore = count($users) >= $batchsize;
 
-    echo json_encode(['success' => true, 'processed' => $processed, 'has_more' => $hasmore]);
+    echo json_encode(['success' => true, 'processed' => $processed, 'skipped' => $skipped, 'has_more' => $hasmore]);
     exit;
 }
 

@@ -24,6 +24,9 @@
 
 namespace local_mc_plugin\output;
 
+// phpcs:ignore moodle.Files.MoodleInternal.MoodleInternalNotNeeded -- direct access fatals before Moodle bootstrap.
+defined('MOODLE_INTERNAL') || die();
+
 use renderable;
 use templatable;
 use renderer_base;

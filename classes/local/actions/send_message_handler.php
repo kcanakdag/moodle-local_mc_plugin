@@ -76,7 +76,7 @@ class send_message_handler implements action_handler {
             return [
                 'success' => false,
                 'error' => 'User ID not found in event payload',
-                'error_code' => 'invalid_payload',
+                'error_code' => error_codes::INVALID_PAYLOAD,
                 'retry' => false,
             ];
         }
@@ -86,7 +86,7 @@ class send_message_handler implements action_handler {
             return [
                 'success' => false,
                 'error' => "User ID {$userid} not found",
-                'error_code' => 'user_not_found',
+                'error_code' => error_codes::USER_NOT_FOUND,
                 'retry' => false,
             ];
         }
@@ -121,7 +121,7 @@ class send_message_handler implements action_handler {
             return [
                 'success' => false,
                 'error' => 'Failed to send message',
-                'error_code' => 'message_send_failed',
+                'error_code' => error_codes::MESSAGE_SEND_FAILED,
                 'retry' => true,
             ];
         }

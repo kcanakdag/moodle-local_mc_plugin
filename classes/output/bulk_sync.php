@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Renderable for the connect button component.
+ * Renderable for the bulk sync component.
  *
  * @package    local_mc_plugin
  * @copyright  2025 Kerem Can Akdag
@@ -33,30 +33,15 @@ use renderer_base;
 use stdClass;
 
 /**
- * Renderable for the connect button component.
- *
- * Prepares data for the connect_button Mustache template, including
- * connection state, URLs, and button styling.
+ * Renderable for the bulk user sync component.
  *
  * @package    local_mc_plugin
  * @copyright  2025 Kerem Can Akdag
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class connect_button implements renderable, templatable {
-    /** @var bool Whether the site is currently connected */
-    private $isconnected;
-
-    /** @var string URL to connect.php */
-    private $connecturl;
-
-    /** @var string URL to ajax_save.php */
-    private $saveurl;
-
-    /** @var string MoodleConnect API URL */
-    private $apiurl;
-
-    /** @var string MoodleConnect frontend URL */
-    private $frontendurl;
+class bulk_sync implements renderable, templatable {
+    /** @var string URL to sync_schema.php */
+    private $syncurl;
 
     /** @var string Session key for CSRF protection */
     private $sesskey;
@@ -64,26 +49,11 @@ class connect_button implements renderable, templatable {
     /**
      * Constructor.
      *
-     * @param bool $isconnected Whether the site is currently connected
-     * @param string $connecturl URL to connect.php endpoint
-     * @param string $saveurl URL to ajax_save.php endpoint
-     * @param string $apiurl MoodleConnect API base URL
-     * @param string $frontendurl MoodleConnect frontend URL
+     * @param string $syncurl URL to sync_schema.php endpoint
      * @param string $sesskey Session key for CSRF protection
      */
-    public function __construct(
-        bool $isconnected,
-        string $connecturl,
-        string $saveurl,
-        string $apiurl,
-        string $frontendurl,
-        string $sesskey
-    ) {
-        $this->isconnected = $isconnected;
-        $this->connecturl = $connecturl;
-        $this->saveurl = $saveurl;
-        $this->apiurl = $apiurl;
-        $this->frontendurl = $frontendurl;
+    public function __construct(string $syncurl, string $sesskey) {
+        $this->syncurl = $syncurl;
         $this->sesskey = $sesskey;
     }
 
@@ -94,15 +64,8 @@ class connect_button implements renderable, templatable {
      * @return stdClass Data for the template
      */
     public function export_for_template(renderer_base $output): stdClass {
-        $data = new stdClass();
-        $data->connecturl = $this->connecturl;
-        $data->saveurl = $this->saveurl;
-        $data->apiurl = $this->apiurl;
-        $data->frontendurl = $this->frontendurl;
-        $data->sesskey = $this->sesskey;
-        $data->isconnected = $this->isconnected;
-        $data->buttonclass = $this->isconnected ? 'btn-secondary' : 'btn-primary';
-        return $data;
+        // Template uses only {{#str}} helpers; no dynamic context needed.
+        return new stdClass();
     }
 
     /**
@@ -112,12 +75,8 @@ class connect_button implements renderable, templatable {
      */
     public function get_js_config(): array {
         return [
-            'connectUrl' => $this->connecturl,
-            'saveUrl' => $this->saveurl,
-            'apiUrl' => $this->apiurl,
-            'frontendUrl' => $this->frontendurl,
+            'syncUrl' => $this->syncurl,
             'sesskey' => $this->sesskey,
-            'isConnected' => $this->isconnected,
         ];
     }
 }
