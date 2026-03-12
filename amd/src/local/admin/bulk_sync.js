@@ -210,6 +210,71 @@ define([
     };
 
     /**
+     * Get references to all UI elements used during sync.
+     *
+     * @returns {Object} UI element references
+     */
+    const getSyncElements = () => ({
+        btn: container.querySelector(SEL.startBtn),
+        spinner: container.querySelector(SEL.spinner),
+        cancelBtn: container.querySelector(SEL.cancelBtn),
+        progressContainer: container.querySelector(SEL.progress),
+        progressBar: container.querySelector(SEL.progressBar),
+        progressText: container.querySelector(SEL.progressText),
+        resultEl: container.querySelector(SEL.result),
+    });
+
+    /**
+     * Set up UI for sync start: disable button, show spinner/progress/cancel.
+     *
+     * @param {Object} els UI element references from getSyncElements
+     */
+    const setupSyncUI = (els) => {
+        if (els.btn) {
+            els.btn.disabled = true;
+        }
+        if (els.spinner) {
+            els.spinner.classList.remove('d-none');
+        }
+        if (els.cancelBtn) {
+            els.cancelBtn.classList.remove('d-none');
+            cancelController = new AbortController();
+            els.cancelBtn.addEventListener('click', () => {
+                cancelled = true;
+                els.cancelBtn.disabled = true;
+            }, {signal: cancelController.signal});
+        }
+        if (els.progressContainer) {
+            els.progressContainer.classList.remove('d-none');
+        }
+        if (els.resultEl) {
+            els.resultEl.textContent = '';
+        }
+    };
+
+    /**
+     * Reset UI after sync completes: hide spinner/cancel, re-enable button.
+     *
+     * @param {Object} els UI element references from getSyncElements
+     */
+    const resetSyncUI = (els) => {
+        if (cancelController) {
+            cancelController.abort();
+            cancelController = null;
+        }
+        if (els.spinner) {
+            els.spinner.classList.add('d-none');
+        }
+        if (els.cancelBtn) {
+            els.cancelBtn.classList.add('d-none');
+            els.cancelBtn.disabled = false;
+        }
+        if (els.btn) {
+            els.btn.disabled = false;
+        }
+    };
+
+    /**
      * Start the bulk sync process.
      */
     const startBulkSync = async() => {
@@ -219,35 +284,8 @@ define([
         isRunning = true;
         cancelled = false;
 
-        const btn = container.querySelector(SEL.startBtn);
-        const spinner = container.querySelector(SEL.spinner);
-        const cancelBtn = container.querySelector(SEL.cancelBtn);
-        const progressContainer = container.querySelector(SEL.progress);
-        const progressBar = container.querySelector(SEL.progressBar);
-        const progressText = container.querySelector(SEL.progressText);
-        const resultEl = container.querySelector(SEL.result);
-
-        if (btn) {
-            btn.disabled = true;
-        }
-        if (spinner) {
-            spinner.classList.remove('d-none');
-        }
-        if (cancelBtn) {
-            cancelBtn.classList.remove('d-none');
-            // Use AbortController to cleanly manage the cancel listener.
-            cancelController = new AbortController();
-            cancelBtn.addEventListener('click', () => {
-                cancelled = true;
-                cancelBtn.disabled = true;
-            }, {signal: cancelController.signal});
-        }
-        if (progressContainer) {
-            progressContainer.classList.remove('d-none');
-        }
-        if (resultEl) {
-            resultEl.textContent = '';
-        }
+        const els = getSyncElements();
+        setupSyncUI(els);
 
         let offset = 0;
         let totalProcessed = 0;
@@ -257,7 +295,7 @@ define([
             while (true) { // eslint-disable-line no-constant-condition
                 if (cancelled) {
                     const cancelMsg = await buildResultMessage('bulk_sync_cancelled', totalProcessed, allSkipped);
-                    showResult(resultEl, false, cancelMsg);
+                    showResult(els.resultEl, false, cancelMsg);
                     break;
                 }
 
@@ -265,7 +303,7 @@ define([
 
                 if (!result.success) {
                     const errorMsg = await buildResultMessage('bulk_sync_error', totalProcessed, allSkipped);
-                    showResult(resultEl, false, errorMsg);
+                    showResult(els.resultEl, false, errorMsg);
                     break;
                 }
 
@@ -277,45 +315,31 @@ define([
 
                 // Update progress bar.
                 const percent = totalCount > 0 ? Math.min(Math.round((totalProcessed / totalCount) * 100), 100) : 0;
-                if (progressBar) {
-                    progressBar.style.width = percent + '%';
-                    progressBar.textContent = percent + '%';
-                    progressBar.setAttribute('aria-valuenow', percent);
+                if (els.progressBar) {
+                    els.progressBar.style.width = percent + '%';
+                    els.progressBar.textContent = percent + '%';
+                    els.progressBar.setAttribute('aria-valuenow', percent);
                 }
-                if (progressText) {
+                if (els.progressText) {
                     const progressMsg = await Str.get_string(
                         'bulk_sync_progress', 'local_mc_plugin',
                         {processed: totalProcessed, total: totalCount}
                     );
-                    progressText.textContent = progressMsg;
+                    els.progressText.textContent = progressMsg;
                 }
 
                 if (!result.has_more) {
                     const successMsg = await buildResultMessage('bulk_sync_success', totalProcessed, allSkipped);
-                    showResult(resultEl, true, successMsg);
+                    showResult(els.resultEl, true, successMsg);
                     break;
                 }
             }
         } catch (err) {
             const errorMsg = await buildResultMessage('bulk_sync_error', totalProcessed, allSkipped);
-            showResult(resultEl, false, errorMsg);
+            showResult(els.resultEl, false, errorMsg);
         }
 
-        // Clean up cancel listener and reset UI.
-        if (cancelController) {
-            cancelController.abort();
-            cancelController = null;
-        }
-        if (spinner) {
-            spinner.classList.add('d-none');
-        }
-        if (cancelBtn) {
-            cancelBtn.classList.add('d-none');
-            cancelBtn.disabled = false;
-        }
-        if (btn) {
-            btn.disabled = false;
-        }
+        resetSyncUI(els);
         isRunning = false;
     };
 
