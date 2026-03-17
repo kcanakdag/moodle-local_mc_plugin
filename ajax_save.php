@@ -46,7 +46,7 @@ if ($sitesecret === null) {
 if ($sitekey !== null) {
     $keylen = strlen($sitekey);
     if ($keylen < 16 || $keylen > 128) {
-        echo json_encode(['success' => false, 'message' => 'Invalid site key length (must be 16-128 characters)']);
+        echo json_encode(['success' => false, 'message' => get_string('error_invalid_site_key_length', 'local_mc_plugin')]);
         exit;
     }
     if (!preg_match('/^[A-Za-z0-9_-]+$/', $sitekey)) {
@@ -57,7 +57,7 @@ if ($sitekey !== null) {
 if ($sitesecret !== null) {
     $secretlen = strlen($sitesecret);
     if ($secretlen < 16 || $secretlen > 128) {
-        echo json_encode(['success' => false, 'message' => 'Invalid site secret length (must be 16-128 characters)']);
+        echo json_encode(['success' => false, 'message' => get_string('error_invalid_site_secret_length', 'local_mc_plugin')]);
         exit;
     }
     if (!preg_match('/^[A-Za-z0-9_-]+$/', $sitesecret)) {
@@ -98,11 +98,11 @@ if ($action === 'save') {
 
                 // Check if class exists and is a valid event.
                 if (!class_exists($fullclass)) {
-                    echo json_encode(['success' => false, 'message' => 'Invalid event class: ' . $class]);
+                    echo json_encode(['success' => false, 'message' => get_string('error_invalid_event_class', 'local_mc_plugin', $class)]);
                     exit;
                 }
                 if (!is_subclass_of($fullclass, '\\core\\event\\base')) {
-                    echo json_encode(['success' => false, 'message' => 'Class is not a valid event: ' . $class]);
+                    echo json_encode(['success' => false, 'message' => get_string('error_invalid_event_class_not_event', 'local_mc_plugin', $class)]);
                     exit;
                 }
             }

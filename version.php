@@ -25,8 +25,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_mc_plugin';
-$plugin->version   = 2026031201;      // Version 5.3.1 - Rebuild AMD modules.
+$plugin->version   = 2026031700;      // Version 5.3.2 - Use get_string() for all error messages.
 $plugin->requires  = 2022041900;      // Moodle 4.0+.
 $plugin->supported = [400, 502];      // Moodle 4.0 to 5.2.
 $plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = 'v5.3.1';
+$plugin->release   = 'v5.3.2';
