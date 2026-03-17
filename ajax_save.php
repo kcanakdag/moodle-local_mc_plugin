@@ -98,11 +98,13 @@ if ($action === 'save') {
 
                 // Check if class exists and is a valid event.
                 if (!class_exists($fullclass)) {
-                    echo json_encode(['success' => false, 'message' => get_string('error_invalid_event_class', 'local_mc_plugin', $class)]);
+                    $msg = get_string('error_invalid_event_class', 'local_mc_plugin', $class);
+                    echo json_encode(['success' => false, 'message' => $msg]);
                     exit;
                 }
                 if (!is_subclass_of($fullclass, '\\core\\event\\base')) {
-                    echo json_encode(['success' => false, 'message' => get_string('error_invalid_event_class_not_event', 'local_mc_plugin', $class)]);
+                    $msg = get_string('error_invalid_event_class_not_event', 'local_mc_plugin', $class);
+                    echo json_encode(['success' => false, 'message' => $msg]);
                     exit;
                 }
             }
