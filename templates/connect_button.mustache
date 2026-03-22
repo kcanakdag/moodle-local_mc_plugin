@@ -18,6 +18,7 @@
     @template local_mc_plugin/connect_button
 
     Connect button for MoodleConnect OAuth flow.
+    JS routes via core/ajax methodnames; no sesskey or legacy URL data attributes needed.
 
     Classes required for JS:
     * none
@@ -29,21 +30,15 @@
     * data-region="button-spinner" - Loading spinner container
 
     Context variables required for this template:
-    * connecturl (string) - URL to connect.php
-    * saveurl (string) - URL to ajax_save.php
     * apiurl (string) - MoodleConnect API URL
     * frontendurl (string) - MoodleConnect frontend URL
-    * sesskey (string) - CSRF token
     * isconnected (bool) - Current connection state
     * buttonclass (string) - CSS class for button (btn-primary or btn-outline-primary)
 
     Example context (json):
     {
-        "connecturl": "/local/mc_plugin/connect.php",
-        "saveurl": "/local/mc_plugin/ajax_save.php",
         "apiurl": "https://moodleconnect.com/api",
         "frontendurl": "https://moodleconnect.com",
-        "sesskey": "abc123",
         "isconnected": false,
         "buttonclass": "btn-primary"
     }
@@ -58,11 +53,8 @@
     {{! Connect button }}
     <button type="button"
             data-action="connect"
-            data-connecturl="{{connecturl}}"
-            data-saveurl="{{saveurl}}"
             data-apiurl="{{apiurl}}"
             data-frontendurl="{{frontendurl}}"
-            data-sesskey="{{sesskey}}"
             class="btn {{buttonclass}}">
         <span data-region="button-text">
             {{#isconnected}}

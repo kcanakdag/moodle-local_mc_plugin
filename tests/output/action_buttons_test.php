@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Property tests for action_buttons renderable.
+ * Tests for action_buttons renderable.
  *
  * @package    local_mc_plugin
  * @category   test
@@ -26,10 +26,10 @@
 namespace local_mc_plugin\output;
 
 /**
- * Property tests for action_buttons renderable.
+ * Tests for action_buttons renderable.
  *
- * Tests the correctness property defined in the design document:
- * - Property 6: Action buttons context completeness
+ * After the External Services migration, action_buttons carries no URL or
+ * sesskey data. These tests verify the no-arg constructor and empty returns.
  *
  * @package    local_mc_plugin
  * @category   test
@@ -39,155 +39,43 @@ namespace local_mc_plugin\output;
  */
 final class action_buttons_test extends \advanced_testcase {
     /**
-     * Data provider for property tests with various configuration states.
-     *
-     * Generates 100+ test cases with different combinations of:
-     * - Various sync URL formats
-     * - Various AJAX save URL formats
-     * - Different sesskey values
-     *
-     * @return array Test data
+     * Test that export_for_template returns an empty stdClass.
      */
-    public static function configuration_state_provider(): array {
-        $testcases = [];
-
-        // Various sync URL patterns.
-        $syncurls = [
-            '/local/mc_plugin/sync_schema.php',
-            'http://localhost/local/mc_plugin/sync_schema.php',
-            'https://example.com/local/mc_plugin/sync_schema.php',
-            '/sync_schema.php',
-            'https://moodle.example.org/local/mc_plugin/sync_schema.php',
-        ];
-
-        // Various AJAX save URL patterns.
-        $ajaxsaveurls = [
-            '/local/mc_plugin/ajax_save.php',
-            'http://localhost/local/mc_plugin/ajax_save.php',
-            'https://example.com/local/mc_plugin/ajax_save.php',
-            '/ajax_save.php',
-            'https://moodle.example.org/local/mc_plugin/ajax_save.php',
-        ];
-
-        // Various sesskey patterns.
-        $sesskeys = ['abc123', 'XyZ789AbC', 'a1b2c3d4e5f6', '0123456789', 'session_key_test'];
-
-        $counter = 0;
-        foreach ($syncurls as $syncurl) {
-            foreach ($ajaxsaveurls as $ajaxsaveurl) {
-                foreach ($sesskeys as $sesskey) {
-                    $testcases["case_{$counter}"] = [
-                        $syncurl,
-                        $ajaxsaveurl,
-                        $sesskey,
-                    ];
-                    $counter++;
-                }
-            }
-        }
-
-        // We should have 5 * 5 * 5 = 125 test cases, which exceeds 100.
-        return $testcases;
-    }
-
-    /**
-     * **Feature: mustache-templates-refactor, Property 6: Action buttons context completeness**
-     *
-     * *For any* configuration, the action_buttons renderable's export_for_template
-     * method SHALL return a context object containing all required keys:
-     * syncurl, ajaxsaveurl, and sesskey.
-     *
-     * **Validates: Requirements 2.6**
-     *
-     * @dataProvider configuration_state_provider
-     * @param string $syncurl Sync URL
-     * @param string $ajaxsaveurl AJAX save URL
-     * @param string $sesskey Session key
-     */
-    public function test_property_context_completeness(
-        string $syncurl,
-        string $ajaxsaveurl,
-        string $sesskey
-    ): void {
+    public function test_export_for_template_returns_empty_object(): void {
         $this->resetAfterTest(true);
 
-        // Create the renderable with the given parameters.
-        $buttons = new action_buttons(
-            $syncurl,
-            $ajaxsaveurl,
-            $sesskey
-        );
+        $buttons = new action_buttons();
 
-        // Create a mock renderer for export_for_template.
         $page = new \moodle_page();
         $renderer = new \renderer_base($page, RENDERER_TARGET_GENERAL);
 
-        // Export the template data.
         $data = $buttons->export_for_template($renderer);
 
-        // Property 6: All required keys must be present.
-        $requiredkeys = ['syncurl', 'ajaxsaveurl', 'sesskey'];
-
-        foreach ($requiredkeys as $key) {
-            $this->assertTrue(
-                property_exists($data, $key),
-                "Context must contain key '{$key}'"
-            );
-        }
-
-        // Verify the values match what was passed in.
-        $this->assertEquals($syncurl, $data->syncurl);
-        $this->assertEquals($ajaxsaveurl, $data->ajaxsaveurl);
-        $this->assertEquals($sesskey, $data->sesskey);
+        $this->assertInstanceOf(\stdClass::class, $data);
+        $this->assertEmpty((array) $data, 'export_for_template must return an empty stdClass');
     }
 
     /**
-     * Test that get_js_config returns all required configuration keys.
+     * Test that get_js_config returns an empty array.
      */
-    public function test_get_js_config_completeness(): void {
+    public function test_get_js_config_returns_empty_array(): void {
         $this->resetAfterTest(true);
 
-        $buttons = new action_buttons(
-            '/local/mc_plugin/sync_schema.php',
-            '/local/mc_plugin/ajax_save.php',
-            'testsesskey'
-        );
+        $buttons = new action_buttons();
 
         $config = $buttons->get_js_config();
 
-        // Verify all required keys are present.
-        $requiredkeys = ['syncUrl', 'ajaxSaveUrl', 'sesskey'];
-        foreach ($requiredkeys as $key) {
-            $this->assertArrayHasKey($key, $config, "JS config must contain key '{$key}'");
-        }
-
-        // Verify values match.
-        $this->assertEquals('/local/mc_plugin/sync_schema.php', $config['syncUrl']);
-        $this->assertEquals('/local/mc_plugin/ajax_save.php', $config['ajaxSaveUrl']);
-        $this->assertEquals('testsesskey', $config['sesskey']);
+        $this->assertIsArray($config);
+        $this->assertEmpty($config, 'get_js_config must return an empty array');
     }
 
     /**
-     * Test that URLs with query parameters are preserved.
+     * Test that action_buttons is instantiable with no arguments.
      */
-    public function test_urls_with_query_parameters(): void {
+    public function test_no_arg_constructor(): void {
         $this->resetAfterTest(true);
 
-        $syncurl = '/sync_schema.php?param1=value1&param2=value2';
-        $ajaxsaveurl = '/ajax_save.php?action=save&format=json';
-
-        $buttons = new action_buttons(
-            $syncurl,
-            $ajaxsaveurl,
-            'sesskey123'
-        );
-
-        $page = new \moodle_page();
-        $renderer = new \renderer_base($page, RENDERER_TARGET_GENERAL);
-
-        $data = $buttons->export_for_template($renderer);
-
-        $this->assertEquals($syncurl, $data->syncurl);
-        $this->assertEquals($ajaxsaveurl, $data->ajaxsaveurl);
+        $buttons = new action_buttons();
+        $this->assertInstanceOf(action_buttons::class, $buttons);
     }
 }

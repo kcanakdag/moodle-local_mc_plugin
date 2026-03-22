@@ -38,17 +38,12 @@ use local_mc_plugin\output\action_buttons;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class setting_action_buttons extends \admin_setting {
-    /** @var string URL to the sync_schema.php endpoint */
-    private $syncurl;
-
     /**
      * Constructor.
      *
      * @param string $name Unique setting name
-     * @param string $syncurl URL to the schema sync endpoint
      */
-    public function __construct($name, $syncurl) {
-        $this->syncurl = $syncurl;
+    public function __construct($name) {
         parent::__construct($name, '', '', '');
     }
 
@@ -84,22 +79,14 @@ class setting_action_buttons extends \admin_setting {
         // Get the plugin renderer.
         $renderer = $PAGE->get_renderer('local_mc_plugin');
 
-        // Build URLs and config.
-        $ajaxsaveurl = (new \moodle_url('/local/mc_plugin/ajax_save.php'))->out(false);
-        $sesskey = sesskey();
-
         // Create the renderable.
-        $buttons = new action_buttons(
-            $this->syncurl,
-            $ajaxsaveurl,
-            $sesskey
-        );
+        $buttons = new action_buttons();
 
         // Render using the Output API.
         $html = $renderer->render($buttons);
 
         // Initialize the AMD module with config from renderable.
-        $PAGE->requires->js_call_amd('local_mc_plugin/admin', 'initActionButtons', [$buttons->get_js_config()]);
+        $PAGE->requires->js_call_amd('local_mc_plugin/admin', 'initActionButtons', []);
 
         return $html;
     }

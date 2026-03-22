@@ -35,38 +35,18 @@ use stdClass;
 /**
  * Renderable for the action buttons component.
  *
- * Prepares data for the action_buttons Mustache template, including
- * sync URL, AJAX save URL, and session key.
+ * Prepares data for the action_buttons Mustache template.
+ * URL plumbing removed: JS routes via core/ajax methodnames instead of URLs.
  *
  * @package    local_mc_plugin
  * @copyright  2025 Kerem Can Akdag
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class action_buttons implements renderable, templatable {
-    /** @var string URL to sync_schema.php */
-    private $syncurl;
-
-    /** @var string URL to ajax_save.php */
-    private $ajaxsaveurl;
-
-    /** @var string Session key for CSRF protection */
-    private $sesskey;
-
     /**
      * Constructor.
-     *
-     * @param string $syncurl URL to sync_schema.php endpoint
-     * @param string $ajaxsaveurl URL to ajax_save.php endpoint
-     * @param string $sesskey Session key for CSRF protection
      */
-    public function __construct(
-        string $syncurl,
-        string $ajaxsaveurl,
-        string $sesskey
-    ) {
-        $this->syncurl = $syncurl;
-        $this->ajaxsaveurl = $ajaxsaveurl;
-        $this->sesskey = $sesskey;
+    public function __construct() {
     }
 
     /**
@@ -76,11 +56,7 @@ class action_buttons implements renderable, templatable {
      * @return stdClass Data for the template
      */
     public function export_for_template(renderer_base $output): stdClass {
-        $data = new stdClass();
-        $data->syncurl = $this->syncurl;
-        $data->ajaxsaveurl = $this->ajaxsaveurl;
-        $data->sesskey = $this->sesskey;
-        return $data;
+        return new stdClass();
     }
 
     /**
@@ -89,10 +65,6 @@ class action_buttons implements renderable, templatable {
      * @return array Configuration array for js_call_amd
      */
     public function get_js_config(): array {
-        return [
-            'syncUrl' => $this->syncurl,
-            'ajaxSaveUrl' => $this->ajaxsaveurl,
-            'sesskey' => $this->sesskey,
-        ];
+        return [];
     }
 }

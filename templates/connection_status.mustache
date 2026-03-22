@@ -18,6 +18,7 @@
     @template local_mc_plugin/connection_status
 
     Connection status display with connect button for MoodleConnect admin settings.
+    JS routes via core/ajax methodnames; no URL or sesskey data attributes needed.
 
     Classes required for JS:
     * none
@@ -25,31 +26,21 @@
     Data attributes required for JS:
     * data-region="connection-status" - Main status container
     * data-region="status-content" - Content area for dynamic updates
-    * data-syncurl - URL to sync_schema.php
-    * data-sesskey - CSRF token
     * data-eventinputid - Event selector input ID for counter refresh
     * data-action="connect" - Connect button
     * data-region="connect-status" - Connect status message container
 
     Context variables required for this template:
-    * syncurl (string) - URL to sync_schema.php
-    * sesskey (string) - CSRF token
     * eventinputid (string) - Event selector input ID
     * isconnected (bool) - Current connection state
-    * connecturl (string) - URL to connect.php
-    * saveurl (string) - URL to ajax_save.php
     * apiurl (string) - MoodleConnect API URL
     * frontendurl (string) - MoodleConnect frontend URL
     * buttonclass (string) - CSS class for button
 
     Example context (json):
     {
-        "syncurl": "/local/mc_plugin/sync_schema.php",
-        "sesskey": "abc123def456",
         "eventinputid": "id_s_local_mc_plugin_monitored_events",
         "isconnected": true,
-        "connecturl": "/local/mc_plugin/connect.php",
-        "saveurl": "/local/mc_plugin/ajax_save.php",
         "apiurl": "https://moodleconnect.com/api",
         "frontendurl": "https://moodleconnect.com",
         "buttonclass": "btn-secondary"
@@ -57,8 +48,6 @@
 }}
 <div class="local_mc_plugin_connection_status"
      data-region="connection-status"
-     data-syncurl="{{syncurl}}"
-     data-sesskey="{{sesskey}}"
      data-eventinputid="{{eventinputid}}">
     {{! Status display }}
     <div data-region="status-content" class="d-flex align-items-center">
@@ -81,11 +70,8 @@
         {{! Connect button }}
         <button type="button"
                 data-action="connect"
-                data-connecturl="{{connecturl}}"
-                data-saveurl="{{saveurl}}"
                 data-apiurl="{{apiurl}}"
                 data-frontendurl="{{frontendurl}}"
-                data-sesskey="{{sesskey}}"
                 class="btn {{buttonclass}}">
             <span data-region="button-text">
                 {{#isconnected}}
