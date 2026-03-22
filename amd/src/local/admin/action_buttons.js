@@ -32,9 +32,6 @@ define([
 ], function(Selectors, Repository, ConnectionStatus, TemplateHelper, Str) {
     "use strict";
 
-    /** @type {Object} Configuration */
-    let config = {};
-
     /** @type {string} Button label */
     let btnLabel = '';
 
@@ -187,26 +184,19 @@ define([
     return {
         /**
          * Initialize the action buttons module.
-         *
-         * @param {Object} [cfg] Optional configuration object
          */
-        init: async function(cfg) {
-            cfg = cfg || null;
+        init: async function() {
             // Find the action buttons container
             container = document.querySelector(Selectors.actions.container);
 
             if (container) {
-                // Read config from data attributes
-                config = {};
-
                 // Find elements within container
                 resultDiv = container.querySelector(Selectors.actions.resultDiv);
                 primaryBtn = container.querySelector(Selectors.actions.primaryBtn);
                 btnSpinner = container.querySelector(Selectors.actions.btnSpinner);
                 btnTextEl = container.querySelector(Selectors.actions.btnText);
-            } else if (cfg) {
-                // Fallback to passed config and legacy selectors (backward compatibility)
-                config = cfg;
+            } else {
+                // Fallback to legacy selectors (backward compatibility)
                 resultDiv = document.querySelector(Selectors.actions.legacyResultDiv);
                 primaryBtn = document.querySelector(Selectors.actions.legacyPrimaryBtn);
                 btnSpinner = document.querySelector(Selectors.actions.legacyBtnSpinner);

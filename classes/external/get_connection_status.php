@@ -117,7 +117,7 @@ class get_connection_status extends external_api {
             'site_name' => '',
             'synced_event_count' => 0,
             'synced_events' => [],
-            'error' => 'Cannot reach MoodleConnect',
+            'error' => $curlerror ?: 'Cannot reach MoodleConnect',
         ];
     }
 

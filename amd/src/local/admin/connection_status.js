@@ -32,9 +32,6 @@ define([
 ], function(Selectors, Repository, EventSelector, TemplateHelper, Str) {
     "use strict";
 
-    /** @type {Object} Configuration */
-    let config = {};
-
     /** @type {string} Event selector input ID for refreshing counter */
     let eventInputId = '';
 
@@ -206,15 +203,11 @@ define([
             statusContainer = document.querySelector(Selectors.status.container);
 
             if (statusContainer) {
-                // Read config from data attributes
-                config = {};
                 eventInputId = statusContainer.dataset.eventinputid || (cfg && cfg.eventInputId) || '';
 
                 // Find the content area for template rendering
                 statusContent = statusContainer.querySelector(Selectors.status.content);
             } else if (cfg) {
-                // Fallback to passed config (backward compatibility)
-                config = cfg;
                 eventInputId = cfg.eventInputId || '';
             }
 

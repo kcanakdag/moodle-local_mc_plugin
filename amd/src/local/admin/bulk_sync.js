@@ -32,9 +32,6 @@ define([
     const MAX_SKIPPED_DISPLAY = 100;
     const SEL = Selectors.bulkSync;
 
-    /** @type {Object} Configuration */
-    let config = {};
-
     /** @type {number} Total user count from preflight */
     let totalCount = 0;
 

@@ -76,12 +76,14 @@ class sync_all_events extends external_api {
 
         $coursesyncsuccess = false;
         $coursesyncmessage = '';
-        try {
-            $courseresult = \local_mc_plugin\local\moodleconnect_client::sync_all_courses();
-            $coursesyncsuccess = $courseresult['success'];
-            $coursesyncmessage = $courseresult['message'] ?? '';
-        } catch (\Exception $e) {
-            $coursesyncmessage = $e->getMessage();
+        if ($result['success']) {
+            try {
+                $courseresult = \local_mc_plugin\local\moodleconnect_client::sync_all_courses();
+                $coursesyncsuccess = $courseresult['success'];
+                $coursesyncmessage = $courseresult['message'] ?? '';
+            } catch (\Exception $e) {
+                $coursesyncmessage = $e->getMessage();
+            }
         }
 
         return [

@@ -83,7 +83,6 @@ class save_settings extends external_api {
         $saved = [];
         $credentialssaved = false;
 
-        // Validate and save site_key.
         if ($params['site_key'] !== '') {
             $keylen = strlen($params['site_key']);
             if ($keylen < 16 || $keylen > 128) {
@@ -96,7 +95,6 @@ class save_settings extends external_api {
             $saved[] = 'site_key';
         }
 
-        // Validate and save site_secret.
         if ($params['site_secret'] !== '') {
             $secretlen = strlen($params['site_secret']);
             if ($secretlen < 16 || $secretlen > 128) {
@@ -113,7 +111,6 @@ class save_settings extends external_api {
             $credentialssaved = true;
         }
 
-        // Validate and save monitored_events.
         if ($params['monitored_events'] !== '') {
             $trimmed = trim($params['monitored_events']);
             if (!empty($trimmed)) {
@@ -141,7 +138,6 @@ class save_settings extends external_api {
             $saved[] = 'debug_mode';
         }
 
-        // Trigger course sync if credentials were saved.
         $coursesyncsuccess = false;
         $coursesyncmessage = '';
         if ($credentialssaved) {
