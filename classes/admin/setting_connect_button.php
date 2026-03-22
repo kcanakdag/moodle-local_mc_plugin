@@ -87,21 +87,15 @@ class setting_connect_button extends \admin_setting {
         // Get the plugin renderer.
         $renderer = $PAGE->get_renderer('local_mc_plugin');
 
-        // Build URLs and config.
-        $connecturl = (new \moodle_url('/local/mc_plugin/connect.php'))->out(false);
-        $saveurl = (new \moodle_url('/local/mc_plugin/ajax_save.php'))->out(false);
+        // Build config (URLs only; sesskey and legacy PHP endpoints no longer needed).
         $apiurl = local_mc_plugin_get_api_url();
         $frontendurl = local_mc_plugin_get_frontend_url();
-        $sesskey = sesskey();
 
         // Create the renderable.
         $button = new connect_button(
             $this->isconnected,
-            $connecturl,
-            $saveurl,
             $apiurl,
-            $frontendurl,
-            $sesskey
+            $frontendurl
         );
 
         // Render using the Output API.
