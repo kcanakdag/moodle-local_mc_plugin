@@ -1,3 +1,18 @@
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 /**
  * Bulk sync module for firing user_updated events for all active users.
  *
@@ -40,16 +55,11 @@ define([
 
     /**
      * Initialize the bulk sync component.
-     *
-     * @param {Object} cfg Configuration object
-     * @param {string} cfg.syncUrl URL to sync_schema.php
-     * @param {string} cfg.sesskey Moodle session key
      */
-    const init = async function(cfg) {
+    const init = async function() {
         if (container) {
-            return; // Already initialized — prevent duplicate listeners on re-init.
+            return; // Already initialized - prevent duplicate listeners on re-init.
         }
-        config = cfg;
 
         container = document.querySelector(SEL.container);
         if (!container) {
@@ -105,7 +115,7 @@ define([
         const btn = container.querySelector(SEL.startBtn);
 
         try {
-            const result = await Repository.bulkSyncCount(config.syncUrl, config.sesskey);
+            const result = await Repository.bulkSyncCount();
 
             if (!result.success) {
                 showStatus(statusEl, result.message, 'text-danger');
@@ -113,7 +123,7 @@ define([
             }
 
             totalCount = result.count;
-            quotaInfo = result.quota || null;
+            quotaInfo = result.quota_limit > 0 ? {used: result.quota_used, limit: result.quota_limit} : null;
 
             if (!result.monitored) {
                 const noTriggerMsg = await Str.get_string('bulk_sync_no_trigger', 'local_mc_plugin');
@@ -299,7 +309,7 @@ define([
                     break;
                 }
 
-                const result = await Repository.bulkSyncFire(config.syncUrl, config.sesskey, offset, BATCH_SIZE);
+                const result = await Repository.bulkSyncFire(offset, BATCH_SIZE);
 
                 if (!result.success) {
                     const errorMsg = await buildResultMessage('bulk_sync_error', totalProcessed, allSkipped);

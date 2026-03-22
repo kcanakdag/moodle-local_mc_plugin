@@ -1,3 +1,18 @@
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 /**
  * Action buttons module for the admin settings page.
  *
@@ -136,7 +151,7 @@ define([
         try {
             // Save settings first
             const values = getFormValues();
-            const saveResult = await Repository.saveSettings(config.ajaxSaveUrl, config.sesskey, values);
+            const saveResult = await Repository.saveSettings(values);
 
             if (!saveResult.success) {
                 setLoading(false);
@@ -148,7 +163,7 @@ define([
             // Then sync events
             const syncingText = await Str.get_string('btn_syncing', 'local_mc_plugin');
             setBtnText(syncingText);
-            const syncResult = await Repository.syncEvents(config.syncUrl, config.sesskey);
+            const syncResult = await Repository.syncEvents();
 
             setLoading(false);
             setBtnText(btnLabel);
@@ -182,11 +197,7 @@ define([
 
             if (container) {
                 // Read config from data attributes
-                config = {
-                    syncUrl: container.dataset.syncurl || (cfg && cfg.syncUrl) || '',
-                    ajaxSaveUrl: container.dataset.ajaxsaveurl || (cfg && cfg.ajaxSaveUrl) || '',
-                    sesskey: container.dataset.sesskey || (cfg && cfg.sesskey) || '',
-                };
+                config = {};
 
                 // Find elements within container
                 resultDiv = container.querySelector(Selectors.actions.resultDiv);
