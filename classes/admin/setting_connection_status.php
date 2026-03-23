@@ -86,22 +86,14 @@ class setting_connection_status extends \admin_setting {
         // Get the plugin renderer.
         $renderer = $PAGE->get_renderer('local_mc_plugin');
 
-        // Build URLs and config.
-        $syncurl = (new \moodle_url('/local/mc_plugin/sync_schema.php'))->out(false);
-        $connecturl = (new \moodle_url('/local/mc_plugin/connect.php'))->out(false);
-        $saveurl = (new \moodle_url('/local/mc_plugin/ajax_save.php'))->out(false);
+        // Build config (URLs only; sesskey and legacy PHP endpoints no longer needed).
         $apiurl = local_mc_plugin_get_api_url();
         $frontendurl = local_mc_plugin_get_frontend_url();
-        $sesskey = sesskey();
 
         // Create the renderable with all data including connect button.
         $status = new connection_status(
-            $syncurl,
-            $sesskey,
             $this->eventinputid,
             $this->isconnected,
-            $connecturl,
-            $saveurl,
             $apiurl,
             $frontendurl
         );

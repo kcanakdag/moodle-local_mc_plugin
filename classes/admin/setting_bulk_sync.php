@@ -77,14 +77,11 @@ class setting_bulk_sync extends \admin_setting {
     public function output_html($data, $query = '') {
         global $PAGE;
 
-        $syncurl = (new \moodle_url('/local/mc_plugin/sync_schema.php'))->out(false);
-        $sesskey = sesskey();
-
         $renderer = $PAGE->get_renderer('local_mc_plugin');
-        $bulksync = new bulk_sync($syncurl, $sesskey);
+        $bulksync = new bulk_sync();
         $html = $renderer->render($bulksync);
 
-        $PAGE->requires->js_call_amd('local_mc_plugin/admin', 'initBulkSync', [$bulksync->get_js_config()]);
+        $PAGE->requires->js_call_amd('local_mc_plugin/admin', 'initBulkSync', []);
 
         return format_admin_setting($this, '', $html, '', false, '', null, $query);
     }

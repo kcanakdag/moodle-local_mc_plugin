@@ -36,7 +36,8 @@ use stdClass;
  * Renderable for the connect button component.
  *
  * Prepares data for the connect_button Mustache template, including
- * connection state, URLs, and button styling.
+ * connection state, API URL, and frontend URL.
+ * URL plumbing removed: JS routes via core/ajax methodnames instead of URLs.
  *
  * @package    local_mc_plugin
  * @copyright  2025 Kerem Can Akdag
@@ -46,45 +47,27 @@ class connect_button implements renderable, templatable {
     /** @var bool Whether the site is currently connected */
     private $isconnected;
 
-    /** @var string URL to connect.php */
-    private $connecturl;
-
-    /** @var string URL to ajax_save.php */
-    private $saveurl;
-
     /** @var string MoodleConnect API URL */
     private $apiurl;
 
     /** @var string MoodleConnect frontend URL */
     private $frontendurl;
 
-    /** @var string Session key for CSRF protection */
-    private $sesskey;
-
     /**
      * Constructor.
      *
      * @param bool $isconnected Whether the site is currently connected
-     * @param string $connecturl URL to connect.php endpoint
-     * @param string $saveurl URL to ajax_save.php endpoint
      * @param string $apiurl MoodleConnect API base URL
      * @param string $frontendurl MoodleConnect frontend URL
-     * @param string $sesskey Session key for CSRF protection
      */
     public function __construct(
         bool $isconnected,
-        string $connecturl,
-        string $saveurl,
         string $apiurl,
-        string $frontendurl,
-        string $sesskey
+        string $frontendurl
     ) {
         $this->isconnected = $isconnected;
-        $this->connecturl = $connecturl;
-        $this->saveurl = $saveurl;
         $this->apiurl = $apiurl;
         $this->frontendurl = $frontendurl;
-        $this->sesskey = $sesskey;
     }
 
     /**
@@ -95,11 +78,8 @@ class connect_button implements renderable, templatable {
      */
     public function export_for_template(renderer_base $output): stdClass {
         $data = new stdClass();
-        $data->connecturl = $this->connecturl;
-        $data->saveurl = $this->saveurl;
         $data->apiurl = $this->apiurl;
         $data->frontendurl = $this->frontendurl;
-        $data->sesskey = $this->sesskey;
         $data->isconnected = $this->isconnected;
         $data->buttonclass = $this->isconnected ? 'btn-secondary' : 'btn-primary';
         return $data;
@@ -112,11 +92,8 @@ class connect_button implements renderable, templatable {
      */
     public function get_js_config(): array {
         return [
-            'connectUrl' => $this->connecturl,
-            'saveUrl' => $this->saveurl,
             'apiUrl' => $this->apiurl,
             'frontendUrl' => $this->frontendurl,
-            'sesskey' => $this->sesskey,
             'isConnected' => $this->isconnected,
         ];
     }

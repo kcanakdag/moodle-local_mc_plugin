@@ -36,30 +36,19 @@ use stdClass;
  * Renderable for the connection status component.
  *
  * Prepares data for the connection_status Mustache template, including
- * sync URL, session key, event input ID, and connect button configuration.
+ * event input ID, connection state, and connect button configuration.
+ * URL plumbing removed: JS routes via core/ajax methodnames instead of URLs.
  *
  * @package    local_mc_plugin
  * @copyright  2025 Kerem Can Akdag
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class connection_status implements renderable, templatable {
-    /** @var string URL to sync_schema.php */
-    private $syncurl;
-
-    /** @var string Session key for CSRF protection */
-    private $sesskey;
-
     /** @var string Event selector input ID for counter refresh */
     private $eventinputid;
 
     /** @var bool Whether the site is currently connected */
     private $isconnected;
-
-    /** @var string URL to connect.php */
-    private $connecturl;
-
-    /** @var string URL to ajax_save.php */
-    private $saveurl;
 
     /** @var string MoodleConnect API URL */
     private $apiurl;
@@ -70,31 +59,19 @@ class connection_status implements renderable, templatable {
     /**
      * Constructor.
      *
-     * @param string $syncurl URL to sync_schema.php endpoint
-     * @param string $sesskey Session key for CSRF protection
      * @param string $eventinputid Event selector input ID (optional)
      * @param bool $isconnected Whether the site is currently connected
-     * @param string $connecturl URL to connect.php endpoint
-     * @param string $saveurl URL to ajax_save.php endpoint
      * @param string $apiurl MoodleConnect API base URL
      * @param string $frontendurl MoodleConnect frontend URL
      */
     public function __construct(
-        string $syncurl,
-        string $sesskey,
         string $eventinputid = '',
         bool $isconnected = false,
-        string $connecturl = '',
-        string $saveurl = '',
         string $apiurl = '',
         string $frontendurl = ''
     ) {
-        $this->syncurl = $syncurl;
-        $this->sesskey = $sesskey;
         $this->eventinputid = $eventinputid;
         $this->isconnected = $isconnected;
-        $this->connecturl = $connecturl;
-        $this->saveurl = $saveurl;
         $this->apiurl = $apiurl;
         $this->frontendurl = $frontendurl;
     }
@@ -107,13 +84,9 @@ class connection_status implements renderable, templatable {
      */
     public function export_for_template(renderer_base $output): stdClass {
         $data = new stdClass();
-        $data->syncurl = $this->syncurl;
-        $data->sesskey = $this->sesskey;
         $data->eventinputid = $this->eventinputid;
         // Connect button data.
         $data->isconnected = $this->isconnected;
-        $data->connecturl = $this->connecturl;
-        $data->saveurl = $this->saveurl;
         $data->apiurl = $this->apiurl;
         $data->frontendurl = $this->frontendurl;
         $data->buttonclass = $this->isconnected ? 'btn-secondary' : 'btn-primary';
@@ -127,8 +100,6 @@ class connection_status implements renderable, templatable {
      */
     public function get_js_config(): array {
         return [
-            'syncUrl' => $this->syncurl,
-            'sesskey' => $this->sesskey,
             'eventInputId' => $this->eventinputid,
         ];
     }
@@ -140,11 +111,8 @@ class connection_status implements renderable, templatable {
      */
     public function get_connect_js_config(): array {
         return [
-            'connectUrl' => $this->connecturl,
-            'saveUrl' => $this->saveurl,
             'apiUrl' => $this->apiurl,
             'frontendUrl' => $this->frontendurl,
-            'sesskey' => $this->sesskey,
             'isConnected' => $this->isconnected,
         ];
     }

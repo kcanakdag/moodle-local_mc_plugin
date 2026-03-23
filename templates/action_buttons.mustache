@@ -18,6 +18,7 @@
     @template local_mc_plugin/action_buttons
 
     Action buttons component for MoodleConnect admin settings.
+    JS routes via core/ajax methodnames; no URL or sesskey data attributes needed.
 
     Classes required for JS:
     * none
@@ -28,27 +29,15 @@
     * data-action="save-sync" - Save and sync button
     * data-region="button-text" - Button text span
     * data-region="button-spinner" - Loading spinner container
-    * data-syncurl - URL to sync_schema.php
-    * data-ajaxsaveurl - URL to ajax_save.php
-    * data-sesskey - CSRF token
 
     Context variables required for this template:
-    * syncurl (string) - URL to sync_schema.php
-    * ajaxsaveurl (string) - URL to ajax_save.php
-    * sesskey (string) - CSRF token
+    * (none)
 
     Example context (json):
-    {
-        "syncurl": "/local/mc_plugin/sync_schema.php",
-        "ajaxsaveurl": "/local/mc_plugin/ajax_save.php",
-        "sesskey": "abc123def456"
-    }
+    {}
 }}
 <div class="local_mc_plugin_action_buttons text-center"
-     data-region="action-buttons"
-     data-syncurl="{{syncurl}}"
-     data-ajaxsaveurl="{{ajaxsaveurl}}"
-     data-sesskey="{{sesskey}}">
+     data-region="action-buttons">
     {{! Result message container - hidden by default }}
     <div data-region="action-result" class="mb-3"></div>
 

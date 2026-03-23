@@ -5,6 +5,24 @@ All notable changes to the MoodleConnect plugin will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.4.0] - 2026-03-23
+
+### Changed
+- **External Services migration**: Replaced legacy browser AJAX endpoints (`connect.php`, `ajax_save.php`, `sync_schema.php`) with Moodle External Services (`classes/external/*` + `db/services.php`). JS now uses `core/ajax` instead of raw `fetch()`. Improves security, validation, and compatibility with Moodle standards.
+- **GPL boilerplate**: Added missing GPL license headers to all AMD JavaScript source files
+
+### Added
+- 7 new external function classes: `connect_init`, `save_settings`, `get_connection_status`, `sync_events`, `sync_all_events`, `bulk_sync_count`, `bulk_sync_fire`
+
+### Removed
+- `connect.php`, `ajax_save.php` (replaced by External Services)
+- AJAX action handlers in `sync_schema.php` (standalone page UI retained)
+- URL/sesskey plumbing from templates, renderables, and admin setting classes
+
+### Fixed
+- Course sync no longer fires a redundant HTTP call when the primary schema sync fails
+- Connection status error now includes the actual curl error message instead of a generic string
+
 ## [5.3.0] - 2026-03-12
 
 ### Added

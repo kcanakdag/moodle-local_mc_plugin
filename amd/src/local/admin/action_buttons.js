@@ -1,3 +1,18 @@
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 /**
  * Action buttons module for the admin settings page.
  *
@@ -16,9 +31,6 @@ define([
     'core/str'
 ], function(Selectors, Repository, ConnectionStatus, TemplateHelper, Str) {
     "use strict";
-
-    /** @type {Object} Configuration */
-    let config = {};
 
     /** @type {string} Button label */
     let btnLabel = '';
@@ -136,7 +148,7 @@ define([
         try {
             // Save settings first
             const values = getFormValues();
-            const saveResult = await Repository.saveSettings(config.ajaxSaveUrl, config.sesskey, values);
+            const saveResult = await Repository.saveSettings(values);
 
             if (!saveResult.success) {
                 setLoading(false);
@@ -148,7 +160,7 @@ define([
             // Then sync events
             const syncingText = await Str.get_string('btn_syncing', 'local_mc_plugin');
             setBtnText(syncingText);
-            const syncResult = await Repository.syncEvents(config.syncUrl, config.sesskey);
+            const syncResult = await Repository.syncEvents();
 
             setLoading(false);
             setBtnText(btnLabel);
@@ -172,30 +184,19 @@ define([
     return {
         /**
          * Initialize the action buttons module.
-         *
-         * @param {Object} [cfg] Optional configuration object
          */
-        init: async function(cfg) {
-            cfg = cfg || null;
+        init: async function() {
             // Find the action buttons container
             container = document.querySelector(Selectors.actions.container);
 
             if (container) {
-                // Read config from data attributes
-                config = {
-                    syncUrl: container.dataset.syncurl || (cfg && cfg.syncUrl) || '',
-                    ajaxSaveUrl: container.dataset.ajaxsaveurl || (cfg && cfg.ajaxSaveUrl) || '',
-                    sesskey: container.dataset.sesskey || (cfg && cfg.sesskey) || '',
-                };
-
                 // Find elements within container
                 resultDiv = container.querySelector(Selectors.actions.resultDiv);
                 primaryBtn = container.querySelector(Selectors.actions.primaryBtn);
                 btnSpinner = container.querySelector(Selectors.actions.btnSpinner);
                 btnTextEl = container.querySelector(Selectors.actions.btnText);
-            } else if (cfg) {
-                // Fallback to passed config and legacy selectors (backward compatibility)
-                config = cfg;
+            } else {
+                // Fallback to legacy selectors (backward compatibility)
                 resultDiv = document.querySelector(Selectors.actions.legacyResultDiv);
                 primaryBtn = document.querySelector(Selectors.actions.legacyPrimaryBtn);
                 btnSpinner = document.querySelector(Selectors.actions.legacyBtnSpinner);

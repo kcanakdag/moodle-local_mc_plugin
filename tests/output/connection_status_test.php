@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Property tests for connection_status renderable.
+ * Tests for connection_status renderable.
  *
  * @package    local_mc_plugin
  * @category   test
@@ -26,10 +26,10 @@
 namespace local_mc_plugin\output;
 
 /**
- * Property tests for connection_status renderable.
+ * Tests for connection_status renderable.
  *
- * Tests the correctness property defined in the design document:
- * - Property 3: Connection status context completeness
+ * After the External Services migration, connection_status carries only
+ * eventinputid, isconnected, apiurl, and frontendurl (no syncurl/sesskey).
  *
  * @package    local_mc_plugin
  * @category   test
@@ -41,28 +41,11 @@ final class connection_status_test extends \advanced_testcase {
     /**
      * Data provider for property tests with various configuration states.
      *
-     * Generates 100+ test cases with different combinations of:
-     * - Various sync URL formats
-     * - Different sesskey values
-     * - Various event input ID formats (including empty)
-     *
      * @return array Test data
      */
     public static function configuration_state_provider(): array {
         $testcases = [];
 
-        // Various sync URL patterns.
-        $syncurls = [
-            '/local/mc_plugin/sync_schema.php',
-            'http://localhost/local/mc_plugin/sync_schema.php',
-            'https://example.com/local/mc_plugin/sync_schema.php',
-            '/sync_schema.php',
-        ];
-
-        // Various sesskey patterns.
-        $sesskeys = ['abc123', 'XyZ789AbC', 'a1b2c3d4e5f6', '0123456789', 'session_key_test'];
-
-        // Various event input ID patterns (including empty).
         $eventinputids = [
             '',
             'id_s_local_mc_plugin_monitored_events',
@@ -71,72 +54,57 @@ final class connection_status_test extends \advanced_testcase {
             'mc_events_input',
         ];
 
+        $connectionstates = [true, false];
+
+        $apiurls = [
+            'https://moodleconnect.com/api',
+            'http://localhost:5000/api',
+            'https://staging.moodleconnect.com/api',
+        ];
+
         $counter = 0;
-        foreach ($syncurls as $syncurl) {
-            foreach ($sesskeys as $sesskey) {
-                foreach ($eventinputids as $eventinputid) {
+        foreach ($eventinputids as $eventinputid) {
+            foreach ($connectionstates as $isconnected) {
+                foreach ($apiurls as $apiurl) {
                     $testcases["case_{$counter}"] = [
-                        $syncurl,
-                        $sesskey,
                         $eventinputid,
+                        $isconnected,
+                        $apiurl,
+                        'https://moodleconnect.com',
                     ];
                     $counter++;
                 }
             }
         }
 
-        // Add additional variations to ensure we have 100+ cases.
-        for ($i = 0; $i < 20; $i++) {
-            $syncurlindex = $i % count($syncurls);
-            $sesskeyindex = $i % count($sesskeys);
-            $eventinputidindex = $i % count($eventinputids);
-            $testcases["extra_{$i}"] = [
-                $syncurls[$syncurlindex] . "?v={$i}",
-                $sesskeys[$sesskeyindex] . $i,
-                $eventinputids[$eventinputidindex] . ($eventinputids[$eventinputidindex] ? "_{$i}" : ''),
-            ];
-        }
-
         return $testcases;
     }
 
     /**
-     * **Feature: mustache-templates-refactor, Property 3: Connection status context completeness**
-     *
-     * *For any* configuration state, the connection_status renderable's
-     * export_for_template method SHALL return a context object containing
-     * all required keys: syncurl, sesskey, and eventinputid.
-     *
-     * **Validates: Requirements 2.4**
+     * Test that export_for_template returns all required context keys.
      *
      * @dataProvider configuration_state_provider
-     * @param string $syncurl Sync URL
-     * @param string $sesskey Session key
      * @param string $eventinputid Event input ID
+     * @param bool $isconnected Connection state
+     * @param string $apiurl API URL
+     * @param string $frontendurl Frontend URL
      */
     public function test_property_context_completeness(
-        string $syncurl,
-        string $sesskey,
-        string $eventinputid
+        string $eventinputid,
+        bool $isconnected,
+        string $apiurl,
+        string $frontendurl
     ): void {
         $this->resetAfterTest(true);
 
-        // Create the renderable with the given parameters.
-        $status = new connection_status(
-            $syncurl,
-            $sesskey,
-            $eventinputid
-        );
+        $status = new connection_status($eventinputid, $isconnected, $apiurl, $frontendurl);
 
-        // Create a mock renderer for export_for_template.
         $page = new \moodle_page();
         $renderer = new \renderer_base($page, RENDERER_TARGET_GENERAL);
 
-        // Export the template data.
         $data = $status->export_for_template($renderer);
 
-        // Property 3: All required keys must be present.
-        $requiredkeys = ['syncurl', 'sesskey', 'eventinputid'];
+        $requiredkeys = ['eventinputid', 'isconnected', 'apiurl', 'frontendurl', 'buttonclass'];
 
         foreach ($requiredkeys as $key) {
             $this->assertTrue(
@@ -145,36 +113,55 @@ final class connection_status_test extends \advanced_testcase {
             );
         }
 
-        // Verify the values match what was passed in.
-        $this->assertEquals($syncurl, $data->syncurl);
-        $this->assertEquals($sesskey, $data->sesskey);
         $this->assertEquals($eventinputid, $data->eventinputid);
+        $this->assertEquals($isconnected, $data->isconnected);
+        $this->assertEquals($apiurl, $data->apiurl);
+        $this->assertEquals($frontendurl, $data->frontendurl);
     }
 
     /**
-     * Test that get_js_config returns all required configuration keys.
+     * Test that get_js_config returns only eventInputId.
      */
     public function test_get_js_config_completeness(): void {
         $this->resetAfterTest(true);
 
         $status = new connection_status(
-            '/local/mc_plugin/sync_schema.php',
-            'testsesskey',
-            'id_s_local_mc_plugin_monitored_events'
+            'id_s_local_mc_plugin_monitored_events',
+            true,
+            'https://moodleconnect.com/api',
+            'https://moodleconnect.com'
         );
 
         $config = $status->get_js_config();
 
-        // Verify all required keys are present.
-        $requiredkeys = ['syncUrl', 'sesskey', 'eventInputId'];
+        $this->assertArrayHasKey('eventInputId', $config, "JS config must contain 'eventInputId'");
+        $this->assertCount(1, $config, 'get_js_config must contain exactly one key');
+        $this->assertEquals('id_s_local_mc_plugin_monitored_events', $config['eventInputId']);
+    }
+
+    /**
+     * Test that get_connect_js_config returns apiUrl, frontendUrl, isConnected.
+     */
+    public function test_get_connect_js_config_completeness(): void {
+        $this->resetAfterTest(true);
+
+        $status = new connection_status(
+            '',
+            true,
+            'https://moodleconnect.com/api',
+            'https://moodleconnect.com'
+        );
+
+        $config = $status->get_connect_js_config();
+
+        $requiredkeys = ['apiUrl', 'frontendUrl', 'isConnected'];
         foreach ($requiredkeys as $key) {
-            $this->assertArrayHasKey($key, $config, "JS config must contain key '{$key}'");
+            $this->assertArrayHasKey($key, $config, "Connect JS config must contain '{$key}'");
         }
 
-        // Verify values match.
-        $this->assertEquals('/local/mc_plugin/sync_schema.php', $config['syncUrl']);
-        $this->assertEquals('testsesskey', $config['sesskey']);
-        $this->assertEquals('id_s_local_mc_plugin_monitored_events', $config['eventInputId']);
+        $this->assertEquals('https://moodleconnect.com/api', $config['apiUrl']);
+        $this->assertEquals('https://moodleconnect.com', $config['frontendUrl']);
+        $this->assertTrue($config['isConnected']);
     }
 
     /**
@@ -183,11 +170,7 @@ final class connection_status_test extends \advanced_testcase {
     public function test_empty_eventinputid(): void {
         $this->resetAfterTest(true);
 
-        $status = new connection_status(
-            '/sync_schema.php',
-            'sesskey123',
-            ''
-        );
+        $status = new connection_status('', false, '', '');
 
         $page = new \moodle_page();
         $renderer = new \renderer_base($page, RENDERER_TARGET_GENERAL);
@@ -196,5 +179,19 @@ final class connection_status_test extends \advanced_testcase {
 
         $this->assertTrue(property_exists($data, 'eventinputid'));
         $this->assertEquals('', $data->eventinputid);
+    }
+
+    /**
+     * Test default (no-arg) constructor produces a valid object.
+     */
+    public function test_default_constructor(): void {
+        $this->resetAfterTest(true);
+
+        $status = new connection_status();
+        $this->assertInstanceOf(connection_status::class, $status);
+
+        $config = $status->get_js_config();
+        $this->assertArrayHasKey('eventInputId', $config);
+        $this->assertEquals('', $config['eventInputId']);
     }
 }

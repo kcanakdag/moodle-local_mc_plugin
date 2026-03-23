@@ -35,26 +35,17 @@ use stdClass;
 /**
  * Renderable for the bulk user sync component.
  *
+ * URL plumbing removed: JS routes via core/ajax methodnames instead of URLs.
+ *
  * @package    local_mc_plugin
  * @copyright  2025 Kerem Can Akdag
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class bulk_sync implements renderable, templatable {
-    /** @var string URL to sync_schema.php */
-    private $syncurl;
-
-    /** @var string Session key for CSRF protection */
-    private $sesskey;
-
     /**
      * Constructor.
-     *
-     * @param string $syncurl URL to sync_schema.php endpoint
-     * @param string $sesskey Session key for CSRF protection
      */
-    public function __construct(string $syncurl, string $sesskey) {
-        $this->syncurl = $syncurl;
-        $this->sesskey = $sesskey;
+    public function __construct() {
     }
 
     /**
@@ -74,9 +65,6 @@ class bulk_sync implements renderable, templatable {
      * @return array Configuration array for js_call_amd
      */
     public function get_js_config(): array {
-        return [
-            'syncUrl' => $this->syncurl,
-            'sesskey' => $this->sesskey,
-        ];
+        return [];
     }
 }

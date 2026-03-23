@@ -1,49 +1,52 @@
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 /**
  * Repository module for AJAX calls to the backend.
+ *
+ * Uses Moodle's core/ajax to call External Services by methodname.
  *
  * @module     local_mc_plugin/local/admin/repository
  * @copyright  2025 Kerem Can Akdag
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-define([], function() {
+define(['core/ajax'], function(Ajax) {
     "use strict";
 
     /**
-     * Make a POST request with form data.
+     * Call a single external function and return its promise.
      *
-     * @param {string} url The URL to post to
-     * @param {Object} data The data to send
-     * @returns {Promise<Object>} The JSON response
+     * @param {string} methodname The external function name
+     * @param {Object} args The arguments
+     * @returns {Promise<Object>} The response
      */
-    const postForm = async(url, data) => {
-        const params = new URLSearchParams();
-        Object.entries(data).forEach(([key, value]) => {
-            params.append(key, value);
-        });
-
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-            body: params.toString(),
-        });
-
-        return response.json();
-    };
+    const call = (methodname, args) => Ajax.call([{methodname, args}])[0];
 
     return {
         /**
          * Initialize the connection flow (get a token).
          *
-         * @param {string} connectUrl URL to connect.php
-         * @param {string} sesskey Moodle session key
          * @returns {Promise<Object>} Response with token or error
          */
-        initConnection: async function(connectUrl, sesskey) {
-            return postForm(connectUrl, {action: 'init', sesskey});
+        initConnection: function() {
+            return call('local_mc_plugin_connect_init', {});
         },
 
         /**
          * Poll the MoodleConnect API for connection status.
+         * This calls an external service (not Moodle), so it uses fetch directly.
          *
          * @param {string} apiUrl MoodleConnect API URL
          * @param {string} token Connection token
@@ -57,90 +60,85 @@ define([], function() {
         /**
          * Save credentials to Moodle settings.
          *
-         * @param {string} saveUrl URL to ajax_save.php
-         * @param {string} sesskey Moodle session key
          * @param {string} siteKey The site key
          * @param {string} siteSecret The site secret
          * @returns {Promise<Object>} Response with success status
          */
-        saveCredentials: async function(saveUrl, sesskey, siteKey, siteSecret) {
-            return postForm(saveUrl, {
-                action: 'save',
-                sesskey,
-                siteKey: siteKey,
-                siteSecret: siteSecret,
+        saveCredentials: function(siteKey, siteSecret) {
+            return call('local_mc_plugin_save_settings', {
+                site_key: siteKey,
+                site_secret: siteSecret,
             });
         },
 
         /**
          * Get connection status from the backend.
          *
-         * @param {string} syncUrl URL to sync_schema.php
-         * @param {string} sesskey Moodle session key
          * @returns {Promise<Object>} Status response
          */
-        getConnectionStatus: async function(syncUrl, sesskey) {
-            return postForm(syncUrl, {action: 'status', sesskey});
+        getConnectionStatus: function() {
+            return call('local_mc_plugin_get_connection_status', {});
         },
 
         /**
          * Save settings via AJAX.
          *
-         * @param {string} ajaxSaveUrl URL to ajax_save.php
-         * @param {string} sesskey Moodle session key
          * @param {Object} values Form values to save
          * @returns {Promise<Object>} Response with success status
          */
-        saveSettings: async function(ajaxSaveUrl, sesskey, values) {
-            return postForm(ajaxSaveUrl, {action: 'save', sesskey, ...values});
+        saveSettings: function(values) {
+            const args = {};
+            if (values.siteKey) {
+                args.site_key = values.siteKey;
+            }
+            if (values.siteSecret) {
+                args.site_secret = values.siteSecret;
+            }
+            if (values.monitoredEvents !== undefined) {
+                args.monitored_events = values.monitoredEvents;
+            }
+            if (values.debugMode !== undefined) {
+                args.debug_mode = values.debugMode;
+            }
+            return call('local_mc_plugin_save_settings', args);
         },
 
         /**
          * Sync events to MoodleConnect.
          *
-         * @param {string} syncUrl URL to sync_schema.php
-         * @param {string} sesskey Moodle session key
          * @returns {Promise<Object>} Response with success status and event count
          */
-        syncEvents: async function(syncUrl, sesskey) {
-            return postForm(syncUrl, {action: 'sync', sesskey});
+        syncEvents: function() {
+            return call('local_mc_plugin_sync_events', {});
         },
 
         /**
          * Sync ALL events to MoodleConnect (for initial connection or resync).
          *
-         * @param {string} syncUrl URL to sync_schema.php
-         * @param {string} sesskey Moodle session key
          * @returns {Promise<Object>} Response with success status and event count
          */
-        syncAllEvents: async function(syncUrl, sesskey) {
-            return postForm(syncUrl, {action: 'syncall', sesskey});
+        syncAllEvents: function() {
+            return call('local_mc_plugin_sync_all_events', {});
         },
 
         /**
          * Count active users for bulk sync preflight.
          *
-         * @param {string} syncUrl URL to sync_schema.php
-         * @param {string} sesskey Moodle session key
          * @returns {Promise<Object>} Response with count and monitored status
          */
-        bulkSyncCount: async function(syncUrl, sesskey) {
-            return postForm(syncUrl, {action: 'bulkcount', sesskey});
+        bulkSyncCount: function() {
+            return call('local_mc_plugin_bulk_sync_count', {});
         },
 
         /**
          * Fire user_updated events for a batch of users.
          *
-         * @param {string} syncUrl URL to sync_schema.php
-         * @param {string} sesskey Moodle session key
          * @param {number} offset Start offset
          * @param {number} batchSize Number of users per batch
          * @returns {Promise<Object>} Response with processed count and has_more flag
          */
-        bulkSyncFire: async function(syncUrl, sesskey, offset, batchSize) {
-            return postForm(syncUrl, {
-                action: 'bulkfire',
-                sesskey,
+        bulkSyncFire: function(offset, batchSize) {
+            return call('local_mc_plugin_bulk_sync_fire', {
                 offset: offset,
                 batch_size: batchSize, // eslint-disable-line camelcase
             });

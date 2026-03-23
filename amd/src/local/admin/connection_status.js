@@ -1,3 +1,18 @@
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 /**
  * Connection status module for the admin settings page.
  *
@@ -16,9 +31,6 @@ define([
     'core/str'
 ], function(Selectors, Repository, EventSelector, TemplateHelper, Str) {
     "use strict";
-
-    /** @type {Object} Configuration */
-    let config = {};
 
     /** @type {string} Event selector input ID for refreshing counter */
     let eventInputId = '';
@@ -93,11 +105,11 @@ define([
      */
     const syncAllEventsInBackground = async() => {
         try {
-            const syncResult = await Repository.syncAllEvents(config.syncUrl, config.sesskey);
+            const syncResult = await Repository.syncAllEvents();
 
             if (syncResult.success) {
                 // Refresh connection status to show updated sync count
-                const data = await Repository.getConnectionStatus(config.syncUrl, config.sesskey);
+                const data = await Repository.getConnectionStatus();
                 if (data.connected) {
                     await updateStatus(true, data.site_name, data.synced_event_count || 0, data.synced_events || []);
                 }
@@ -133,7 +145,7 @@ define([
             await TemplateHelper.renderConnectionStatus(statusContent, loadingContext);
 
             try {
-                const data = await Repository.getConnectionStatus(config.syncUrl, config.sesskey);
+                const data = await Repository.getConnectionStatus();
 
                 if (data.connected) {
                     await updateStatus(true, data.site_name, data.synced_event_count || 0, data.synced_events || []);
@@ -191,18 +203,11 @@ define([
             statusContainer = document.querySelector(Selectors.status.container);
 
             if (statusContainer) {
-                // Read config from data attributes
-                config = {
-                    syncUrl: statusContainer.dataset.syncurl || (cfg && cfg.syncUrl) || '',
-                    sesskey: statusContainer.dataset.sesskey || (cfg && cfg.sesskey) || '',
-                };
                 eventInputId = statusContainer.dataset.eventinputid || (cfg && cfg.eventInputId) || '';
 
                 // Find the content area for template rendering
                 statusContent = statusContainer.querySelector(Selectors.status.content);
             } else if (cfg) {
-                // Fallback to passed config (backward compatibility)
-                config = cfg;
                 eventInputId = cfg.eventInputId || '';
             }
 
