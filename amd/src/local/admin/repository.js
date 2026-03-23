@@ -66,8 +66,8 @@ define(['core/ajax'], function(Ajax) {
          */
         saveCredentials: function(siteKey, siteSecret) {
             return call('local_mc_plugin_save_settings', {
-                site_key: siteKey,
-                site_secret: siteSecret,
+                site_key: siteKey, // eslint-disable-line camelcase
+                site_secret: siteSecret, // eslint-disable-line camelcase
             });
         },
 
@@ -89,16 +89,16 @@ define(['core/ajax'], function(Ajax) {
         saveSettings: function(values) {
             const args = {};
             if (values.siteKey) {
-                args.site_key = values.siteKey;
+                args.site_key = values.siteKey; // eslint-disable-line camelcase
             }
             if (values.siteSecret) {
-                args.site_secret = values.siteSecret;
+                args.site_secret = values.siteSecret; // eslint-disable-line camelcase
             }
             if (values.monitoredEvents !== undefined) {
-                args.monitored_events = values.monitoredEvents;
+                args.monitored_events = values.monitoredEvents; // eslint-disable-line camelcase
             }
             if (values.debugMode !== undefined) {
-                args.debug_mode = values.debugMode;
+                args.debug_mode = values.debugMode; // eslint-disable-line camelcase
             }
             return call('local_mc_plugin_save_settings', args);
         },

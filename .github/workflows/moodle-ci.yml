@@ -134,7 +134,6 @@ jobs:
 
       - name: Grunt
         if: ${{ !cancelled() }}
-        continue-on-error: true # Plugin uses custom Gruntfile, Moodle's grunt may not fully apply
         run: moodle-plugin-ci grunt --max-lint-warnings 0
 
       - name: PHPUnit tests
