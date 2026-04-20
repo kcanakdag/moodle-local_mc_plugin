@@ -5,6 +5,15 @@ All notable changes to the MoodleConnect plugin will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.4.2] - 2026-04-20
+
+### Changed
+- Verified compatibility with Moodle 5.2 GA (released 2026-04-20). No code changes required. Audited against the 5.2 deprecation and removal list: no calls to removed functions (`cron_*`, `get_context_instance`, `get_system_context`, `print_arrow`, etc.), no use of removed `core/modal_factory` / `core/modal_registry` JS modules, no `relateduserid` inside event `other[]` arrays, no implicit-nullable PHP 8.4 parameter patterns. All external service classes already use the `\core_external\*` namespace.
+- Bumped `$plugin->version` to `2026042000` and `$plugin->release` to `v5.4.2`. `$plugin->supported` remains `[400, 502]`.
+
+### Notes
+- TODO markers added for optional post-5.2 modernization: migrate AMD modules to ES modules, convert remaining Promise chains to async/await, and replace `@file_put_contents` debug logging with `debugging()` / `mtrace()`.
+
 ## [5.4.0] - 2026-03-23
 
 ### Changed

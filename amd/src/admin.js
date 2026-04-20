@@ -22,6 +22,9 @@
  * @copyright  2025 Kerem Can Akdag
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+// TODO(5.2-modernization): Migrate every module under amd/src/ from classic AMD
+// (define([...], function(){...})) to ES modules (import/export default). Moodle 5.x
+// still transpiles ESM to AMD via Babel, but ESM is the preferred authoring style.
 define([
     'local_mc_plugin/local/admin/event_selector',
     'local_mc_plugin/local/admin/connection_status',

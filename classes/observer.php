@@ -216,6 +216,9 @@ class observer {
     public static function handle_event(\core\event\base $event) {
         global $CFG;
 
+        // TODO(5.2-modernization): Replace the three @file_put_contents debug-log writes
+        // in this method with debugging() / mtrace() so logging goes through Moodle's
+        // standard channels instead of a suppressed direct write to $CFG->dataroot.
         // Check if events are blocked due to limit exceeded.
         if (self::is_events_blocked()) {
             // Log blocked event in debug mode.

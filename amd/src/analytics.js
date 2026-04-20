@@ -46,6 +46,9 @@ define(['core/ajax', 'core/notification'], function(Ajax, Notification) {
             content.style.pointerEvents = 'none';
         }
 
+        // TODO(5.2-modernization): Convert this Promise chain to async/await to match
+        // the rest of the AMD modules (connect.js, bulk_sync.js, etc.) and align with
+        // Moodle 5.x's preferred JS style.
         Ajax.call([{
             methodname: 'local_mc_plugin_get_analytics',
             args: {days: days, category: category}
