@@ -25,8 +25,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_mc_plugin';
-$plugin->version   = 2026042000;      // Verified compatible with Moodle 5.2 GA (2026-04-20).
+$plugin->version   = 2026042001;      // Moodle marketplace release (2026-07-20). Verified compatible with Moodle 5.2 GA.
 $plugin->requires  = 2022041900;      // Moodle 4.0+.
 $plugin->supported = [400, 502];      // Moodle 4.0 to 5.2.
 $plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = 'v5.4.2';
+$plugin->release   = 'v5.4.3';
